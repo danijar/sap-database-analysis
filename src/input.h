@@ -21,5 +21,6 @@ private:
 	size_t Id(std::string name);
 	void Ratio(size_t From, size_t To, float Weight);
 	std::vector<row> Query(std::string Dsn, std::string User, std::string Password, bool Output = false);
+	void Graph(std::vector<row> &Rows, bool Output = false);
 	size_t Size();
 };
