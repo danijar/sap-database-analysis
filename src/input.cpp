@@ -1,48 +1,18 @@
 #include "input.h"
-***REMOVED***
 #include <iostream>
-#include <chrono>
-***REMOVED***
+#include "bar.h"
 using namespace std;
-using namespace std::chrono;
 ***REMOVED***
 ***REMOVED***
 // Constructor
 Input::Input(string Dsn, string User, string Password, bool Output)
 {
-	// Measure execution time
-	high_resolution_clock::time_point start;
-	if (Output)
-		start = high_resolution_clock::now();
-***REMOVED***
 	// Query rows from database
 	auto rows = Query(Dsn, User, Password, Output);
-***REMOVED***
-	// Build ratio graph
-	size_t counter = 0;
-	for (auto i = rows.begin(); i != rows.end(); ++i) {
-		// Create nodes
-		size_t parent = Id(i->parent);
-		size_t child = Id(i->child);
-***REMOVED***
-		// Create edges
-		Ratio(parent, child, i->parentratio);
-		Ratio(child, parent, i->childratio);
-***REMOVED***
-		// Output
-		counter++;
-		if (Output && counter % 10000 == 0)
-			cout << ".";
-	}
+	Graph(rows, Output);
 ***REMOVED***
 	// Output
 	if (Output) {
-		// End line
-		cout << endl;
-***REMOVED***
-		// Calculate execution time
-		long long time = duration_cast<chrono::milliseconds>(high_resolution_clock::now() - start).count();
-***REMOVED***
 		// Count connections
 		size_t connections = 0;
 		for (auto i = ratios.begin(); i != ratios.end(); ++i)
@@ -51,9 +21,8 @@ Input::Input(string Dsn, string User, string Password, bool Output)
 		// Print message
 		cout << "Loaded "
 				<< ids.size() << " tables and "
-				<< connections << " connections of "
-				<< 0.001 * (1000 * Size() / 1024 / 1024) << "mb of memory in "
-				<< 0.001 * time << "s."
+				<< connections << " connections stored in "
+				<< 0.001 * (1000 * Size() / 1024 / 1024) << " megabytes of memory."
 				<< endl;
 	}
 }
@@ -100,23 +69,30 @@ vector<Input::row> Input::Query(string Dsn, string User, string Password, bool O
 		string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
 		db.rlogon(connect.c_str());
 ***REMOVED***
+		// Count number of rows in result
+		int count;
+		otl_stream countquery;
+		countquery.open(50, "SELECT COUNT(*) FROM ABAP.RESULT", db);
+		countquery >> count;
+***REMOVED***
 		// Select whole results table
-		otl_stream select(50, "SELECT parent, child, parent_ratio, child_ratio FROM ABAP.RESULT", db);
+		otl_stream query(50, "SELECT parent, child, parent_ratio, child_ratio FROM ABAP.RESULT", db);
 ***REMOVED***
 		// Read input data into array
-		while (!select.eof()) {
+		Bar bar("Query rows", count);
+		while (!query.eof()) {
 			row current;
-			select >> current.parent >> current.child >> current.parentratio >> current.childratio;
+			query >> current.parent >> current.child >> current.parentratio >> current.childratio;
 			rows.push_back(current);
 ***REMOVED***
 			// Output
 			if (Output && rows.size() % 10000 == 0)
-				cout << ".";
+				bar.Increment(10000);
 		}
 ***REMOVED***
 		// Output end line
 		if (Output)
-			cout << endl;
+			bar.Finish();
 	}
 	catch (otl_exception& e) {
 		// Print database errors
@@ -130,6 +106,32 @@ vector<Input::row> Input::Query(string Dsn, string User, string Password, bool O
 	db.logoff();
 ***REMOVED***
 	return rows;
+}
+***REMOVED***
+// Build ratio graph
+void Input::Graph(vector<row> &Rows, bool Output)
+{
+	// Create graph from query rows
+	size_t counter = 0;
+	Bar bar("Unpack data", Rows.size());
+	for (auto i = Rows.begin(); i != Rows.end(); ++i) {
+		// Create nodes
+		size_t parent = Id(i->parent);
+		size_t child = Id(i->child);
+***REMOVED***
+		// Create edges
+		Ratio(parent, child, i->parentratio);
+		Ratio(child, parent, i->childratio);
+***REMOVED***
+		// Output
+		counter++;
+		if (Output && counter % 10000 == 0)
+			bar.Increment(10000);
+	}
+***REMOVED***
+	// Output line end
+	if (Output)
+		bar.Finish();
 }
 ***REMOVED***
 // Calculate memory size in bytes
