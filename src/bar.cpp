@@ -4,6 +4,7 @@ using namespace std;
 using namespace std::chrono;
 ***REMOVED***
 ***REMOVED***
+// Constructor
 Bar::Bar(string Label, size_t Max, size_t Width) : label(Label), max(Max), width(Width), current(0), active(true)
 {
 	// Validate parameters
@@ -17,6 +18,7 @@ Bar::Bar(string Label, size_t Max, size_t Width) : label(Label), max(Max), width
 	Draw();
 }
 ***REMOVED***
+// Increment progress state
 bool Bar::Increment(int Step)
 {
 	// If in progress increment state
@@ -35,11 +37,13 @@ bool Bar::Increment(int Step)
 	return active;
 }
 ***REMOVED***
+// Get current state
 size_t Bar::Current()
 {
 	return current;
 }
 ***REMOVED***
+// Redraw and add final line break
 void Bar::Finish(bool Success)
 {
 	// Calculate execution time
