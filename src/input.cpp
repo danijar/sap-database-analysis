@@ -1,8 +1,10 @@
 #include "input.h"
 #include <iostream>
+#define OTL_ODBC
+#define OTL_STL
+#include "otlv4.h"
 #include "bar.h"
 #include "serialize.h"
-***REMOVED***
 using namespace std;
 ***REMOVED***
 ***REMOVED***
