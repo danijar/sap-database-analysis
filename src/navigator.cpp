@@ -1,5 +1,6 @@
 #include "navigator.h"
 #include <iostream>
+#include "queries.h"
 using namespace std;
 ***REMOVED***
 // Constructor
@@ -24,6 +25,16 @@ Navigator::Navigator(Input &Input, unordered_set<size_t> &Heads) : input(Input),
 		// Root level
 		else if (name == "/") {
 			path.clear();
+		}
+***REMOVED***
+		// List scheme
+		else if (name == "ls") {
+			if (path.size()) {
+				vector<string> fields = Queries::Schema(input.names[path.back()]);
+				for (auto i : fields)
+					cout << i << " ";
+				cout << endl;
+			}
 		}
 ***REMOVED***
 		// Specified table

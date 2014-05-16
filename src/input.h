@@ -1,12 +1,7 @@
 #pragma once
-***REMOVED***
 #include <string>
 #include <vector>
 #include <unordered_map>
-***REMOVED***
-#define OTL_ODBC
-#define OTL_STL
-#include "otlv4.h"
 ***REMOVED***
 ***REMOVED***
 /*
