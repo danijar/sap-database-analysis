@@ -1,7 +1,7 @@
 #include "input.h"
-***REMOVED***
 #include <iostream>
-***REMOVED***
+#include <unordered_set>
+#include "navigator.h"
 using namespace std;
 ***REMOVED***
 int main()
@@ -16,22 +16,24 @@ int main()
 			input.Save();
 	}
 ***REMOVED***
-	// Show small set of input data
-	size_t tables = input.ids.size();
-	for (size_t i = 1000; i < min(tables, 1010); ++i) {
-		for (size_t j = 0; j < min(tables, 10); ++j) {
-			cout << input.names[i] << " " << input.names[j];
-			if (input.ratios[i].find(j) != input.ratios[i].end())
-				cout << " " << input.ratios[i][j];
-			if (input.ratios[j].find(i) != input.ratios[j].end())
-				cout << " " << input.ratios[i][j];
-			cout << endl;
-		}
-		cout << endl;
-	}
+	// Initialize set with all parents
+	unordered_set<size_t> heads;
+	heads.reserve(input.ratios.size());
+	for (auto i = input.ratios.begin(); i != input.ratios.end(); ++i)
+		heads.insert(i->first);
+	cout << "Filled with " << input.ratios.size() << " ids." << endl;
 ***REMOVED***
-	// Find superparents
-	// ...
+	// Remove tables that have parents
+	for (auto i = input.ratios.begin(); i != input.ratios.end(); ++i) {
+		for (auto j = i->second.begin(); j != i->second.end(); ++j) {
+			auto k = heads.find(j->first);
+			if (k != heads.end())
+				heads.erase(k);
+		}
+	}
+	
+	// Navigate through hierarchie
+	Navigator navigator(input, heads);
 ***REMOVED***
 	// Hold console open
 	cin.get();

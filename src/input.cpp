@@ -218,7 +218,9 @@ void Input::Graph(vector<row> &Rows, bool Output)
 ***REMOVED***
 		// Create edges
 		Ratio(parent, child, i->parentratio);
-		Ratio(child, parent, i->childratio);
+		
+		// For now, ignore child ratio completely
+		// Ratio(child, parent, i->childratio);
 ***REMOVED***
 		// Output
 		counter++;
