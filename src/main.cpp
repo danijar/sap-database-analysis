@@ -6,7 +6,7 @@ using namespace std;
 ***REMOVED***
 int main()
 {
-	// Load and cache input data
+	// Load input data from database or dump
 	Input input;
 	if (input.Saved())
 		input.Load();
@@ -36,5 +36,6 @@ int main()
 	Navigator navigator(input, heads);
 ***REMOVED***
 	// Hold console open
+	cin.get();
 	cin.get();
 }
