@@ -65,7 +65,7 @@ Deserialize::~Deserialize()
 }
 ***REMOVED***
 ***REMOVED***
-size_t Deserialize::GetSizeT()
+Deserialize &Deserialize::operator>>(size_t &Value)
 {
 	const size_t length = sizeof(size_t);
 ***REMOVED***
@@ -74,12 +74,12 @@ size_t Deserialize::GetSizeT()
 	stream.read(data, length);
 ***REMOVED***
 	// Convert type
-	size_t result;
-	memcpy(&result, data, length);
-	return result;
+	memcpy(&Value, data, length);
+***REMOVED***
+	return *this;
 }
 ***REMOVED***
-float Deserialize::GetFloat()
+Deserialize &Deserialize::operator>>(float &Value)
 {
 	const size_t length = sizeof(float);
 ***REMOVED***
@@ -88,23 +88,25 @@ float Deserialize::GetFloat()
 	stream.read(data, length);
 ***REMOVED***
 	// Convert type
-	float result;
-	memcpy(&result, data, length);
-	return result;
+	memcpy(&Value, data, length);
+***REMOVED***
+	return *this;
 }
 ***REMOVED***
-std::string Deserialize::GetString()
+Deserialize &Deserialize::operator>>(string &Value)
 {
 	// String length is stored before characters
-	size_t length = GetSizeT();
+	size_t length;
+	*this >> length;
 ***REMOVED***
 	// Read from stream
-	char *value = new char[length + 1];
-	stream.read(value, length);
-	value[length] = '\0';
+	char *data = new char[length + 1];
+	stream.read(data, length);
+	data[length] = '\0';
 ***REMOVED***
 	// Convert type
-	string result(value);
-	delete[] value;
-	return result;
+	Value = string(data);
+	delete[] data;
+***REMOVED***
+	return *this;
 }

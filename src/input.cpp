@@ -41,33 +41,34 @@ bool Input::Load(std::string Path)
 	
 	Deserialize in(Path);
 	size_t size;
+	size_t id;
+	string name;
 	
 	// Ids
-	size = in.GetSizeT();
+	in >> size;
 	for (size_t i = 0; i < size; ++i) {
-		string name = in.GetString();
-		size_t id = in.GetSizeT();
+		in >> name >> id;
 		ids.insert(make_pair(name, id));
 	}
 ***REMOVED***
 	// Names
-	size = in.GetSizeT();
+	in >> size;
 	for (size_t i = 0; i < size; ++i) {
-		size_t id = in.GetSizeT();
-		string name = in.GetString();
+		in >> id >> name;
 		names.insert(make_pair(id, name));
 	}
 ***REMOVED***
 	// Ratios
-	size = in.GetSizeT();
+	in >> size;
 	for (size_t i = 0; i < size; ++i) {
-		size_t key = in.GetSizeT();
-		size_t length = in.GetSizeT();
+		size_t key, length;
+		in >> key >> length;
 ***REMOVED***
 		unordered_map<size_t, float> value;
+		float weight;
 		for (size_t j = 0; j < length; ++j) {
-			size_t id = in.GetSizeT();
-			float weight = in.GetFloat();
+			in >> id;
+			in >> weight;
 			value.insert(make_pair(id, weight));
 		}
 ***REMOVED***

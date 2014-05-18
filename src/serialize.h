@@ -20,9 +20,9 @@ class Deserialize {
 public:
 	Deserialize(std::string Path);
 	~Deserialize();
-	size_t GetSizeT();
-	float GetFloat();
-	std::string GetString();
+	Deserialize &operator>>(size_t &Value);
+	Deserialize &operator>>(float &Value);
+	Deserialize &operator>>(std::string &Value);
 private:
 	std::ifstream stream;
 };
