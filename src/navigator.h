@@ -19,6 +19,6 @@ private:
 	size_t Children(size_t Id);
 	struct Child{ std::string Name; float Ratio; size_t Children; };
 	void Table(std::string Parent, std::vector<Child> &Children, size_t Limit = 16);
-	void Diff(std::string TableA, std::string TableB);
+	void Difference(std::string Left, std::string Right);
 	void Clear();
 };
