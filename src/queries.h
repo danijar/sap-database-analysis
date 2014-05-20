@@ -5,5 +5,5 @@
 #include <unordered_set>
 ***REMOVED***
 namespace Queries {
-	std::unordered_set<std::string> Schema(std::string Table);
+	std::unordered_set<std::string> Scheme(std::string Table);
 }

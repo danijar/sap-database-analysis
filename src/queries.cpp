@@ -6,7 +6,7 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 namespace Queries {
-	unordered_set<string> Schema(string Table)
+	unordered_set<string> Scheme(string Table)
 	{
 		unordered_set<string> fields;
 ***REMOVED***
