@@ -39,7 +39,7 @@ Navigator::Navigator(Input &Input, unordered_set<size_t> &Heads) : input(Input),
 		// List scheme
 		else if (command == "scheme") {
 			if (path.size()) {
-				vector<string> fields = Queries::Schema(input.names[path.back()]);
+				unordered_set<string> fields = Queries::Schema(input.names[path.back()]);
 				for (auto i : fields)
 					cout << i << " ";
 				cout << endl;
@@ -51,7 +51,19 @@ Navigator::Navigator(Input &Input, unordered_set<size_t> &Heads) : input(Input),
 		// List whole list of children
 		else if (command == "more") {
 			Clear();
-			List(0);
+			//Read the limit from command line
+			cout << "Limit?\n>";
+			string limit; 
+			cin >> limit;
+			List( atoi(limit.c_str()) );
+		}
+***REMOVED***
+		// List a diff of two tables
+		else if (command == "diff"){
+			cout << "Tables?\n>";
+			string table_a, table_b;
+			cin >> table_a >> table_b;
+			Diff(table_a, table_b);
 		}
 ***REMOVED***
 		// Exit navigator
@@ -67,6 +79,7 @@ Navigator::Navigator(Input &Input, unordered_set<size_t> &Heads) : input(Input),
 			cout << "root"   << "\t" << "Go to the root level that lists all table heads." << endl;
 			cout << "scheme" << "\t" << "List column scheme of the current table. Needs connection to database." << endl;
 			cout << "more"   << "\t" << "List all children of the current table." << endl;
+			cout << "diff"	 << "\t" << "Show changes between two tables";
 			cout << "exit"   << "\t" << "Exit the navigator. Synonyms: quit." << endl;
 		}
 ***REMOVED***
@@ -111,7 +124,7 @@ bool Navigator::Up()
 }
 ***REMOVED***
 // List children of current table
-void Navigator::List(size_t Limit)
+void Navigator::List(size_t Limit, bool Reverse)
 {
 	string parent;
 	vector<Child> children;
@@ -128,7 +141,10 @@ void Navigator::List(size_t Limit)
 		}
 ***REMOVED***
 		// Sort by number of children
-		sort(children.begin(), children.end(), [](const Child &A, const Child &B) { return A.Children > B.Children; });
+		if (Reverse)
+			sort(children.begin(), children.end(), [](const Child &A, const Child &B) { return A.Children < B.Children; });
+		else	
+			sort(children.begin(), children.end(), [](const Child &A, const Child &B) { return A.Children > B.Children; });
 	}
 ***REMOVED***
 	// For tables list their children
@@ -146,7 +162,10 @@ void Navigator::List(size_t Limit)
 		}
 ***REMOVED***
 		// Sort by ratio to parent
-		sort(children.begin(), children.end(), [](const Child &A, const Child &B) { return A.Ratio > B.Ratio; });
+		if (Limit >= 0)
+			sort(children.begin(), children.end(), [](const Child &A, const Child &B) { return A.Ratio > B.Ratio; });
+		else
+			sort(children.begin(), children.end(), [](const Child &A, const Child &B) { return A.Ratio < B.Ratio; });
 	}
 ***REMOVED***
 	// Print children
@@ -248,9 +267,9 @@ void Navigator::Table(string Parent, vector<Child> &Children, size_t Limit)
 ***REMOVED***
 		// Print current row
 		Child child = Children[i];
-		if (child.Ratio > 0)
+		if (child.Ratio > 0) {
 			cout << setw(width_ratio) << right << setprecision(2) << fixed << child.Ratio << " ";
-		else {
+		} else {
 			for (int j = 0; j < width_ratio - 1; ++j)
 				cout << " ";
 			cout << "- ";
@@ -259,12 +278,81 @@ void Navigator::Table(string Parent, vector<Child> &Children, size_t Limit)
 		cout << setw(width_name) << left << child.Name << " ";
 		cout << endl;
 	}
+	
 ***REMOVED***
 	// Print continuation indicator
 	cout << "..." << endl;
 ***REMOVED***
 	// Reset formatting options
 	cout.flags(format);
+}
+***REMOVED***
+// Show a diff between two tables
+***REMOVED***
+void Navigator::Diff(string TableA, string TableB){
+	Clear();
+***REMOVED***
+	// Find nodes for diff to
+	auto tableAId = input.ids.find(TableA);
+	auto tableBId = input.ids.find(TableB);
+***REMOVED***
+	// If tables weren't found
+	if (tableAId == input.ids.end() || tableBId == input.ids.end()) {
+		cout << "Error:\tOne or both of the tables were not found" << endl;
+		return;
+	}
+	// Get vector from first table as in missing
+	unordered_set<string> parent_set = Queries::Schema(input.names[tableAId->second]); 
+	
+	// Get the new vector as new 
+	unordered_set<string> child_set = Queries::Schema(input.names[tableBId->second]);
+	if (parent_set.empty() || child_set.empty()) {
+		cout << "Error:\tCould not retrieve elements from DD03L" << endl;
+		return;
+	}
+	cout << "Changes from " << TableA << " to " << TableB <<  ":" << endl;
+	
+	vector<string> parent_vector;
+	vector<string> child_vector;
+	vector<string> common_vector;
+	
+	for each (auto field in parent_set)	{
+		// If field is in both push it to common
+		if (child_set.find(field) != child_set.end()){
+			common_vector.push_back(field);
+			child_set.erase(field);
+		} else {
+			parent_vector.push_back(field);
+		}
+	}
+	// Now in child set are only the new fields left
+	for each (auto field in child_set) {
+		child_vector.push_back(field);
+	}
+***REMOVED***
+	int width_common, width_parent, width_child;
+	width_common = width_parent = width_child = 20;
+***REMOVED***
+	// Print the header
+	cout << setw(width_common) << left << "Common" << " ";
+	cout << setw(width_parent) << left << "Missing" << " ";
+	cout << setw(width_child) << left << "New" << " " << endl;
+***REMOVED***
+	for (size_t i = 0; i < width_common; i++)
+		cout << "-";
+	cout << " ";
+	for (size_t i = 0; i < width_parent; i++)
+		cout << "-";
+	cout << " ";
+	for (size_t i = 0; i < width_child; i++)
+		cout << "-";
+	cout << " " << endl;
+***REMOVED***
+	for (size_t i = 0; i < common_vector.size() || i < child_vector.size() || i < parent_vector.size(); i++) {
+		cout << setw(width_common) << right << ((i < common_vector.size()) ? common_vector[i] : " ") << " ";
+		cout << setw(width_parent) << right << ((i < parent_vector.size()) ? parent_vector[i] : " ") << " ";
+		cout << setw(width_child) << right << ((i < child_vector.size()) ? child_vector[i] : " ") << " " << endl;
+	}
 }
 ***REMOVED***
 // Clear console window on multiple platforms
