@@ -1,7 +1,14 @@
-# Visual Studio
+# Build files
 /Debug
 /Release
 /x64
+***REMOVED***
+# Project files
+*.sdf
+*.sln
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
 ***REMOVED***
 # Binaries
 *.dump
