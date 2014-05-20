@@ -5,10 +5,12 @@
 ***REMOVED***
 # Project files
 *.sdf
+*.opensdf
 *.sln
 *.vcxproj
 *.vcxproj.user
 *.vcxproj.filters
+*.v12.suo
 ***REMOVED***
 # Binaries
 *.dump
