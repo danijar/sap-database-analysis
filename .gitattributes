@@ -1,9 +1,2 @@
-# use unix line endings by default
+# Unix line endings
 * text eol=lf
-***REMOVED***
-# windows only files
-*.sdf eol=crlf
-*.sln eol=crlf
-*.vcxproj eol=crlf
-*.vcxproj.user eol=crlf
-*.vcxproj.filters eol=crlf
