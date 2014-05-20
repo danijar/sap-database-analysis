@@ -2,7 +2,8 @@
 ***REMOVED***
 #include <vector>
 #include <string>
+#include <unordered_set>
 ***REMOVED***
 namespace Queries {
-	std::vector<std::string> Schema(std::string Table);
+	std::unordered_set<std::string> Schema(std::string Table);
 }

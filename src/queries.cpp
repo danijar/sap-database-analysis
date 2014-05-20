@@ -6,9 +6,9 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 namespace Queries {
-	vector<string> Schema(string Table)
+	unordered_set<string> Schema(string Table)
 	{
-		vector<string> fields;
+		unordered_set<string> fields;
 ***REMOVED***
 		// Initialize database driver
 		otl_connect db;
@@ -27,7 +27,7 @@ namespace Queries {
 			while (!query.eof()) {
 				string field;
 				query >> field;
-				fields.push_back(field);
+				fields.insert(field);
 			}
 		}
 		catch (otl_exception& e) {
