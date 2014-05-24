@@ -4,6 +4,7 @@
 #include "navigator.h"
 using namespace std;
 ***REMOVED***
+***REMOVED***
 int main()
 {
 	// Load input data from database or dump

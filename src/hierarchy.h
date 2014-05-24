@@ -6,6 +6,9 @@
 #include "input.h"
 ***REMOVED***
 ***REMOVED***
+/*
+ * Finds a best matching tree hierarchy from input data.
+ */
 class Hierarchy {
 public:
 	Hierarchy(Input &Input);
