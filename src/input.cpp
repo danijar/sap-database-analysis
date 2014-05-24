@@ -12,8 +12,8 @@ using namespace std;
 void Input::Fetch(string Dsn, string User, string Password, bool Output)
 {
 	// Query rows from database
-	auto rows = Query(Dsn, User, Password, Output);
-	Graph(rows, Output);
+	auto rows = Query(Dsn, User, Password);
+	Graph(rows);
 ***REMOVED***
 	// Output
 	if (Output) {
@@ -24,10 +24,10 @@ void Input::Fetch(string Dsn, string User, string Password, bool Output)
 ***REMOVED***
 		// Print message
 		cout << "Loaded "
-			<< ids.size() << " tables and "
-			<< connections << " connections stored in "
-			<< 0.001 * (1000 * Size() / 1024 / 1024) << " megabytes of memory."
-			<< endl;
+			 << ids.size() << " tables and "
+			 << connections << " connections stored in "
+			 << 0.001 * (1000 * Size() / 1024 / 1024) << " megabytes of memory."
+			 << endl;
 	}
 }
 ***REMOVED***
@@ -118,9 +118,9 @@ bool Input::Saved(string Path)
 size_t Input::Id(string name)
 {
 	// Add if not already in map
-	auto parentiterator = ids.find(name);
-	if (parentiterator == ids.end()) {
-		size_t id = ids.size();
+	auto i = ids.find(name);
+	if (i == ids.end()) {
+		size_t id = ids.size() + 1;
 		ids[name] = id;
 		names[id] = name;
 		return id;
@@ -128,23 +128,11 @@ size_t Input::Id(string name)
 ***REMOVED***
 	// Otherwise return existing
 	else
-		return parentiterator->second;
-}
-***REMOVED***
-// Set ratios between two tables
-void Input::Ratio(size_t From, size_t To, float Weight)
-{
-	// Create new start node if not existing
-	auto i = ratios.find(From);
-	if (i == ratios.end())
-		ratios[From] = unordered_map<size_t, float>();
-***REMOVED***
-	// Set weight
-	ratios[From][To] = Weight;
+		return i->second;
 }
 ***REMOVED***
 // Load input data from database into memory
-vector<Input::row> Input::Query(string Dsn, string User, string Password, bool Output)
+vector<Input::row> Input::Query(string Dsn, string User, string Password)
 {
 	vector<row> rows;
 ***REMOVED***
@@ -178,15 +166,9 @@ vector<Input::row> Input::Query(string Dsn, string User, string Password, bool O
 			row current;
 			query >> current.parent >> current.child >> current.parentratio >> current.childratio;
 			rows.push_back(current);
-***REMOVED***
-			// Output
-			if (Output && rows.size() % 10000 == 0)
-				bar.Increment(10000);
+			bar.Increment();
 		}
-***REMOVED***
-		// Output end line
-		if (Output)
-			bar.Finish();
+		bar.Finish();
 	}
 	catch (otl_exception& e) {
 		// Print database errors
@@ -203,7 +185,7 @@ vector<Input::row> Input::Query(string Dsn, string User, string Password, bool O
 }
 ***REMOVED***
 // Build ratio graph
-void Input::Graph(vector<row> &Rows, bool Output)
+void Input::Graph(vector<row> &Rows)
 {
 	// Skip if empty
 	if (!Rows.size()) {
@@ -212,7 +194,6 @@ void Input::Graph(vector<row> &Rows, bool Output)
 	}
 ***REMOVED***
 	// Create graph from query rows
-	size_t counter = 0;
 	Bar bar("Unpack data", Rows.size());
 	for (auto i = Rows.begin(); i != Rows.end(); ++i) {
 		// Create nodes
@@ -220,20 +201,14 @@ void Input::Graph(vector<row> &Rows, bool Output)
 		size_t child = Id(i->child);
 ***REMOVED***
 		// Create edges
-		Ratio(parent, child, i->parentratio);
+		ratios[parent][child] = i->parentratio;
 		
 		// For now, ignore child ratio completely
 		// Ratio(child, parent, i->childratio);
 ***REMOVED***
-		// Output
-		counter++;
-		if (Output && counter % 10000 == 0)
-			bar.Increment(10000);
+		bar.Increment();
 	}
-***REMOVED***
-	// Output line end
-	if (Output)
-		bar.Finish();
+	bar.Finish();
 }
 ***REMOVED***
 // Calculate memory size in bytes

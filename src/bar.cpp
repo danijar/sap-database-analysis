@@ -1,11 +1,12 @@
 #include "bar.h"
 #include <iostream>
+#include <iomanip>
 using namespace std;
 using namespace std::chrono;
 ***REMOVED***
 ***REMOVED***
 // Constructor
-Bar::Bar(string Label, size_t Max, size_t Width) : label(Label), max(Max), width(Width), current(0), active(true)
+Bar::Bar(string Label, size_t Max, size_t Width) : label(Label), max(Max), width(Width), current(0), redrawed(0), active(true)
 {
 	// Validate parameters
 	if (Max < 1)
@@ -22,11 +23,16 @@ Bar::Bar(string Label, size_t Max, size_t Width) : label(Label), max(Max), width
 bool Bar::Increment(int Step)
 {
 	// If in progress increment state
-	if (current < max) {
+	if (current < max && active) {
 		current += Step;
 		if (current > max)
 			current = max;
-		Draw();
+***REMOVED***
+		// Draw if necessary
+		if (current - redrawed > max / width - 1) {
+			redrawed = current;
+			Draw();
+		}
 	}
 	// Else finish up
 	else {
@@ -59,11 +65,10 @@ void Bar::Finish(bool Success)
 ***REMOVED***
 	// Redraw and add final line break
 	Draw();
+	auto format = cout.flags();
 	cout << " ";
-	if (elapsed < 1000) cout << " ";
-	if (elapsed <  100) cout << " ";
-	if (elapsed <   10) cout << " ";
-	cout << elapsed << "s" << endl;
+	cout << setw(7) << setprecision(1) << fixed << elapsed << "s" << endl;
+	cout.flags(format);
 ***REMOVED***
 	// Disable bar
 	active = false;
@@ -86,8 +91,9 @@ void Bar::Draw()
 	if (label.length())
 		cout << label << " ";
 	size_t padding = 62 - width;
-	for (size_t i = 0; i < padding - label.length(); ++i)
-		cout << " ";
+	if (padding > label.length())
+		for (size_t i = 0; i < padding - label.length(); ++i)
+			cout << " ";
 ***REMOVED***
 	// Draw progress bar
 	cout << (percent < 100 ? percent < 10 ? "  " : " " : "") << percent << "% ";

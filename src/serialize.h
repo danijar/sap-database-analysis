@@ -4,6 +4,9 @@
 #include <fstream>
 ***REMOVED***
 ***REMOVED***
+/*
+ * Stream to serialize values to disk.
+ */
 class Serialize {
 public:
 	Serialize(std::string Path);
@@ -16,6 +19,9 @@ private:
 };
 ***REMOVED***
 ***REMOVED***
+/*
+ * Stream to deserialize values from disk.
+ */
 class Deserialize {
 public:
 	Deserialize(std::string Path);

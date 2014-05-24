@@ -2,18 +2,21 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
-#include "input.h"
+#include "hierarchy.h"
 ***REMOVED***
 ***REMOVED***
+/*
+ * Console based navigation through our result set. Currently,
+ * it operated just on the input data rather than the hierarchy.
+ */
 class Navigator {
 public:
-	Navigator(Input &Input, std::unordered_set<size_t> &Heads);
+	Navigator(Hierarchy &Hierarchy);
 	bool Go(std::string Name);
 	bool Up();
 	void List(size_t Limit = 16, bool Reverse = false);
 private:
-	Input &input;
-	std::unordered_set<size_t> &heads;
+	Hierarchy &hierarchy;
 	std::vector<size_t> path;
 	float Ratio(size_t From, size_t To);
 	size_t Children(size_t Id);
