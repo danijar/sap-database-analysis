@@ -4,7 +4,9 @@
 #include <iomanip>
 #include <cstdlib>
 #include "queries.h"
+#include "charts.h"
 using namespace std;
+***REMOVED***
 ***REMOVED***
 // Constructor
 Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
@@ -76,6 +78,16 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 			return;
 		}
 ***REMOVED***
+		// Draw histogram of children and their number of occurrence.
+		else if (command == "histo") {
+			size_t id = path.size() ? path.back() : 0;
+			vector<size_t> data;
+			data.reserve(hierarchy.children[id].size());
+			for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i)
+				data.push_back(hierarchy.children[*i].size());
+			Charts::Histogram(data);
+		}
+***REMOVED***
 		// Show available commands
 		else if (command == "help") {
 			cout << "To navigate to a table, enter its name." << endl;
@@ -83,7 +95,8 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 			cout << "root"   << "\t" << "Go to the root level that lists all table heads." << endl;
 			cout << "scheme" << "\t" << "List column scheme of the current table. Needs connection to database." << endl;
 			cout << "more"   << "\t" << "List all children of the current table." << endl;
-			cout << "diff"	 << "\t" << "Show changes between two tables.";
+			cout << "diff"	 << "\t" << "Show changes between two tables." << endl;
+			cout << "histo"  << "\t" << "Draw histogram of children and their number of occurrence." << endl;
 			cout << "exit"   << "\t" << "Exit the navigator. Synonyms: quit." << endl;
 		}
 ***REMOVED***
@@ -208,7 +221,7 @@ void Navigator::Table(string Parent, vector<Child> &Children, size_t Limit)
 	}
 ***REMOVED***
 	// Show number of rows
-	cout << "Found " << Children.size() << (Children.size() > 1 ? " tables." : " table.") << endl << endl;
+	cout << "Found " << Children.size() << (Children.size() > 1 ? " children." : " child.") << endl << endl;
 ***REMOVED***
 	// Find column widths
 	size_t width_name = 0, width_children = 0, width_ratio = 4;

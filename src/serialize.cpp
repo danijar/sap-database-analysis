@@ -1,5 +1,4 @@
 #include "serialize.h"
-***REMOVED***
 using namespace std;
 ***REMOVED***
 ***REMOVED***
