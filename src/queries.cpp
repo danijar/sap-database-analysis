@@ -6,6 +6,7 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 namespace Queries {
+	// Get fields of a table from DDO3L
 	unordered_set<string> Scheme(string Table)
 	{
 		unordered_set<string> fields;

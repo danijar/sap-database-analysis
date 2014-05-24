@@ -20,8 +20,7 @@ public:
 private:
 	struct row { std::string parent, child; float parentratio, childratio; };
 	size_t Id(std::string name);
-	void Ratio(size_t From, size_t To, float Weight);
-	std::vector<row> Query(std::string Dsn, std::string User, std::string Password, bool Output = false);
-	void Graph(std::vector<row> &Rows, bool Output = false);
+	std::vector<row> Query(std::string Dsn, std::string User, std::string Password);
+	void Graph(std::vector<row> &Rows);
 	size_t Size();
 };

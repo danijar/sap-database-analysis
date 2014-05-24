@@ -7,20 +7,20 @@
 using namespace std;
 ***REMOVED***
 // Constructor
-Navigator::Navigator(Input &Input, unordered_set<size_t> &Heads) : input(Input), heads(Heads)
+Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 {
 	Clear();
 	List();
 ***REMOVED***
 	for (;;) {
-		// Read user input
+		// Read user hierarchy
 		cout << endl << "> ";
 		string command;
 		cin >> command;
 		cout << endl;
 ***REMOVED***
 		// One table up
-		if (command == "up") {
+		if (command == "back") {
 			if (Up()) {
 				Clear();
 				List();
@@ -39,7 +39,7 @@ Navigator::Navigator(Input &Input, unordered_set<size_t> &Heads) : input(Input),
 		// List scheme
 		else if (command == "scheme") {
 			if (path.size()) {
-				unordered_set<string> fields = Queries::Scheme(input.names[path.back()]);
+				unordered_set<string> fields = Queries::Scheme(hierarchy.names[path.back()]);
 				for (auto i : fields)
 					cout << i << " ";
 				cout << endl;
@@ -79,7 +79,7 @@ Navigator::Navigator(Input &Input, unordered_set<size_t> &Heads) : input(Input),
 		// Show available commands
 		else if (command == "help") {
 			cout << "To navigate to a table, enter its name." << endl;
-			cout << "up"     << "\t" << "Go back to the table you saw before." << endl;
+			cout << "back"   << "\t" << "Go back to the table you saw before." << endl;
 			cout << "root"   << "\t" << "Go to the root level that lists all table heads." << endl;
 			cout << "scheme" << "\t" << "List column scheme of the current table. Needs connection to database." << endl;
 			cout << "more"   << "\t" << "List all children of the current table." << endl;
@@ -103,10 +103,10 @@ Navigator::Navigator(Input &Input, unordered_set<size_t> &Heads) : input(Input),
 bool Navigator::Go(string Name)
 {
 	// Find node navigating to
-	auto i = input.ids.find(Name);
+	auto i = hierarchy.ids.find(Name);
 	
 	// Name doesn't match
-	if (i == input.ids.end())
+	if (i == hierarchy.ids.end())
 		return false;
 ***REMOVED***
 	// Add to path
@@ -130,58 +130,41 @@ bool Navigator::Up()
 // List children of current table
 void Navigator::List(size_t Limit, bool Reverse)
 {
-	string parent;
-	vector<Child> children;
+	// Name and id of current table
+	size_t id = path.size() ? path.back() : 0;
+	string headline = path.size() ? hierarchy.names[id] : "Root";
 ***REMOVED***
-	// On root level list head tables
-	if (!path.size()) {
-		parent = "Head tables";
-		for (auto i = heads.begin(); i != heads.end(); ++i) {
+	// Prepare vector of children
+	vector<Child> children;
+	if (hierarchy.children.find(id) != hierarchy.children.end()) {
+		for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i) {
 			Child child;
-			child.Name = input.names[*i];
+			child.Name = hierarchy.names[*i];
 			child.Children = Children(*i);
-			child.Ratio = -1;
+			child.Ratio = Ratio(id, *i);
 			children.push_back(child);
 		}
-***REMOVED***
-		// Sort by number of children
-		if (Reverse)
-			sort(children.begin(), children.end(), [](const Child &A, const Child &B) { return A.Children < B.Children; });
-		else	
-			sort(children.begin(), children.end(), [](const Child &A, const Child &B) { return A.Children > B.Children; });
 	}
 ***REMOVED***
-	// For tables list their children
-	else {
-		size_t id = path.back();
-		parent = input.names[id];
-		if (input.ratios.find(id) != input.ratios.end()) {
-			for (auto i = input.ratios[id].begin(); i != input.ratios[id].end(); ++i) {
-				Child child;
-				child.Name = input.names[i->first];
-				child.Children = Children(i->first);
-				child.Ratio = Ratio(id, i->first);
-				children.push_back(child);
-			}
-		}
-***REMOVED***
-		// Sort by ratio to parent
-		if (Limit >= 0)
-			sort(children.begin(), children.end(), [](const Child &A, const Child &B) { return A.Ratio > B.Ratio; });
-		else
-			sort(children.begin(), children.end(), [](const Child &A, const Child &B) { return A.Ratio < B.Ratio; });
+	// Sort by ratio to parent, on root level by number of children
+	if (path.size()) {
+		auto comparator = [Reverse](const Child &A, const Child &B) { return A.Ratio > B.Ratio != Reverse; };
+		sort(children.begin(), children.end(), comparator);
+	} else {
+		auto comparator = [Reverse](const Child &A, const Child &B) { return A.Children > B.Children != Reverse; };
+		sort(children.begin(), children.end(), comparator);
 	}
-***REMOVED***
+	
 	// Print children
-	Table(parent, children, Limit);
+	Table(headline, children, Limit);
 }
 ***REMOVED***
 // Get ratio between to tables
 float Navigator::Ratio(size_t From, size_t To)
 {
 	// Check for connection from parent table
-	auto i = input.ratios.find(From);
-	if (i == input.ratios.end())
+	auto i = hierarchy.ratios.find(From);
+	if (i == hierarchy.ratios.end())
 		return -1;
 ***REMOVED***
 	// Check for connection to child
@@ -195,12 +178,15 @@ float Navigator::Ratio(size_t From, size_t To)
 // Get number of children of a table
 size_t Navigator::Children(size_t Id)
 {
+	// Find node of interest
+	auto i = hierarchy.children.find(Id);
+***REMOVED***
 	// No children
-	if (input.ratios.find(Id) == input.ratios.end())
+	if (i == hierarchy.children.end())
 		return 0;
 ***REMOVED***
 	// Get number of children
-	return input.ratios[Id].size();
+	return i->second.size();
 }
 ***REMOVED***
 // Print out the passed children as table
@@ -282,7 +268,6 @@ void Navigator::Table(string Parent, vector<Child> &Children, size_t Limit)
 		cout << setw(width_name) << left << child.Name << " ";
 		cout << endl;
 	}
-	
 ***REMOVED***
 	// Print continuation indicator
 	cout << "..." << endl;
@@ -295,14 +280,14 @@ void Navigator::Table(string Parent, vector<Child> &Children, size_t Limit)
 ***REMOVED***
 void Navigator::Difference(string Left, string Right)
 {
-	// Validate input
-	auto i = input.ids.find(Left);
-	auto j = input.ids.find(Right);
-	if (i == input.ids.end()) {
+	// Validate hierarchy
+	auto i = hierarchy.ids.find(Left);
+	auto j = hierarchy.ids.find(Right);
+	if (i == hierarchy.ids.end()) {
 		cout << "'" << Left << "' is no valid table name." << endl;
 		return;
 	}
-	if (j == input.ids.end()) {
+	if (j == hierarchy.ids.end()) {
 		cout << "'" << Right << "' is no valid table name." << endl;
 		return;
 	}
