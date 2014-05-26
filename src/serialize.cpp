@@ -4,8 +4,7 @@ using namespace std;
 ***REMOVED***
 Serialize::Serialize(std::string Path) : stream(Path.c_str(), ios::out | ios::binary)
 {
-	if (!stream.is_open() || !stream.good())
-		throw exception("Could not open file for writing.");
+***REMOVED***
 }
 ***REMOVED***
 Serialize::~Serialize()
@@ -13,7 +12,12 @@ Serialize::~Serialize()
 	stream.close();
 }
 ***REMOVED***
-Serialize &Serialize::operator<<(size_t Value)
+bool Serialize::Good()
+{
+	return stream.is_open() && stream.good();
+}
+***REMOVED***
+Serialize &Serialize::operator<<(const size_t Value)
 {
 	const size_t length = sizeof(size_t);
 ***REMOVED***
@@ -26,7 +30,7 @@ Serialize &Serialize::operator<<(size_t Value)
 	return *this;
 }
 ***REMOVED***
-Serialize &Serialize::operator<<(float Value)
+Serialize &Serialize::operator<<(const float Value)
 {
 	const size_t length = sizeof(float);
 ***REMOVED***
@@ -39,7 +43,7 @@ Serialize &Serialize::operator<<(float Value)
 	return *this;
 }
 ***REMOVED***
-Serialize &Serialize::operator<<(std::string Value)
+Serialize &Serialize::operator<<(const std::string Value)
 {
 	// First write string length
 	*this << Value.length();
@@ -54,8 +58,7 @@ Serialize &Serialize::operator<<(std::string Value)
 ***REMOVED***
 Deserialize::Deserialize(std::string Path) : stream(Path.c_str(), ios::in | ios::binary)
 {
-	if (!stream.is_open() || !stream.good())
-		throw exception("Could not open file for reading.");
+***REMOVED***
 }
 ***REMOVED***
 Deserialize::~Deserialize()
@@ -63,6 +66,10 @@ Deserialize::~Deserialize()
 	stream.close();
 }
 ***REMOVED***
+bool Deserialize::Good()
+{
+	return stream.is_open() && stream.good();
+}
 ***REMOVED***
 Deserialize &Deserialize::operator>>(size_t &Value)
 {

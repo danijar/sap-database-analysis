@@ -8,10 +8,11 @@ using namespace std;
 ***REMOVED***
 int main()
 {
+	// Fetch input
 	Input input("HANA", "***REMOVED***", "***REMOVED***");
-	// For testing
-	Schemata schemata(input, "HANA", "***REMOVED***", "***REMOVED***");
 	
+	// Fetch schemata
+	Schemata schemata(input, "HANA", "***REMOVED***", "***REMOVED***");
 ***REMOVED***
 	// Build hierarchy
 	Hierarchy hierarchy(input);

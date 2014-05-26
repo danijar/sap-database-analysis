@@ -11,14 +11,15 @@ using namespace std;
 // Constructor checks for dump or queries
 Input::Input(string Dsn, string User, string Password, string Path)
 {
-	// Load input data from database or dump
-	if (Saved(Path))
-		Load(Path);
-	else {
-		Fetch(Dsn, User, Password);
-		if (ids.size())
-			Save(Path);
+	// Try to load dump
+	if (Saved(Path) && Load(Path)) {
+		cout << "Loaded cached ratios." << endl;
+		return;
 	}
+***REMOVED***
+	Fetch(Dsn, User, Password);
+	if (ids.size())
+		Save(Path);
 }
 ***REMOVED***
 // Fetch input from database and generate graph from it
@@ -59,41 +60,15 @@ bool Input::Load(string Path)
 	names.clear();
 	ratios.clear();
 	
+	// Initialize stream
 	Deserialize in(Path);
-	size_t size;
-	size_t id;
-	string name;
-	
-	// Ids
-	in >> size;
-	for (size_t i = 0; i < size; ++i) {
-		in >> name >> id;
-		ids.insert(make_pair(name, id));
-	}
+	if (!in.Good())
+		return false;
 ***REMOVED***
-	// Names
-	in >> size;
-	for (size_t i = 0; i < size; ++i) {
-		in >> id >> name;
-		names.insert(make_pair(id, name));
-	}
-***REMOVED***
-	// Ratios
-	in >> size;
-	for (size_t i = 0; i < size; ++i) {
-		size_t key, length;
-		in >> key >> length;
-***REMOVED***
-		unordered_map<size_t, float> value;
-		float weight;
-		for (size_t j = 0; j < length; ++j) {
-			in >> id;
-			in >> weight;
-			value.insert(make_pair(id, weight));
-		}
-***REMOVED***
-		ratios.insert(make_pair(key, value));
-	}
+	// Read data
+	in >> ids;
+	in >> names;
+	in >> ratios;
 ***REMOVED***
 	return true;
 }
@@ -101,26 +76,15 @@ bool Input::Load(string Path)
 // Save current data to disk
 bool Input::Save(string Path)
 {
+	// Initialize stream
 	Serialize out(Path);
+	if (!out.Good())
+		return false;
 ***REMOVED***
-	// Ids
-	out << ids.size();
-	for (auto i = ids.begin(); i != ids.end(); ++i)
-		out << i->first << i->second;
-***REMOVED***
-	// Names
-	out << names.size();
-	for (auto const& i : names)
-		out << i.first << i.second;
-***REMOVED***
-	// Ratios
-	out << ratios.size();
-	for (auto i = ratios.begin(); i != ratios.end(); ++i) {
-		out << i->first;
-		out << i->second.size();
-		for (auto const& j : i->second)
-			out << j.first << j.second;
-	}
+	// Write data
+	out << ids;
+	out << names;
+	out << ratios;
 ***REMOVED***
 	return true;
 }

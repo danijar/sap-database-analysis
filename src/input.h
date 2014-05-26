@@ -10,12 +10,12 @@
  */
 class Input {
 public:
-	Input(std::string Dsn, std::string User, std::string Password, std::string Path = "input.dump");
-	bool Save(std::string Path = "input.dump");
-	bool Saved(std::string Path = "input.dump");
+	Input(std::string Dsn, std::string User, std::string Password, std::string Path = "ratios.dump");
 	void Fetch(std::string Dsn, std::string User, std::string Password, bool Output = false);
-	bool Load(std::string Path = "input.dump");
-***REMOVED***
+	bool Load(std::string Path = "ratios.dump");
+	bool Save(std::string Path = "ratios.dump");
+	bool Saved(std::string Path = "ratios.dump");
+	
 	std::unordered_map<std::string, size_t> ids;
 	std::unordered_map<size_t, std::string> names;
 	std::unordered_map<size_t, std::unordered_map<size_t, float>> ratios;
