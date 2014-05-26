@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
+#include <functional>
 #include <cstdlib>
 #include "queries.h"
 #include "charts.h"
@@ -41,7 +42,7 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 		// List scheme
 		else if (command == "scheme") {
 			if (path.size()) {
-				unordered_set<string> fields = Queries::Scheme(hierarchy.names[path.back()]);
+				unordered_set<string> fields = Queries::Schema(hierarchy.names[path.back()]);
 				for (auto i : fields)
 					cout << i << " ";
 				cout << endl;
@@ -80,11 +81,27 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 ***REMOVED***
 		// Draw histogram of children and their number of occurrence.
 		else if (command == "histo") {
+			// Ask for parameters
+			size_t limit;
+			cout << "Limit: ";
+			cin >> limit;
+			cout << endl;
+***REMOVED***
+			// Fetch and sort children
 			size_t id = path.size() ? path.back() : 0;
 			vector<size_t> data;
 			data.reserve(hierarchy.children[id].size());
 			for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i)
 				data.push_back(hierarchy.children[*i].size());
+			sort(data.begin(), data.end(), greater<size_t>());
+***REMOVED***
+			// Apply limit and plot
+			if (limit > data.size() - 1) {
+				limit = 0;
+				cout << "Adjusted limit to not exceed number of children." << endl << endl;
+			}
+			if (limit)
+				data.resize(limit);
 			Charts::Histogram(data);
 		}
 ***REMOVED***
@@ -306,8 +323,8 @@ void Navigator::Difference(string Left, string Right)
 	}
 ***REMOVED***
 	// Get table shemes
-	auto parent = Queries::Scheme(Left);
-	auto child = Queries::Scheme(Right);
+	auto parent = Queries::Schema(Left);
+	auto child = Queries::Schema(Right);
 	if (parent.empty() || child.empty()) {
 		cout << "Could not retrieve table schemes." << endl;
 		return;

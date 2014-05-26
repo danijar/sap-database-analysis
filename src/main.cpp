@@ -2,20 +2,16 @@
 #include <iostream>
 #include <unordered_set>
 #include "navigator.h"
+#include "schemata.h"
 using namespace std;
 ***REMOVED***
 ***REMOVED***
 int main()
 {
-	// Load input data from database or dump
-	Input input;
-	if (input.Saved())
-		input.Load();
-	else {
-		input.Fetch("HANA", "***REMOVED***", "***REMOVED***");
-		if (input.ids.size())
-			input.Save();
-	}
+	Input input("HANA", "***REMOVED***", "***REMOVED***");
+	// For testing
+	Schemata schemata(input, "HANA", "***REMOVED***", "***REMOVED***");
+	
 ***REMOVED***
 	// Build hierarchy
 	Hierarchy hierarchy(input);
