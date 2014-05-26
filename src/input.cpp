@@ -8,11 +8,29 @@
 using namespace std;
 ***REMOVED***
 ***REMOVED***
+// Constructor checks for dump or queries
+Input::Input(string Dsn, string User, string Password, string Path)
+{
+	// Load input data from database or dump
+	if (Saved(Path))
+		Load(Path);
+	else {
+		Fetch(Dsn, User, Password);
+		if (ids.size())
+			Save(Path);
+	}
+}
+***REMOVED***
 // Fetch input from database and generate graph from it
 void Input::Fetch(string Dsn, string User, string Password, bool Output)
 {
+	// Reset data
+	ids.clear();
+	names.clear();
+	ratios.clear();
+***REMOVED***
 	// Query rows from database
-	auto rows = Query(Dsn, User, Password);
+	auto rows = Queries::Ratios(Dsn, User, Password);
 	Graph(rows);
 ***REMOVED***
 	// Output
@@ -23,16 +41,18 @@ void Input::Fetch(string Dsn, string User, string Password, bool Output)
 			connections += i->second.size();
 ***REMOVED***
 		// Print message
+		cout << fixed;
 		cout << "Loaded "
 			 << ids.size() << " tables and "
 			 << connections << " connections stored in "
 			 << 0.001 * (1000 * Size() / 1024 / 1024) << " megabytes of memory."
 			 << endl;
+		cout << scientific;
 	}
 }
 ***REMOVED***
 // Reset and load data from disk
-bool Input::Load(std::string Path)
+bool Input::Load(string Path)
 {
 	// Reset data
 	ids.clear();
@@ -79,7 +99,7 @@ bool Input::Load(std::string Path)
 }
 ***REMOVED***
 // Save current data to disk
-bool Input::Save(std::string Path)
+bool Input::Save(string Path)
 {
 	Serialize out(Path);
 ***REMOVED***
@@ -131,61 +151,8 @@ size_t Input::Id(string name)
 		return i->second;
 }
 ***REMOVED***
-// Load input data from database into memory
-vector<Input::row> Input::Query(string Dsn, string User, string Password)
-{
-	vector<row> rows;
-***REMOVED***
-	// Initialize database driver
-	otl_connect db;
-	otl_connect::otl_initialize();
-***REMOVED***
-	try {
-		// Connect to database
-		string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
-		db.rlogon(connect.c_str());
-***REMOVED***
-		// Count number of rows in result
-		int count;
-		otl_stream countquery;
-		countquery.open(50, "SELECT COUNT(*) FROM ABAP.RESULT_V1", db);
-		countquery >> count;
-***REMOVED***
-		// Skip if empty
-		if (!count) {
-			cout << "No records found." << endl;
-			return rows;
-		}
-***REMOVED***
-		// Select whole results table
-		otl_stream query(50, "SELECT parent, child, parent_ratio, child_ratio FROM ABAP.RESULT_V1", db);
-***REMOVED***
-		// Read input data into array
-		Bar bar("Query rows", count);
-		while (!query.eof()) {
-			row current;
-			query >> current.parent >> current.child >> current.parentratio >> current.childratio;
-			rows.push_back(current);
-			bar.Increment();
-		}
-		bar.Finish();
-	}
-	catch (otl_exception& e) {
-		// Print database errors
-		cerr << e.msg << endl;
-		cerr << e.stm_text << endl;
-		cerr << e.sqlstate << endl;
-		cerr << e.var_info << endl;
-	}
-***REMOVED***
-	// Cleanup
-	db.logoff();
-***REMOVED***
-	return rows;
-}
-***REMOVED***
 // Build ratio graph
-void Input::Graph(vector<row> &Rows)
+void Input::Graph(vector<Queries::ratio_row> &Rows)
 {
 	// Skip if empty
 	if (!Rows.size()) {
