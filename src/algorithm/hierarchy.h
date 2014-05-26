@@ -3,7 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
-#include "input.h"
+#include "algorithm/input.h"
 ***REMOVED***
 ***REMOVED***
 /*
@@ -11,11 +11,11 @@
  */
 class Hierarchy {
 public:
-	Hierarchy(Input &Input, std::string Path = "hierarchy.dump");
+	Hierarchy(Input &Input, std::string Path = "data/hierarchy.dump");
 	void Generate();
-	bool Load(std::string Path = "hierarchy.dump");
-	bool Save(std::string Path = "hierarchy.dump");
-	bool Saved(std::string Path = "hierarchy.dump");
+	bool Load(std::string Path = "data/hierarchy.dump");
+	bool Save(std::string Path = "data/hierarchy.dump");
+	bool Saved(std::string Path = "data/hierarchy.dump");
 ***REMOVED***
 	std::unordered_map<std::string, size_t> &ids;
 	std::unordered_map<size_t, std::string> &names;

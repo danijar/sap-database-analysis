@@ -1,4 +1,4 @@
-#include "queries.h"
+#include "helper/queries.h"
 #define OTL_ODBC
 #define OTL_STL
 #include "otlv4.h"
