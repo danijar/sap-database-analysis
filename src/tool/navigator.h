@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
-#include "hierarchy.h"
+#include "algorithm/hierarchy.h"
 ***REMOVED***
 ***REMOVED***
 /*

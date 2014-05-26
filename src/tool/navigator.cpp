@@ -4,8 +4,8 @@
 #include <iomanip>
 #include <functional>
 #include <cstdlib>
-#include "queries.h"
-#include "charts.h"
+#include "helper/queries.h"
+#include "helper/charts.h"
 using namespace std;
 ***REMOVED***
 ***REMOVED***

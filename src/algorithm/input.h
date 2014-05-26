@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "queries.h"
+#include "helper/queries.h"
 ***REMOVED***
 /*
  * Responsible for querying input data from database and
@@ -10,11 +10,11 @@
  */
 class Input {
 public:
-	Input(std::string Dsn, std::string User, std::string Password, std::string Path = "ratios.dump");
+	Input(std::string Dsn, std::string User, std::string Password, std::string Path = "data/ratios.dump");
 	void Fetch(std::string Dsn, std::string User, std::string Password, bool Output = false);
-	bool Load(std::string Path = "ratios.dump");
-	bool Save(std::string Path = "ratios.dump");
-	bool Saved(std::string Path = "ratios.dump");
+	bool Load(std::string Path = "data/ratios.dump");
+	bool Save(std::string Path = "data/ratios.dump");
+	bool Saved(std::string Path = "data/ratios.dump");
 	
 	std::unordered_map<std::string, size_t> ids;
 	std::unordered_map<size_t, std::string> names;

@@ -1,7 +1,7 @@
-#include "hierarchy.h"
+#include "algorithm/hierarchy.h"
 #include <iostream>
-#include "bar.h"
-#include "serialize.h"
+#include "helper/bar.h"
+#include "helper/serialize.h"
 using namespace std;
 ***REMOVED***
 ***REMOVED***

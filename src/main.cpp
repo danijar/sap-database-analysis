@@ -1,8 +1,9 @@
-#include "input.h"
 #include <iostream>
 #include <unordered_set>
-#include "navigator.h"
-#include "schemata.h"
+#include "algorithm/input.h"
+#include "algorithm/hierarchy.h"
+#include "algorithm/schemata.h"
+#include "tool/navigator.h"
 using namespace std;
 ***REMOVED***
 ***REMOVED***

@@ -1,6 +1,6 @@
-#include "schemata.h"
-#include "queries.h"
-#include "serialize.h"
+#include "algorithm/schemata.h"
+#include "helper/queries.h"
+#include "helper/serialize.h"
 using namespace std;
 ***REMOVED***
 ***REMOVED***

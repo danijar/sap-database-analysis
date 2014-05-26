@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <iostream>
-#include "input.h"
+#include "algorithm/input.h"
 ***REMOVED***
 /*
 * Responsible for querying field data from database and
@@ -12,11 +12,11 @@
 class Schemata
 {
 public:
-	Schemata(Input &Input, std::string Dsn, std::string User, std::string Password, std::string Path = "schemata.dump");
+	Schemata(Input &Input, std::string Dsn, std::string User, std::string Password, std::string Path = "data/schemata.dump");
 	void Fetch(std::string Dsn, std::string User, std::string Password, bool Output = false);
-	bool Load(std::string Path = "schemata.dump");
-	bool Save(std::string Path = "schemata.dump");
-	bool Saved(std::string Path = "schemata.dump");
+	bool Load(std::string Path = "data/schemata.dump");
+	bool Save(std::string Path = "data/schemata.dump");
+	bool Saved(std::string Path = "data/schemata.dump");
 	
 private:
 	size_t Size();
