@@ -4,7 +4,6 @@
 #include <unordered_set>
 #include <iostream>
 #include "input.h"
-#include "serialize.h"
 ***REMOVED***
 /*
 * Responsible for querying field data from database and
@@ -13,12 +12,11 @@
 class Schemata
 {
 public:
-	Schemata(Input &Input, std::string Dsn, std::string User, std::string Password, std::string Path = "schema.dump");
-***REMOVED***
+	Schemata(Input &Input, std::string Dsn, std::string User, std::string Password, std::string Path = "schemata.dump");
 	void Fetch(std::string Dsn, std::string User, std::string Password, bool Output = false);
-	bool Load(std::string Path = "schema.dump");
-	bool Save(std::string Path = "schema.dump");
-	bool Saved(std::string Path = "schema.dump");
+	bool Load(std::string Path = "schemata.dump");
+	bool Save(std::string Path = "schemata.dump");
+	bool Saved(std::string Path = "schemata.dump");
 	
 private:
 	size_t Size();

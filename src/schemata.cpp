@@ -1,17 +1,21 @@
 #include "schemata.h"
+#include "queries.h"
+#include "serialize.h"
 using namespace std;
+***REMOVED***
 ***REMOVED***
 // Constructor checks dump and fetch data
 Schemata::Schemata(Input &Input, string Dsn, string User, string Password, string Path) : ids(Input.ids)
 {
-	// Load input data from database or dump
-	if (Saved(Path))
-		Load(Path);
-	else {
-		Fetch(Dsn, User, Password, true);
-		if (schemata.size())
-			Save(Path);
+	// Try to load dump
+	if (Saved(Path) && Load(Path)) {
+		cout << "Loaded cached schemata." << endl;
+		return;
 	}
+***REMOVED***
+	Fetch(Dsn, User, Password);
+	if (schemata.size())
+		Save(Path);
 }
 ***REMOVED***
 // Fetch fields from database and build map from it
@@ -44,44 +48,15 @@ void Schemata::Fetch(string Dsn, string User, string Password, bool Output)
 bool Schemata::Load(string Path)
 {
 	// Reset data
-	ids.clear();
 	schemata.clear();
 ***REMOVED***
+	// Initialize stream
 	Deserialize in(Path);
-	size_t size;
-	size_t id;
-	string name;
+	if (!in.Good())
+		return false;
 ***REMOVED***
-	// Ids
-	in >> size;
-	for (size_t i = 0; i < size; ++i) {
-		in >> name >> id;
-		ids.insert(make_pair(name, id));
-	}
-***REMOVED***
-	
-	// Schemata
-	in >> size;
-	for (size_t i = 0; i < size; ++i) {
-		size_t key, length, pos;
-		in >> key >> length;
-***REMOVED***
-		unordered_set<Queries::Field> value;
-		string name, roll, domain;
-		Queries::Field field;
-		for (size_t j = 0; j < length; ++j) {
-			// Read in field values and add to set
-			in >> name >> domain >> roll;
-			in >> pos;
-			field.name		= name;
-			field.domain	= domain;
-			field.roll		= roll;
-			field.position	= pos;
-			value.insert(field);
-		}
-***REMOVED***
-		schemata.insert(make_pair(key, value));
-	}
+	// Read data
+	in >> schemata;
 ***REMOVED***
 	return true;
 }
@@ -89,20 +64,13 @@ bool Schemata::Load(string Path)
 // Save current data to disk
 bool Schemata::Save(string Path)
 {
+	// Initialize stream
 	Serialize out(Path);
-***REMOVED***
-	// Ids
-	out << ids.size();
-	for (auto i = ids.begin(); i != ids.end(); ++i)
-		out << i->first << i->second;
-***REMOVED***
+	if (!out.Good())
+		return false;
+	
 	// Schemata
-	out << schemata.size();
-	for (auto i = schemata.begin(); i != schemata.end(); ++i) {
-		out << i->first << i->second.size();
-		for (auto j : i->second)
-			out << j.name << j.domain << j.roll << j.position;		
-	}
+	out << schemata;
 ***REMOVED***
 	return true;
 }
@@ -121,7 +89,7 @@ size_t Schemata::Size()
 {
 	size_t size = 0;
 ***REMOVED***
-	// Ratios
+	// Schemata
 	size += schemata.size() * sizeof(size_t);
 	for (auto i = schemata.begin(); i != schemata.end(); ++i)
 		size += i->second.size() * (sizeof(size_t) + sizeof(Queries::Field));

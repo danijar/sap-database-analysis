@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include "bar.h"
+#include "serialize.h"
 ***REMOVED***
 ***REMOVED***
 /*
@@ -20,11 +21,13 @@ namespace Queries {
 	struct Field {
 		std::string name, roll, domain;
 		size_t position;
-***REMOVED***
-		bool operator==(const Field &other) const {
+		bool operator==(const Field &other) const
+		{
 			return name == other.name;
 		}
 	};
+	Serialize &operator<<(Serialize &serialize, const Field &field);
+	Deserialize &operator>>(Deserialize &deserialize, Field &field);
 ***REMOVED***
 	std::unordered_set<std::string> Schema(std::string Table);
 	std::vector<ratio_row> Ratios(std::string Dsn, std::string User, std::string Password);

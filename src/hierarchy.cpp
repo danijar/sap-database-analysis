@@ -1,11 +1,25 @@
 #include "hierarchy.h"
 #include <iostream>
 #include "bar.h"
+#include "serialize.h"
 using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor
-Hierarchy::Hierarchy(Input &Input) : ids(Input.ids), names(Input.names), ratios(Input.ratios)
+Hierarchy::Hierarchy(Input &Input, string Path) : ids(Input.ids), names(Input.names), ratios(Input.ratios)
+{
+	// Try to load dump
+	if (Saved(Path) && Load(Path)) {
+		cout << "Loaded cached hierarchy." << endl;
+		return;
+	}
+***REMOVED***
+	Generate();
+	if (ids.size())
+		Save(Path);
+}
+***REMOVED***
+void Hierarchy::Generate()
 {
 	// Add children of all nodes to hierarchy
 	Bar bar("Build hierarchy", ids.size());
@@ -16,12 +30,53 @@ Hierarchy::Hierarchy(Input &Input) : ids(Input.ids), names(Input.names), ratios(
 	bar.Finish();
 ***REMOVED***
 	// Attach head tables to root node
-	auto heads = Heads(Input);
+	auto heads = Heads();
 	for (auto i = heads.begin(); i != heads.end(); ++i)
 		children[0].insert(*i);
 }
 ***REMOVED***
-unordered_set<size_t> Hierarchy::Heads(Input &Input)
+// Reset and load data from disk
+bool Hierarchy::Load(string Path)
+{
+	// Reset data
+	children.clear();
+***REMOVED***
+	// Initialize stream
+	Deserialize in(Path);
+	if (!in.Good())
+		return false;
+***REMOVED***
+	// Read data
+	in >> children;
+***REMOVED***
+	return true;
+}
+***REMOVED***
+// Save current data to disk
+bool Hierarchy::Save(string Path)
+{
+	// Initialize stream
+	Serialize out(Path);
+	if (!out.Good())
+		return false;
+***REMOVED***
+	// Write data
+	out << children;
+***REMOVED***
+	return true;
+}
+***REMOVED***
+// Check whether there is a dump file at this location
+bool Hierarchy::Saved(string Path)
+{
+	ifstream stream(Path.c_str());
+	bool result = stream.good();
+	stream.close();
+	return result;
+}
+***REMOVED***
+// Find head tables
+unordered_set<size_t> Hierarchy::Heads()
 {
 	// Initialize set with all parents
 	unordered_set<size_t> heads;

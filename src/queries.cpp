@@ -75,7 +75,7 @@ namespace Queries {
 			otl_stream query(50, "SELECT parent, child, parent_ratio, child_ratio FROM ABAP.RESULT_V1", db);
 ***REMOVED***
 			// Read input data into array
-			Bar bar("Query rows", count);
+			Bar bar("Query ratios", count);
 			while (!query.eof()) {
 				ratio_row current;
 				query >> current.parent >> current.child >> current.parentratio >> current.childratio;
@@ -96,6 +96,20 @@ namespace Queries {
 		db.logoff();
 ***REMOVED***
 		return rows;
+	}
+***REMOVED***
+	// Serializer for query field type
+	Serialize &operator<<(Serialize &serialize, const Queries::Field &field)
+	{
+		serialize << field.name << field.roll << field.domain << field.position;
+		return serialize;
+	}
+***REMOVED***
+	// Deserializer for query field type
+	Deserialize &operator>>(Deserialize &deserialize, Queries::Field &field)
+	{
+		deserialize >> field.name >> field.roll >> field.domain >> field.position;
+		return deserialize;
 	}
 ***REMOVED***
 	// Load field data from database into memory for certain table
@@ -198,7 +212,7 @@ namespace Queries {
 			otl_stream query(50, select_query.c_str(), db);
 ***REMOVED***
 			// Read input data into array
-			Bar bar("Query fields", count);
+			Bar bar("Query schemata", count);
 			while (!query.eof()) {
 				Field current;
 				string table, position;
