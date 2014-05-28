@@ -96,3 +96,32 @@ size_t Schemata::Size()
 ***REMOVED***
 	return size;
 }
+***REMOVED***
+// Returns a set of fieldnames for a table
+unordered_set<Queries::Field> Schemata::Get(string Table)
+{
+	unordered_set<Queries::Field> empty_set;
+	if (ids.find(Table) == ids.end())
+		return empty_set;
+	if (schemata.find(ids.find(Table)->second) == schemata.end())
+		return empty_set;
+	return schemata.find(ids.find(Table)->second)->second;
+}
+***REMOVED***
+// Returns a differencwe between two tables
+unordered_set<Queries::Field> Schemata::Common(string Parent, string Child)
+{
+	// Get the fields of both tables
+	unordered_set<Queries::Field> parent_set = Get(Parent);
+	unordered_set<Queries::Field> child_set = Get(Child);
+***REMOVED***
+	unordered_set<Queries::Field> common;
+	
+	// Compare all fields in parent with child to find the ones in common
+	for (auto field = parent_set.begin(); field != parent_set.end(); field++) {
+		if (child_set.find(*field) != child_set.end())
+			common.insert(*field);
+	}
+	
+	return common;
+}
