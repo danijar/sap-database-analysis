@@ -9,7 +9,7 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor checks for dump or queries
-Ratios::Ratios(string Dsn, string User, string Password, string Path)
+Ratios::Ratios(string Path)
 {
 	// Try to load dump
 	if (Saved(Path) && Load(Path)) {
@@ -17,13 +17,13 @@ Ratios::Ratios(string Dsn, string User, string Password, string Path)
 		return;
 	}
 ***REMOVED***
-	Fetch(Dsn, User, Password);
+	Fetch();
 	if (ids.size())
 		Save(Path);
 }
 ***REMOVED***
 // Fetch input from database and generate graph from it
-void Ratios::Fetch(string Dsn, string User, string Password, bool Output)
+void Ratios::Fetch(bool Output)
 {
 	// Reset data
 	ids.clear();
@@ -127,6 +127,7 @@ void Ratios::Graph(vector<Queries::Ratio> &Rows)
 	// Push root node at index zero
 	names.push_back("<root>");
 	ids.insert(make_pair("<root>", 0));
+	ratios.emplace_back();
 ***REMOVED***
 	// Fetch distinct table names
 	Bar bar("Unpack data", Rows.size() * 2);
