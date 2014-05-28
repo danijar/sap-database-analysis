@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_set>
+#include "helper/queries.h"
 #include "algorithm/ratios.h"
 #include "algorithm/hierarchy.h"
 #include "algorithm/structures.h"
@@ -11,18 +12,18 @@ using namespace std;
 int main()
 {
 	// Database credentials
-	string dsn = "***REMOVED***";
-	string user = "***REMOVED***";
-	string password = "***REMOVED***";
+	Queries::Dsn = "***REMOVED***";
+	Queries::User = "***REMOVED***";
+	Queries::Password = "***REMOVED***";
 ***REMOVED***
 	// Fetch input
-	Ratios ratios(dsn, user, password);
+	Ratios ratios;
 ***REMOVED***
 	// Build hierarchy
 	Hierarchy hierarchy(ratios);
 ***REMOVED***
-	// Fetch schemata
-	// Structures schemata(ratios, dsn, user, password);
+	// Fetch structures
+	Structures structures(ratios, hierarchy);
 ***REMOVED***
 	// Wait for user input
 	// cout << "Press enter to start hierarchy navigator..." << endl;
@@ -30,5 +31,5 @@ int main()
 	// cin.get();
 ***REMOVED***
 	// Navigate through hierarchie
-	Navigator navigator(hierarchy);
+	Navigator navigator(hierarchy, structures);
 }

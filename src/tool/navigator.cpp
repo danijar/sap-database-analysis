@@ -10,7 +10,7 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor
-Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
+Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(Hierarchy), structures(Structures)
 {
 	Clear();
 	List();
@@ -64,13 +64,13 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 ***REMOVED***
 		// List a difference between two table schemes
 		else if (command == "diff") {
-			// Ask for parameters
-			cout << "Tables: ";
-			string left, right;
-			cin >> left >> right;
+			// Ask for parameter
+			cout << "Child: ";
+			string table;
+			cin >> table;
+			cout << endl;
 ***REMOVED***
-			Clear();
-			Difference(left, right);
+			Difference(table);
 		}
 ***REMOVED***
 		// Exit navigator
@@ -141,7 +141,7 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 			cout << "root"   << "\t" << "Go to the root level that lists all table heads." << endl;
 			cout << "scheme" << "\t" << "List column scheme of the current table. Needs connection to database." << endl;
 			cout << "more"   << "\t" << "List all children of the current table." << endl;
-			cout << "diff"	 << "\t" << "Show changes between two tables." << endl;
+			cout << "diff"	 << "\t" << "Show changes from current table to a child." << endl;
 			cout << "histo"  << "\t" << "Draw histogram of children and their number of occurrence." << endl;
 			cout << "csv"    << "\t" << "Write CSV file of current children and their number of children." << endl;
 			cout << "exit"   << "\t" << "Exit the navigator. Synonyms: quit." << endl;
@@ -321,90 +321,69 @@ void Navigator::Table(size_t Id, vector<Child> &Children, size_t Limit)
 }
 ***REMOVED***
 // Show a diff between two tables
-***REMOVED***
-void Navigator::Difference(string Left, string Right)
+void Navigator::Difference(string Table)
 {
 	// Validate hierarchy
-	auto i = hierarchy.ids.find(Left);
-	auto j = hierarchy.ids.find(Right);
-	if (i == hierarchy.ids.end()) {
-		cout << "'" << Left << "' is no valid table name." << endl;
-		return;
-	}
-	if (j == hierarchy.ids.end()) {
-		cout << "'" << Right << "' is no valid table name." << endl;
+	if (hierarchy.ids.find(Table) == hierarchy.ids.end()) {
+		cout << "'" << Table << "' is no valid table name." << endl;
 		return;
 	}
 ***REMOVED***
-	// Get table shemes
-	auto parent_vector = Queries::Fields(Left);
-	auto child_vector = Queries::Fields(Right);
-	if (parent_vector.empty() || child_vector.empty()) {
-		cout << "Could not retrieve table schemes." << endl;
-		return;
-	}
-***REMOVED***
-	// Convert to sets of just the names for fast access
-	unordered_set<string> parent, child;
-	parent.reserve(parent_vector.size());
-	child.reserve(child_vector.size());
-	for (auto i = parent_vector.begin(); i != parent_vector.end(); ++i)
-		parent.insert(i->name);
-	for (auto i = child_vector.begin(); i != child_vector.end(); ++i)
-		child.insert(i->name);
-***REMOVED***
-	// Find distinct and common fields
-	vector<string> commons, missings, news;
-	for (auto i = parent.begin(); i != parent.end(); ++i)
-		if (child.find(*i) == child.end())
-			missings.push_back(*i);
-		else
-			commons.push_back(*i);
-	for (auto i = child.begin(); i != child.end(); ++i)
-		if (parent.find(*i) == parent.end())
-			news.push_back(*i);
+	// Get differences
+	size_t id = hierarchy.ids[Table];
+	auto differences = structures.Difference(id);
+	unordered_set<string> &added = differences.first;
+	unordered_set<string> &removed = differences.second;
 ***REMOVED***
 	// Find column widths
-	size_t width_commons = 6, width_missings = 7, width_news = 3;
-	for (auto i = commons.begin(); i != commons.end(); ++i)
-		if (i->length() > width_commons)
-			width_commons = i->length();
-	for (auto i = missings.begin(); i != missings.end(); ++i)
-		if (i->length() > width_missings)
-			width_missings = i->length();
-	for (auto i = news.begin(); i != news.end(); ++i)
-		if (i->length() > width_news)
-			width_news = i->length();
+	size_t width_added = 5, width_removed = 7;
+	for (auto i = added.begin(); i != added.end(); ++i)
+		if (i->length() > width_added)
+			width_added = i->length();
+	for (auto i = removed.begin(); i != removed.end(); ++i)
+		if (i->length() > width_removed)
+			width_removed = i->length();
 ***REMOVED***
 	// Store default formatting
 	auto format = cout.flags();
 ***REMOVED***
-***REMOVED***
 	// Draw headline
-	cout << "Changes between " << Left << " to " << Right << endl;
-	for (size_t i = 0; i < 19 + Left.length() + Right.length(); ++i)
+	cout << "Changes to " << Table << endl;
+	for (size_t i = 0; i < 11 + Table.length(); ++i)
 		cout << "=";
 	cout << endl << endl;
 ***REMOVED***
 	// Draw table captions
-	cout << setw(width_commons) << "Common ";
-	cout << setw(width_missings) << "Missing ";
-	cout << setw(width_news) << "New " << endl;
-	for (size_t i = 0; i < width_commons; i++)
+	cout << left;
+	cout << setw(width_added) << "Added ";
+	cout << setw(width_removed) << "Removed" << endl;
+	for (size_t i = 0; i < width_added; i++)
 		cout << "-";
 	cout << " ";
-	for (size_t i = 0; i < width_missings; i++)
-		cout << "-";
-	cout << " ";
-	for (size_t i = 0; i < width_news; i++)
+	for (size_t i = 0; i < width_removed; i++)
 		cout << "-";
 	cout << " " << endl;
 ***REMOVED***
 	// Draw table rows
-	for (size_t i = 0; i < commons.size() || i < news.size() || i < missings.size(); i++) {
-		cout << setw(width_commons) << ((i < commons.size()) ? commons[i] : " ") << " ";
-		cout << setw(width_missings) << ((i < missings.size()) ? missings[i] : " ") << " ";
-		cout << setw(width_news)  << ((i < news.size()) ? news[i] : " ") << " ";
+	auto a = added.begin();
+	auto r = removed.begin();
+	for (size_t i = 0; i < max(added.size(), removed.size()); ++i) {
+		// Added column
+		cout << setw(width_added);
+		if (a != added.end()) {
+			cout << *a << " ";
+			a++;
+		}
+		else cout << " " << " ";
+		
+		// Removed column
+		cout << setw(width_removed);
+		if (r != removed.end()) {
+			cout << *r << " ";
+			r++;
+		}
+		else cout << " " << " ";
+		
 		cout << endl;
 	}
 ***REMOVED***

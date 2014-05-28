@@ -5,25 +5,26 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor checks dump and fetch data
-Structures::Structures(Ratios &Ratios, string Dsn, string User, string Password, string Path) : ids(Ratios.ids)
+Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : ids(Ratios.ids), hierarchy(Hierarchy)
 {
 	// Try to load dump
-	
 	if (Saved(Path) && Load(Path)) {
 		cout << "Loaded cached schemata." << endl;
 		return;
 	}
 ***REMOVED***
-	Fetch(Dsn, User, Password);
+	Fetch();
+	Generate();
 	if (structures.size())
 		Save(Path);
 }
 ***REMOVED***
 // Fetch fields from database and build map from it
-void Structures::Fetch(string Dsn, string User, string Password, bool Output)
+void Structures::Fetch(bool Output)
 {
 	// Reset data
 	structures.clear();
+	differences.clear();
 	
 	// Fetch schemata from database
 	structures = Queries::Structures(ids);
@@ -50,6 +51,7 @@ bool Structures::Load(string Path)
 {
 	// Reset data
 	structures.clear();
+	differences.clear();
 ***REMOVED***
 	// Initialize stream
 	Deserialize in(Path);
@@ -58,6 +60,8 @@ bool Structures::Load(string Path)
 ***REMOVED***
 	// Read data
 	in >> structures;
+	in >> differences;
+***REMOVED***
 	return true;
 }
 ***REMOVED***
@@ -71,6 +75,7 @@ bool Structures::Save(string Path)
 ***REMOVED***
 	// Structures
 	out << structures;
+	out << differences;
 ***REMOVED***
 	return true;
 }
@@ -84,6 +89,46 @@ bool Structures::Saved(string Path)
 	return result;
 }
 ***REMOVED***
+// Compute added and removed fields between any two tables
+pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t Parent, size_t Child)
+{
+	pair<unordered_set<string>, unordered_set<string>> result;
+***REMOVED***
+	// Find added fields
+	for (auto i = structures[Child].begin(); i != structures[Child].end(); ++i)
+		if (structures[Parent].find(*i) == structures[Parent].end())
+			result.first.insert(i->name);
+***REMOVED***
+	// Find removed streams
+	for (auto i = structures[Parent].begin(); i != structures[Parent].end(); ++i)
+		if (structures[Child].find(*i) == structures[Child].end())
+			result.second.insert(i->name);
+***REMOVED***
+	return result;
+}
+***REMOVED***
+// Return cached difference for a child to its parent
+pair<unordered_set<string>, unordered_set<string>> &Structures::Difference(size_t Child)
+{
+	// Check for valid table
+	if (Child > differences.size() - 1)
+		throw exception("Table index out of range");
+***REMOVED***
+	return differences[Child];
+}
+***REMOVED***
+// Batch compute differences from all tables to their parents
+void Structures::Generate()
+{
+	// Initialize container
+	differences.resize(ids.size());
+***REMOVED***
+	// Compute for each children of current table
+	for (size_t i = 0; i < ids.size(); ++i)
+		for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j)
+				differences[*j] = Difference(i, *j);
+}
+***REMOVED***
 // Calculate memory size in bytes
 size_t Structures::Size()
 {
@@ -92,34 +137,10 @@ size_t Structures::Size()
 	// Structures
 	size += structures.size() * sizeof(size_t);
 	for (auto i = structures.begin(); i != structures.end(); ++i)
-		size += i->size() * (sizeof(size_t) + sizeof(Queries::Field));
+		size += i->size() * (sizeof(size_t)+sizeof(Queries::Field));
+***REMOVED***
+	// Differences
+	// ...
 ***REMOVED***
 	return size;
-}
-***REMOVED***
-// Returns a set of fieldnames for a table
-unordered_set<Queries::Field> Structures::Get(size_t Id)
-{
-	unordered_set<Queries::Field> empty_set;
-	if (Id > ids.size())
-		return empty_set;
-	return structures[Id];
-}
-***REMOVED***
-// Returns a differencwe between two tables
-unordered_set<Queries::Field> Structures::Common(size_t Parent_Id, size_t Child_Id)
-{
-	// Get the fields of both tables
-	unordered_set<Queries::Field> parent_set = Get(Parent_Id);
-	unordered_set<Queries::Field> child_set = Get(Child_Id);
-***REMOVED***
-	unordered_set<Queries::Field> common;
-	
-	// Compare all fields in parent with child to find the ones in common
-	for (auto field = parent_set.begin(); field != parent_set.end(); field++) {
-		if (child_set.find(*field) != child_set.end())
-			common.insert(*field);
-	}
-	
-	return common;
 }
