@@ -92,7 +92,7 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 			vector<size_t> data;
 			data.reserve(hierarchy.children[id].size());
 			for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i)
-				data.push_back(hierarchy.children[*i].size());
+				data.push_back(hierarchy.amounts[*i]);
 			sort(data.begin(), data.end(), greater<size_t>());
 ***REMOVED***
 			// Apply limit and plot
@@ -105,6 +105,35 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 			Charts::Histogram(data);
 		}
 ***REMOVED***
+		else if (command == "csv") {
+			// Fetch and children and amounts
+			size_t id = path.size() ? path.back() : 0;
+			vector<pair<string, size_t>> data;
+			data.reserve(hierarchy.children[id].size());
+			for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i)
+				data.push_back(make_pair(hierarchy.names[*i], hierarchy.amounts[*i]));
+***REMOVED***
+			// Sort data
+			sort(data.begin(), data.end(), [](pair<string, size_t> l, pair<string, size_t> r) { return l.second < r.second; });
+***REMOVED***
+			// Table without special chars as file name
+			string name = hierarchy.names[id];
+			name.erase(remove(name.begin(), name.end(), '<'), name.end());
+			name.erase(remove(name.begin(), name.end(), '>'), name.end());
+			name += ".csv";
+			ofstream out("data/" + name);
+***REMOVED***
+			// Save to disk
+			out << "sep=;" << endl;
+			out << "Table;Amount" << endl;
+			for (auto i = data.begin(); i != data.end(); ++i)
+				out << i->first << ";" << i->second << endl;
+			out.close();
+***REMOVED***
+			// Output
+			cout << "Wrote table names and their amount of children to " << name << "." << endl;
+		}
+***REMOVED***
 		// Show available commands
 		else if (command == "help") {
 			cout << "To navigate to a table, enter its name." << endl;
@@ -114,6 +143,7 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 			cout << "more"   << "\t" << "List all children of the current table." << endl;
 			cout << "diff"	 << "\t" << "Show changes between two tables." << endl;
 			cout << "histo"  << "\t" << "Draw histogram of children and their number of occurrence." << endl;
+			cout << "csv"    << "\t" << "Write CSV file of current children and their number of children." << endl;
 			cout << "exit"   << "\t" << "Exit the navigator. Synonyms: quit." << endl;
 		}
 ***REMOVED***
@@ -162,7 +192,6 @@ void Navigator::List(size_t Limit, bool Reverse)
 {
 	// Name and id of current table
 	size_t id = path.size() ? path.back() : 0;
-	string headline = path.size() ? hierarchy.names[id] : "<root>";
 ***REMOVED***
 	// Prepare vector of children
 	vector<Child> children;
@@ -186,7 +215,7 @@ void Navigator::List(size_t Limit, bool Reverse)
 	}
 	
 	// Print children
-	Table(headline, children, Limit);
+	Table(id, children, Limit);
 }
 ***REMOVED***
 // Get ratio between to tables
@@ -205,14 +234,14 @@ float Navigator::Ratio(size_t From, size_t To)
 }
 ***REMOVED***
 // Print out the passed children as table
-void Navigator::Table(string Parent, vector<Child> &Children, size_t Limit)
+void Navigator::Table(size_t Id, vector<Child> &Children, size_t Limit)
 {
 	// Store default formatting
 	auto format = cout.flags();
 ***REMOVED***
 	// Headline
-	cout << Parent << endl;
-	for (size_t i = 0; i < Parent.length(); ++i)
+	cout << hierarchy.names[Id] << endl;
+	for (size_t i = 0; i < hierarchy.names[Id].length(); ++i)
 		cout << "=";
 	cout << endl;
 ***REMOVED***
@@ -223,7 +252,7 @@ void Navigator::Table(string Parent, vector<Child> &Children, size_t Limit)
 	}
 ***REMOVED***
 	// Show number of rows
-	cout << "Found " << Children.size() << (Children.size() > 1 ? " children." : " child.") << endl << endl;
+	cout << "Found and " << hierarchy.amounts[Id] << " overall and " << Children.size() << (Children.size() > 1 ? " direct children." : " child.") << endl << endl;
 ***REMOVED***
 	// Find column widths
 	size_t width_name = 0, width_children = 0, width_ratio = 4;

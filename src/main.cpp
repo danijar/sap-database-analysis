@@ -22,12 +22,12 @@ int main()
 	Hierarchy hierarchy(ratios);
 ***REMOVED***
 	// Fetch schemata
-	Structures schemata(ratios, dsn, user, password);
+	// Structures schemata(ratios, dsn, user, password);
 ***REMOVED***
 	// Wait for user input
-	cout << "Press enter to start hierarchy navigator..." << endl;
-	cout.flush();
-	cin.get();
+	// cout << "Press enter to start hierarchy navigator..." << endl;
+	// cout.flush();
+	// cin.get();
 ***REMOVED***
 	// Navigate through hierarchie
 	Navigator navigator(hierarchy);
