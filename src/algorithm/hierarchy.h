@@ -3,7 +3,8 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
-#include "algorithm/input.h"
+#include "algorithm/ratios.h"
+#include "helper/bar.h"
 ***REMOVED***
 ***REMOVED***
 /*
@@ -11,19 +12,22 @@
  */
 class Hierarchy {
 public:
-	Hierarchy(Input &Input, std::string Path = "data/hierarchy.dump");
-	void Generate();
+	Hierarchy(Ratios &Ratios, std::string Path = "data/hierarchy.dump");
 	bool Load(std::string Path = "data/hierarchy.dump");
 	bool Save(std::string Path = "data/hierarchy.dump");
 	bool Saved(std::string Path = "data/hierarchy.dump");
 ***REMOVED***
 	std::unordered_map<std::string, size_t> &ids;
-	std::unordered_map<size_t, std::string> &names;
-	std::unordered_map<size_t, std::unordered_map<size_t, float>> &ratios;
-	std::unordered_map<size_t, std::unordered_set<size_t>> children;
+	std::vector<std::string> &names;
+	std::vector<std::unordered_map<size_t, float>> &ratios;
+	std::vector<std::unordered_set<size_t>> children;
+	std::vector<size_t> amounts;
+***REMOVED***
 private:
+	void Generate();
 	void Children(size_t Id);
+	std::unordered_set<size_t> Heads();
+	size_t Amount(size_t Id, Bar *Bar);
 ***REMOVED***
 	std::unordered_set<size_t> processed;
-	std::unordered_set<size_t> Heads();
 };

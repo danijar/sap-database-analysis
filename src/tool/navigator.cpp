@@ -42,9 +42,9 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 		// List scheme
 		else if (command == "scheme") {
 			if (path.size()) {
-				unordered_set<string> fields = Queries::Schema(hierarchy.names[path.back()]);
+				vector<Queries::Field> fields = Queries::Fields(hierarchy.names[path.back()]);
 				for (auto i : fields)
-					cout << i << " ";
+					cout << i.name << " ";
 				cout << endl;
 			} else {
 				cout << "Select a table first." << endl;
@@ -92,7 +92,7 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 			vector<size_t> data;
 			data.reserve(hierarchy.children[id].size());
 			for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i)
-				data.push_back(hierarchy.children[*i].size());
+				data.push_back(hierarchy.amounts[*i]);
 			sort(data.begin(), data.end(), greater<size_t>());
 ***REMOVED***
 			// Apply limit and plot
@@ -105,6 +105,35 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 			Charts::Histogram(data);
 		}
 ***REMOVED***
+		else if (command == "csv") {
+			// Fetch and children and amounts
+			size_t id = path.size() ? path.back() : 0;
+			vector<pair<string, size_t>> data;
+			data.reserve(hierarchy.children[id].size());
+			for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i)
+				data.push_back(make_pair(hierarchy.names[*i], hierarchy.amounts[*i]));
+***REMOVED***
+			// Sort data
+			sort(data.begin(), data.end(), [](pair<string, size_t> l, pair<string, size_t> r) { return l.second < r.second; });
+***REMOVED***
+			// Table without special chars as file name
+			string name = hierarchy.names[id];
+			name.erase(remove(name.begin(), name.end(), '<'), name.end());
+			name.erase(remove(name.begin(), name.end(), '>'), name.end());
+			name += ".csv";
+			ofstream out("data/" + name);
+***REMOVED***
+			// Save to disk
+			out << "sep=;" << endl;
+			out << "Table;Amount" << endl;
+			for (auto i = data.begin(); i != data.end(); ++i)
+				out << i->first << ";" << i->second << endl;
+			out.close();
+***REMOVED***
+			// Output
+			cout << "Wrote table names and their amount of children to " << name << "." << endl;
+		}
+***REMOVED***
 		// Show available commands
 		else if (command == "help") {
 			cout << "To navigate to a table, enter its name." << endl;
@@ -114,6 +143,7 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 			cout << "more"   << "\t" << "List all children of the current table." << endl;
 			cout << "diff"	 << "\t" << "Show changes between two tables." << endl;
 			cout << "histo"  << "\t" << "Draw histogram of children and their number of occurrence." << endl;
+			cout << "csv"    << "\t" << "Write CSV file of current children and their number of children." << endl;
 			cout << "exit"   << "\t" << "Exit the navigator. Synonyms: quit." << endl;
 		}
 ***REMOVED***
@@ -162,15 +192,14 @@ void Navigator::List(size_t Limit, bool Reverse)
 {
 	// Name and id of current table
 	size_t id = path.size() ? path.back() : 0;
-	string headline = path.size() ? hierarchy.names[id] : "Root";
 ***REMOVED***
 	// Prepare vector of children
 	vector<Child> children;
-	if (hierarchy.children.find(id) != hierarchy.children.end()) {
+	if (id < hierarchy.children.size()) {
 		for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i) {
 			Child child;
 			child.Name = hierarchy.names[*i];
-			child.Children = Children(*i);
+			child.Children = hierarchy.children[*i].size();
 			child.Ratio = Ratio(id, *i);
 			children.push_back(child);
 		}
@@ -186,48 +215,33 @@ void Navigator::List(size_t Limit, bool Reverse)
 	}
 	
 	// Print children
-	Table(headline, children, Limit);
+	Table(id, children, Limit);
 }
 ***REMOVED***
 // Get ratio between to tables
 float Navigator::Ratio(size_t From, size_t To)
 {
-	// Check for connection from parent table
-	auto i = hierarchy.ratios.find(From);
-	if (i == hierarchy.ratios.end())
+	// Check for table
+	if (From > hierarchy.ratios.size() - 1)
 		return -1;
 ***REMOVED***
 	// Check for connection to child
-	auto j = i->second.find(To);
-	if (j == i->second.end())
+	auto j = hierarchy.ratios[From].find(To);
+	if (j == hierarchy.ratios[From].end())
 		return -1;
 ***REMOVED***
 	return j->second;
 }
 ***REMOVED***
-// Get number of children of a table
-size_t Navigator::Children(size_t Id)
-{
-	// Find node of interest
-	auto i = hierarchy.children.find(Id);
-***REMOVED***
-	// No children
-	if (i == hierarchy.children.end())
-		return 0;
-***REMOVED***
-	// Get number of children
-	return i->second.size();
-}
-***REMOVED***
 // Print out the passed children as table
-void Navigator::Table(string Parent, vector<Child> &Children, size_t Limit)
+void Navigator::Table(size_t Id, vector<Child> &Children, size_t Limit)
 {
 	// Store default formatting
 	auto format = cout.flags();
 ***REMOVED***
 	// Headline
-	cout << Parent << endl;
-	for (size_t i = 0; i < Parent.length(); ++i)
+	cout << hierarchy.names[Id] << endl;
+	for (size_t i = 0; i < hierarchy.names[Id].length(); ++i)
 		cout << "=";
 	cout << endl;
 ***REMOVED***
@@ -238,7 +252,7 @@ void Navigator::Table(string Parent, vector<Child> &Children, size_t Limit)
 	}
 ***REMOVED***
 	// Show number of rows
-	cout << "Found " << Children.size() << (Children.size() > 1 ? " children." : " child.") << endl << endl;
+	cout << "Found and " << hierarchy.amounts[Id] << " overall and " << Children.size() << (Children.size() > 1 ? " direct children." : " child.") << endl << endl;
 ***REMOVED***
 	// Find column widths
 	size_t width_name = 0, width_children = 0, width_ratio = 4;
@@ -323,13 +337,22 @@ void Navigator::Difference(string Left, string Right)
 	}
 ***REMOVED***
 	// Get table shemes
-	auto parent = Queries::Schema(Left);
-	auto child = Queries::Schema(Right);
-	if (parent.empty() || child.empty()) {
+	auto parent_vector = Queries::Fields(Left);
+	auto child_vector = Queries::Fields(Right);
+	if (parent_vector.empty() || child_vector.empty()) {
 		cout << "Could not retrieve table schemes." << endl;
 		return;
 	}
-	
+***REMOVED***
+	// Convert to sets of just the names for fast access
+	unordered_set<string> parent, child;
+	parent.reserve(parent_vector.size());
+	child.reserve(child_vector.size());
+	for (auto i = parent_vector.begin(); i != parent_vector.end(); ++i)
+		parent.insert(i->name);
+	for (auto i = child_vector.begin(); i != child_vector.end(); ++i)
+		child.insert(i->name);
+***REMOVED***
 	// Find distinct and common fields
 	vector<string> commons, missings, news;
 	for (auto i = parent.begin(); i != parent.end(); ++i)

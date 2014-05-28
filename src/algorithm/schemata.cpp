@@ -5,9 +5,10 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor checks dump and fetch data
-Schemata::Schemata(Input &Input, string Dsn, string User, string Password, string Path) : ids(Input.ids)
+Structures::Structures(Ratios &Ratios, string Dsn, string User, string Password, string Path) : ids(Ratios.ids)
 {
 	// Try to load dump
+	
 	if (Saved(Path) && Load(Path)) {
 		cout << "Loaded cached schemata." << endl;
 		return;
@@ -19,20 +20,20 @@ Schemata::Schemata(Input &Input, string Dsn, string User, string Password, strin
 }
 ***REMOVED***
 // Fetch fields from database and build map from it
-void Schemata::Fetch(string Dsn, string User, string Password, bool Output)
+void Structures::Fetch(string Dsn, string User, string Password, bool Output)
 {
 	// Reset data
 	schemata.clear();
 	
 	// Fetch schemata from database
-	schemata = Queries::Schemata(ids, Dsn, User, Password);
-	
+	schemata = Queries::Structures(ids);
+***REMOVED***
 	// Output
 	if (Output) {
 		// Count connections
 		size_t fields = 0;
 		for (auto i = schemata.begin(); i != schemata.end(); ++i)
-			fields += i->second.size();
+			fields += i->size();
 ***REMOVED***
 		// Print message
 		cout << fixed;
@@ -45,7 +46,7 @@ void Schemata::Fetch(string Dsn, string User, string Password, bool Output)
 }
 ***REMOVED***
 // Reset and load data from disk
-bool Schemata::Load(string Path)
+bool Structures::Load(string Path)
 {
 	// Reset data
 	schemata.clear();
@@ -57,26 +58,25 @@ bool Schemata::Load(string Path)
 ***REMOVED***
 	// Read data
 	in >> schemata;
-***REMOVED***
 	return true;
 }
 ***REMOVED***
 // Save current data to disk
-bool Schemata::Save(string Path)
+bool Structures::Save(string Path)
 {
 	// Initialize stream
 	Serialize out(Path);
 	if (!out.Good())
 		return false;
-	
-	// Schemata
+***REMOVED***
+	// Structures
 	out << schemata;
 ***REMOVED***
 	return true;
 }
 ***REMOVED***
 // Check whether there is a dump file at this location
-bool Schemata::Saved(string Path)
+bool Structures::Saved(string Path)
 {
 	ifstream stream(Path.c_str());
 	bool result = stream.good();
@@ -85,14 +85,14 @@ bool Schemata::Saved(string Path)
 }
 ***REMOVED***
 // Calculate memory size in bytes
-size_t Schemata::Size()
+size_t Structures::Size()
 {
 	size_t size = 0;
 ***REMOVED***
-	// Schemata
+	// Structures
 	size += schemata.size() * sizeof(size_t);
 	for (auto i = schemata.begin(); i != schemata.end(); ++i)
-		size += i->second.size() * (sizeof(size_t) + sizeof(Queries::Field));
+		size += i->size() * (sizeof(size_t) + sizeof(Queries::Field));
 ***REMOVED***
 	return size;
 }
