@@ -14,6 +14,9 @@ class Structures
 public:
 	Structures(Ratios &Ratios, std::string Dsn, std::string User, std::string Password, std::string Path = "data/schemata.dump");
 	void Fetch(std::string Dsn, std::string User, std::string Password, bool Output = false);
+	std::unordered_set<Queries::Field> Common(std::string Parent, std::string Child);
+	std::unordered_set<Queries::Field> Get(std::string Table);
+***REMOVED***
 	bool Load(std::string Path = "data/schemata.dump");
 	bool Save(std::string Path = "data/schemata.dump");
 	bool Saved(std::string Path = "data/schemata.dump");
