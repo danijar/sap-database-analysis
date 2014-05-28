@@ -14,8 +14,8 @@ class Structures
 public:
 	Structures(Ratios &Ratios, std::string Dsn, std::string User, std::string Password, std::string Path = "data/schemata.dump");
 	void Fetch(std::string Dsn, std::string User, std::string Password, bool Output = false);
-	std::unordered_set<Queries::Field> Common(std::string Parent, std::string Child);
-	std::unordered_set<Queries::Field> Get(std::string Table);
+	std::unordered_set<Queries::Field> Common(size_t Parent_Id, size_t Child_Id);
+	std::unordered_set<Queries::Field> Get(size_t Id);
 ***REMOVED***
 	bool Load(std::string Path = "data/schemata.dump");
 	bool Save(std::string Path = "data/schemata.dump");
@@ -24,6 +24,6 @@ public:
 private:
 	size_t Size();
 ***REMOVED***
-	std::vector<std::unordered_set<Queries::Field>> schemata;
+	std::vector<std::unordered_set<Queries::Field>> structures;
 	std::unordered_map<std::string, size_t> &ids;
 };
