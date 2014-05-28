@@ -1,4 +1,4 @@
-#include "algorithm/schemata.h"
+#include "algorithm/structures.h"
 #include "helper/queries.h"
 #include "helper/serialize.h"
 using namespace std;
@@ -15,7 +15,7 @@ Structures::Structures(Ratios &Ratios, string Dsn, string User, string Password,
 	}
 ***REMOVED***
 	Fetch(Dsn, User, Password);
-	if (schemata.size())
+	if (structures.size())
 		Save(Path);
 }
 ***REMOVED***
@@ -23,16 +23,16 @@ Structures::Structures(Ratios &Ratios, string Dsn, string User, string Password,
 void Structures::Fetch(string Dsn, string User, string Password, bool Output)
 {
 	// Reset data
-	schemata.clear();
+	structures.clear();
 	
 	// Fetch schemata from database
-	schemata = Queries::Structures(ids);
+	structures = Queries::Structures(ids);
 ***REMOVED***
 	// Output
 	if (Output) {
 		// Count connections
 		size_t fields = 0;
-		for (auto i = schemata.begin(); i != schemata.end(); ++i)
+		for (auto i = structures.begin(); i != structures.end(); ++i)
 			fields += i->size();
 ***REMOVED***
 		// Print message
@@ -49,7 +49,7 @@ void Structures::Fetch(string Dsn, string User, string Password, bool Output)
 bool Structures::Load(string Path)
 {
 	// Reset data
-	schemata.clear();
+	structures.clear();
 ***REMOVED***
 	// Initialize stream
 	Deserialize in(Path);
@@ -57,7 +57,7 @@ bool Structures::Load(string Path)
 		return false;
 ***REMOVED***
 	// Read data
-	in >> schemata;
+	in >> structures;
 	return true;
 }
 ***REMOVED***
@@ -70,7 +70,7 @@ bool Structures::Save(string Path)
 		return false;
 ***REMOVED***
 	// Structures
-	out << schemata;
+	out << structures;
 ***REMOVED***
 	return true;
 }
@@ -90,30 +90,28 @@ size_t Structures::Size()
 	size_t size = 0;
 ***REMOVED***
 	// Structures
-	size += schemata.size() * sizeof(size_t);
-	for (auto i = schemata.begin(); i != schemata.end(); ++i)
+	size += structures.size() * sizeof(size_t);
+	for (auto i = structures.begin(); i != structures.end(); ++i)
 		size += i->size() * (sizeof(size_t) + sizeof(Queries::Field));
 ***REMOVED***
 	return size;
 }
 ***REMOVED***
 // Returns a set of fieldnames for a table
-unordered_set<Queries::Field> Schemata::Get(string Table)
+unordered_set<Queries::Field> Structures::Get(size_t Id)
 {
 	unordered_set<Queries::Field> empty_set;
-	if (ids.find(Table) == ids.end())
+	if (Id > ids.size())
 		return empty_set;
-	if (schemata.find(ids.find(Table)->second) == schemata.end())
-		return empty_set;
-	return schemata.find(ids.find(Table)->second)->second;
+	return structures[Id];
 }
 ***REMOVED***
 // Returns a differencwe between two tables
-unordered_set<Queries::Field> Schemata::Common(string Parent, string Child)
+unordered_set<Queries::Field> Structures::Common(size_t Parent_Id, size_t Child_Id)
 {
 	// Get the fields of both tables
-	unordered_set<Queries::Field> parent_set = Get(Parent);
-	unordered_set<Queries::Field> child_set = Get(Child);
+	unordered_set<Queries::Field> parent_set = Get(Parent_Id);
+	unordered_set<Queries::Field> child_set = Get(Child_Id);
 ***REMOVED***
 	unordered_set<Queries::Field> common;
 	

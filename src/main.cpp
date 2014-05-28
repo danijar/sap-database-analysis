@@ -3,7 +3,7 @@
 #include <unordered_set>
 #include "algorithm/ratios.h"
 #include "algorithm/hierarchy.h"
-#include "algorithm/schemata.h"
+#include "algorithm/structures.h"
 #include "tool/navigator.h"
 using namespace std;
 ***REMOVED***
