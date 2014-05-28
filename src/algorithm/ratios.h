@@ -10,8 +10,8 @@
  */
 class Ratios {
 public:
-	Ratios(std::string Dsn, std::string User, std::string Password, std::string Path = "data/ratios.dump");
-	void Fetch(std::string Dsn, std::string User, std::string Password, bool Output = false);
+	Ratios(std::string Path = "data/ratios.dump");
+	void Fetch(bool Output = false);
 	bool Load(std::string Path = "data/ratios.dump");
 	bool Save(std::string Path = "data/ratios.dump");
 	bool Saved(std::string Path = "data/ratios.dump");
@@ -21,7 +21,6 @@ public:
 	std::vector<std::unordered_map<size_t, float>> ratios;
 ***REMOVED***
 private:
-	
 	void Graph(std::vector<Queries::Ratio > &Rows);
 	size_t Size();
 	size_t Id(std::string name);
