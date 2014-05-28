@@ -3,6 +3,7 @@
 #include <unordered_set>
 #include <string>
 #include "algorithm/hierarchy.h"
+#include "algorithm/structures.h"
 ***REMOVED***
 ***REMOVED***
 /*
@@ -11,16 +12,19 @@
  */
 class Navigator {
 public:
-	Navigator(Hierarchy &Hierarchy);
+	Navigator(Hierarchy &Hierarchy, Structures &Structures);
 	bool Go(std::string Name);
 	bool Up();
 	void List(size_t Limit = 16, bool Reverse = false);
 private:
-	Hierarchy &hierarchy;
-	std::vector<size_t> path;
-	float Ratio(size_t From, size_t To);
 	struct Child{ std::string Name; float Ratio; size_t Children; };
+***REMOVED***
+	float Ratio(size_t From, size_t To);
 	void Table(size_t Id, std::vector<Child> &Children, size_t Limit = 16);
-	void Difference(std::string Left, std::string Right);
+	void Difference(std::string Table);
 	void Clear();
+***REMOVED***
+	Hierarchy &hierarchy;
+	Structures &structures;
+	std::vector<size_t> path;
 };

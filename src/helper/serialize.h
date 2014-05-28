@@ -17,6 +17,7 @@ public:
 	Serialize &operator<<(const size_t Value);
 	Serialize &operator<<(const float Value);
 	Serialize &operator<<(const std::string Value);
+	template <typename TLeft, typename TRight> Serialize &operator<<(const std::pair<TLeft, TRight> Value);
 	template <typename T> Serialize &operator<<(const std::vector<T> Value);
 	template <typename T> Serialize &operator<<(const std::unordered_set<T> Value);
 	template <typename TKey, typename TVal> Serialize &operator<<(const std::unordered_map<TKey, TVal> Value);
@@ -36,6 +37,7 @@ public:
 	Deserialize &operator>>(size_t &Value);
 	Deserialize &operator>>(float &Value);
 	Deserialize &operator>>(std::string &Value);
+	template <typename TLeft, typename TRight> Deserialize &operator>>(std::pair<TLeft, TRight> &Value);
 	template <typename T> Deserialize &operator>>(std::vector<T> &Value);
 	template <typename T> Deserialize &operator>>(std::unordered_set<T> &Value);
 	template <typename TKey, typename TVal> Deserialize &operator>>(std::unordered_map<TKey, TVal> &Value);

@@ -2,6 +2,12 @@
 #include "serialize.h"
 ***REMOVED***
 ***REMOVED***
+template <typename TLeft, typename TRight> Serialize &Serialize::operator<<(const std::pair<TLeft, TRight> Value)
+{
+	*this << Value.first << Value.second;
+	return *this;
+}
+***REMOVED***
 template <typename T> Serialize &Serialize::operator<<(const std::vector<T> Value)
 {
 	*this << Value.size();
@@ -23,6 +29,12 @@ template <typename TKey, typename TVal> Serialize &Serialize::operator<<(const s
 	*this << Value.size();
 	for (auto i = Value.begin(); i != Value.end(); ++i)
 		*this << i->first << i->second;
+	return *this;
+}
+***REMOVED***
+template <typename TLeft, typename TRight> Deserialize &Deserialize::operator>>(std::pair<TLeft, TRight> &Value)
+{
+	*this >> Value.first >> Value.second;
 	return *this;
 }
 ***REMOVED***
