@@ -1,6 +1,5 @@
 #include "algorithm/hierarchy.h"
 #include <iostream>
-#include "helper/bar.h"
 #include "helper/serialize.h"
 using namespace std;
 ***REMOVED***
@@ -32,6 +31,7 @@ bool Hierarchy::Load(string Path)
 ***REMOVED***
 	// Read data
 	in >> children;
+	in >> amounts;
 ***REMOVED***
 	return true;
 }
@@ -46,6 +46,7 @@ bool Hierarchy::Save(string Path)
 ***REMOVED***
 	// Write data
 	out << children;
+	out << amounts;
 ***REMOVED***
 	return true;
 }
@@ -104,6 +105,13 @@ void Hierarchy::Generate()
 	auto heads = Heads();
 	for (auto i = heads.begin(); i != heads.end(); ++i)
 		children[0].insert(*i);
+***REMOVED***
+	// Calculate recursive amount of children starting at root
+	amounts.clear();
+	amounts.resize(names.size());
+	Bar amount_bar("Calculate depth", names.size());
+	Amount(0, &amount_bar);
+	amount_bar.Finish();
 }
 ***REMOVED***
 // Add children of given table to hierarchy
@@ -144,4 +152,19 @@ void Hierarchy::Children(size_t Id)
 		// Add to tree
 		children[parent].insert(child);
 	}
+}
+***REMOVED***
+// Calculate recursive amount of children
+size_t Hierarchy::Amount(size_t Id, Bar *Bar)
+{
+	// Calculate amount if not cached
+	if (!amounts[Id]) {
+		size_t sum = children[Id].size();
+		for (auto i = children[Id].begin(); i != children[Id].end(); ++i)
+			sum += Amount(*i, Bar);
+		amounts[Id] = sum;
+		Bar->Increment();
+	}
+	
+	return amounts[Id];
 }
