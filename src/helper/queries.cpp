@@ -6,49 +6,10 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 namespace Queries {
-	// Get fields of a table from DDO3L
-	unordered_set<string> Schema(string Table)
-	{
-		unordered_set<string> fields;
-***REMOVED***
-		// Initialize database driver
-		otl_connect db;
-		otl_connect::otl_initialize();
-***REMOVED***
-		try {
-			// Connect to database
-			string connect = "***REMOVED***;***REMOVED***;***REMOVED***";
-			db.rlogon(connect.c_str());
-***REMOVED***
-			// Select scheme from table
-			string text = "SELECT FIELDNAME FROM ABAP.DD03L WHERE TABNAME = '" + Table + "' ORDER BY POSITION ASC";
-			otl_stream query(50, text.c_str(), db);
-***REMOVED***
-			// Read input data into array
-			while (!query.eof()) {
-				string field;
-				query >> field;
-				fields.insert(field);
-			}
-		}
-		catch (otl_exception& e) {
-			// Print database errors
-			cerr << e.msg << endl;
-			cerr << e.stm_text << endl;
-			cerr << e.sqlstate << endl;
-			cerr << e.var_info << endl;
-		}
-***REMOVED***
-		// Cleanup
-		db.logoff();
-***REMOVED***
-		return fields;
-	}
-***REMOVED***
 	// Load input data from database into memory
-	vector<ratio_row> Ratios(string Dsn, string User, string Password)
+	vector<Ratio> Ratios()
 	{
-		vector<ratio_row> rows;
+		vector<Ratio> rows;
 ***REMOVED***
 		// Initialize database driver
 		otl_connect db;
@@ -77,9 +38,9 @@ namespace Queries {
 			// Read input data into array
 			Bar bar("Query ratios", count);
 			while (!query.eof()) {
-				ratio_row current;
-				query >> current.parent >> current.child >> current.parentratio >> current.childratio;
-				rows.push_back(current);
+				Ratio ratio;
+				query >> ratio.parent >> ratio.child >> ratio.parentratio >> ratio.childratio;
+				rows.push_back(ratio);
 				bar.Increment();
 			}
 			bar.Finish();
@@ -113,9 +74,9 @@ namespace Queries {
 	}
 ***REMOVED***
 	// Load field data from database into memory for certain table
-	vector<Field> Fields(string Table, string Dsn, string User, string Password)
+	vector<Field> Fields(string Table)
 	{
-		vector<Field> field_rows;
+		vector<Field> rows;
 ***REMOVED***
 		// Initialize database driver
 		otl_connect db;
@@ -136,7 +97,7 @@ namespace Queries {
 			// Skip if empty
 			if (!count) {
 				cout << "No records found." << endl;
-				return field_rows;
+				return rows;
 			}
 ***REMOVED***
 			// Select fields for the table
@@ -150,7 +111,7 @@ namespace Queries {
 				string position;
 				query >> current.name >> current.roll >> current.domain >> position;
 				current.position = (size_t)stoi(position);
-				field_rows.push_back(current);
+				rows.push_back(current);
 				bar.Increment();
 			}
 			bar.Finish();
@@ -166,13 +127,13 @@ namespace Queries {
 		// Cleanup
 		db.logoff();
 ***REMOVED***
-		return field_rows;
+		return rows;
 	}
 ***REMOVED***
 	// Load the scemata of a set of tables from the database
-	unordered_map<size_t, unordered_set<Field>> Schemata(unordered_map<string, size_t> &Ids, string Dsn, string User, string Password)
+	vector<unordered_set<Field>> Structures(unordered_map<string, size_t> &Ids)
 	{
-		unordered_map<size_t, unordered_set<Field>> result;
+		vector<unordered_set<Field>> result;
 ***REMOVED***
 		// Building table list for query
 		string table_list;
@@ -212,14 +173,15 @@ namespace Queries {
 			otl_stream query(50, select_query.c_str(), db);
 ***REMOVED***
 			// Read input data into array
-			Bar bar("Query schemata", count);
+			Bar bar("Query structures", count);
+			result.resize(count);
 			while (!query.eof()) {
 				Field current;
 				string table, position;
 				query >> table >> current.name >> current.roll >> current.domain >> position;
 				current.position = (size_t)stoi(position);
 				
-				// Add field into result table if name is in result table
+				// Find corresponding id and add to result
 				auto i = Ids.find(table);
 				if (i != Ids.end())
 					result[i->second].insert(current);

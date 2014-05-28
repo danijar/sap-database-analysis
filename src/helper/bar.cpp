@@ -49,6 +49,19 @@ size_t Bar::Current()
 	return current;
 }
 ***REMOVED***
+// Change maximum and adjust current position
+void Bar::Resize(size_t Remaining)
+{
+	// Find current progress
+	double progress = (double)current / (double)max;
+***REMOVED***
+	// Update maximum
+	max = current + Remaining;
+***REMOVED***
+	// Adjust current to keep progress
+	current = size_t(max * progress + 0.5);
+}
+***REMOVED***
 // Redraw and add final line break
 void Bar::Finish(bool Success)
 {
