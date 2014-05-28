@@ -1,4 +1,4 @@
-#include "algorithm/input.h"
+#include "algorithm/ratios.h"
 #include <iostream>
 #define OTL_ODBC
 #define OTL_STL
@@ -9,7 +9,7 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor checks for dump or queries
-Input::Input(string Dsn, string User, string Password, string Path)
+Ratios::Ratios(string Dsn, string User, string Password, string Path)
 {
 	// Try to load dump
 	if (Saved(Path) && Load(Path)) {
@@ -23,7 +23,7 @@ Input::Input(string Dsn, string User, string Password, string Path)
 }
 ***REMOVED***
 // Fetch input from database and generate graph from it
-void Input::Fetch(string Dsn, string User, string Password, bool Output)
+void Ratios::Fetch(string Dsn, string User, string Password, bool Output)
 {
 	// Reset data
 	ids.clear();
@@ -31,7 +31,7 @@ void Input::Fetch(string Dsn, string User, string Password, bool Output)
 	ratios.clear();
 ***REMOVED***
 	// Query rows from database
-	auto rows = Queries::Ratios(Dsn, User, Password);
+	auto rows = Queries::Ratios();
 	Graph(rows);
 ***REMOVED***
 	// Output
@@ -39,7 +39,7 @@ void Input::Fetch(string Dsn, string User, string Password, bool Output)
 		// Count connections
 		size_t connections = 0;
 		for (auto i = ratios.begin(); i != ratios.end(); ++i)
-			connections += i->second.size();
+			connections += i->size();
 ***REMOVED***
 		// Print message
 		cout << fixed;
@@ -53,7 +53,7 @@ void Input::Fetch(string Dsn, string User, string Password, bool Output)
 }
 ***REMOVED***
 // Reset and load data from disk
-bool Input::Load(string Path)
+bool Ratios::Load(string Path)
 {
 	// Reset data
 	ids.clear();
@@ -74,7 +74,7 @@ bool Input::Load(string Path)
 }
 ***REMOVED***
 // Save current data to disk
-bool Input::Save(string Path)
+bool Ratios::Save(string Path)
 {
 	// Initialize stream
 	Serialize out(Path);
@@ -90,7 +90,7 @@ bool Input::Save(string Path)
 }
 ***REMOVED***
 // Check whether there is a dump file at this location
-bool Input::Saved(string Path)
+bool Ratios::Saved(string Path)
 {
 	ifstream stream(Path.c_str());
 	bool result = stream.good();
@@ -99,14 +99,14 @@ bool Input::Saved(string Path)
 }
 ***REMOVED***
 // Get or create id of a table name
-size_t Input::Id(string name)
+size_t Ratios::Id(string name)
 {
 	// Add if not already in map
 	auto i = ids.find(name);
 	if (i == ids.end()) {
-		size_t id = ids.size() + 1;
+		size_t id = names.size();
+		names.push_back(name);
 		ids[name] = id;
-		names[id] = name;
 		return id;
 	}
 ***REMOVED***
@@ -116,7 +116,7 @@ size_t Input::Id(string name)
 }
 ***REMOVED***
 // Build ratio graph
-void Input::Graph(vector<Queries::ratio_row> &Rows)
+void Ratios::Graph(vector<Queries::Ratio> &Rows)
 {
 	// Skip if empty
 	if (!Rows.size()) {
@@ -124,14 +124,31 @@ void Input::Graph(vector<Queries::ratio_row> &Rows)
 		return;
 	}
 ***REMOVED***
-	// Create graph from query rows
-	Bar bar("Unpack data", Rows.size());
+	// Push root node at index zero
+	names.push_back("<root>");
+	ids.insert(make_pair("<root>", 0));
+***REMOVED***
+	// Fetch distinct table names
+	Bar bar("Unpack data", Rows.size() * 2);
 	for (auto i = Rows.begin(); i != Rows.end(); ++i) {
 		// Create nodes
-		size_t parent = Id(i->parent);
-		size_t child = Id(i->child);
+		Id(i->parent);
+		Id(i->child);
 ***REMOVED***
-		// Create edges
+		bar.Increment();
+	}
+***REMOVED***
+	// Create graph from query rows
+	ratios.resize(names.size());
+	for (auto i = Rows.begin(); i != Rows.end(); ++i) {
+		// Get table ids from row
+		size_t parent = ids[i->parent];
+		size_t child = ids[i->child];
+***REMOVED***
+		if (parent > ratios.size() - 1)
+			cout << endl << parent << endl << ratios.size();
+***REMOVED***
+		// Add parent ratio
 		ratios[parent][child] = i->parentratio;
 		
 		// For now, ignore child ratio completely
@@ -143,7 +160,7 @@ void Input::Graph(vector<Queries::ratio_row> &Rows)
 }
 ***REMOVED***
 // Calculate memory size in bytes
-size_t Input::Size()
+size_t Ratios::Size()
 {
 	size_t size = 0;
 ***REMOVED***
@@ -154,7 +171,7 @@ size_t Input::Size()
 	// Ratios
 	size += ratios.size() * sizeof(size_t);
 	for (auto i = ratios.begin(); i != ratios.end(); ++i)
-		size += i->second.size() * (sizeof(size_t) + sizeof(float));
+		size += i->size() * (sizeof(size_t) + sizeof(float));
 ***REMOVED***
 	return size;
 }

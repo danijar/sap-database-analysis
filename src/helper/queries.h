@@ -12,7 +12,7 @@
  */
 namespace Queries {
 	// Struct for the ratio rows
-	struct ratio_row {
+	struct Ratio {
 		std::string parent, child;
 		float parentratio, childratio;
 	};
@@ -29,11 +29,13 @@ namespace Queries {
 	Serialize &operator<<(Serialize &serialize, const Field &field);
 	Deserialize &operator>>(Deserialize &deserialize, Field &field);
 ***REMOVED***
-	std::unordered_set<std::string> Schema(std::string Table);
-	std::vector<ratio_row> Ratios(std::string Dsn, std::string User, std::string Password);
-	std::vector<Field> Fields(std::string Table, std::string Dsn, std::string User, std::string Password);
-	std::unordered_map<size_t, std::unordered_set<Field>> Schemata(std::unordered_map<std::string, size_t> &Ids,
-		std::string Dsn, std::string User, std::string Password);
+	static std::string Dsn = "HANA";
+	static std::string User = "***REMOVED***";
+	static std::string Password = "***REMOVED***";
+***REMOVED***
+	std::vector<Ratio> Ratios();
+	std::vector<Field> Fields(std::string Table);
+	std::vector<std::unordered_set<Field>> Structures(std::unordered_map<std::string, size_t> &Ids);
 }
 ***REMOVED***
 namespace std {

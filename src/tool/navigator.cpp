@@ -42,9 +42,9 @@ Navigator::Navigator(Hierarchy &Hierarchy) : hierarchy(Hierarchy)
 		// List scheme
 		else if (command == "scheme") {
 			if (path.size()) {
-				unordered_set<string> fields = Queries::Schema(hierarchy.names[path.back()]);
+				vector<Queries::Field> fields = Queries::Fields(hierarchy.names[path.back()]);
 				for (auto i : fields)
-					cout << i << " ";
+					cout << i.name << " ";
 				cout << endl;
 			} else {
 				cout << "Select a table first." << endl;
@@ -162,15 +162,15 @@ void Navigator::List(size_t Limit, bool Reverse)
 {
 	// Name and id of current table
 	size_t id = path.size() ? path.back() : 0;
-	string headline = path.size() ? hierarchy.names[id] : "Root";
+	string headline = path.size() ? hierarchy.names[id] : "<root>";
 ***REMOVED***
 	// Prepare vector of children
 	vector<Child> children;
-	if (hierarchy.children.find(id) != hierarchy.children.end()) {
+	if (id < hierarchy.children.size()) {
 		for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i) {
 			Child child;
 			child.Name = hierarchy.names[*i];
-			child.Children = Children(*i);
+			child.Children = hierarchy.children[*i].size();
 			child.Ratio = Ratio(id, *i);
 			children.push_back(child);
 		}
@@ -192,31 +192,16 @@ void Navigator::List(size_t Limit, bool Reverse)
 // Get ratio between to tables
 float Navigator::Ratio(size_t From, size_t To)
 {
-	// Check for connection from parent table
-	auto i = hierarchy.ratios.find(From);
-	if (i == hierarchy.ratios.end())
+	// Check for table
+	if (From > hierarchy.ratios.size() - 1)
 		return -1;
 ***REMOVED***
 	// Check for connection to child
-	auto j = i->second.find(To);
-	if (j == i->second.end())
+	auto j = hierarchy.ratios[From].find(To);
+	if (j == hierarchy.ratios[From].end())
 		return -1;
 ***REMOVED***
 	return j->second;
-}
-***REMOVED***
-// Get number of children of a table
-size_t Navigator::Children(size_t Id)
-{
-	// Find node of interest
-	auto i = hierarchy.children.find(Id);
-***REMOVED***
-	// No children
-	if (i == hierarchy.children.end())
-		return 0;
-***REMOVED***
-	// Get number of children
-	return i->second.size();
 }
 ***REMOVED***
 // Print out the passed children as table
@@ -323,13 +308,22 @@ void Navigator::Difference(string Left, string Right)
 	}
 ***REMOVED***
 	// Get table shemes
-	auto parent = Queries::Schema(Left);
-	auto child = Queries::Schema(Right);
-	if (parent.empty() || child.empty()) {
+	auto parent_vector = Queries::Fields(Left);
+	auto child_vector = Queries::Fields(Right);
+	if (parent_vector.empty() || child_vector.empty()) {
 		cout << "Could not retrieve table schemes." << endl;
 		return;
 	}
-	
+***REMOVED***
+	// Convert to sets of just the names for fast access
+	unordered_set<string> parent, child;
+	parent.reserve(parent_vector.size());
+	child.reserve(child_vector.size());
+	for (auto i = parent_vector.begin(); i != parent_vector.end(); ++i)
+		parent.insert(i->name);
+	for (auto i = child_vector.begin(); i != child_vector.end(); ++i)
+		child.insert(i->name);
+***REMOVED***
 	// Find distinct and common fields
 	vector<string> commons, missings, news;
 	for (auto i = parent.begin(); i != parent.end(); ++i)

@@ -1,6 +1,7 @@
 #include <iostream>
+#include <string>
 #include <unordered_set>
-#include "algorithm/input.h"
+#include "algorithm/ratios.h"
 #include "algorithm/hierarchy.h"
 #include "algorithm/schemata.h"
 #include "tool/navigator.h"
@@ -9,17 +10,23 @@ using namespace std;
 ***REMOVED***
 int main()
 {
+	// Database credentials
+	string dsn = "HANA";
+	string user = "***REMOVED***";
+	string password = "***REMOVED***";
+***REMOVED***
 	// Fetch input
-	Input input("HANA", "***REMOVED***", "***REMOVED***");
-	
-	// Fetch schemata
-	Schemata schemata(input, "HANA", "***REMOVED***", "***REMOVED***");
+	Ratios ratios(dsn, user, password);
 ***REMOVED***
 	// Build hierarchy
-	Hierarchy hierarchy(input);
+	Hierarchy hierarchy(ratios);
+***REMOVED***
+	// Fetch schemata
+	Structures schemata(ratios, dsn, user, password);
 ***REMOVED***
 	// Wait for user input
 	cout << "Press enter to start hierarchy navigator..." << endl;
+	cout.flush();
 	cin.get();
 ***REMOVED***
 	// Navigate through hierarchie
