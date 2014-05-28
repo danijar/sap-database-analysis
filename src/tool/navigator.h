@@ -19,9 +19,8 @@ private:
 	Hierarchy &hierarchy;
 	std::vector<size_t> path;
 	float Ratio(size_t From, size_t To);
-	size_t Children(size_t Id);
 	struct Child{ std::string Name; float Ratio; size_t Children; };
-	void Table(std::string Parent, std::vector<Child> &Children, size_t Limit = 16);
+	void Table(size_t Id, std::vector<Child> &Children, size_t Limit = 16);
 	void Difference(std::string Left, std::string Right);
 	void Clear();
 };

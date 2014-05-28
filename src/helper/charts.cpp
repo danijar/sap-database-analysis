@@ -10,22 +10,30 @@ namespace Charts {
 	void Histogram(vector<size_t> &Data, size_t Height, size_t Width)
 	{
 		// Sort data and store maximum
-		sort(Data.begin(), Data.end(), greater<size_t>());
-		size_t max = Data.front();
+		size_t max = 0;
+		for (auto i = Data.begin(); i != Data.end(); ++i)
+			if (*i > max)
+				max = *i;
+***REMOVED***
+		// Count occurences of all numbers
+		vector<size_t> count;
+		count.resize(max + 1);
+		for (auto i = Data.begin(); i != Data.end(); ++i)
+			count[*i]++;
 ***REMOVED***
 		// Restrict dimensions to input data
-		Width = min(Width, Data.size());
+		Width = min(Width, count.size());
 		Height = min(Height, max);
 ***REMOVED***
 		// Sample for width
 		vector<size_t> samples;
 		samples.reserve(Width);
-		size_t step = Data.size() / Width;
+		size_t step = count.size() / Width;
 		for (size_t i = 0; i < Width; ++i) {
 			// Average over samples
 			size_t sum = 0;
 			for (size_t j = 0; j < step; ++j)
-				sum += Data[i * step + j];
+				sum += count[i * step + j];
 			sum /= step;
 ***REMOVED***
 			// Write to vector
