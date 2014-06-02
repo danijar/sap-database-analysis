@@ -4,7 +4,7 @@
 #include <string>
 #include "algorithm/hierarchy.h"
 #include "algorithm/structures.h"
-***REMOVED***
+#include "tool/benchmark.h"
 ***REMOVED***
 /*
  * Console based navigation through our result set. Currently,
