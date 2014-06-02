@@ -93,16 +93,22 @@ bool Structures::Saved(string Path)
 pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t Parent, size_t Child)
 {
 	pair<unordered_set<string>, unordered_set<string>> result;
-***REMOVED***
+	
 	// Find added fields
-	for (auto i = structures[Child].begin(); i != structures[Child].end(); ++i)
-		if (structures[Parent].find(*i) == structures[Parent].end())
+	for (auto i = structures[Child].begin(); i != structures[Child].end(); ++i) {
+		// Using the own find operator because find doesent use def. comperator
+		if (std::find_if(structures[Parent].begin(), structures[Parent].end(),
+				Queries::find_field(*i)) == structures[Parent].end())
 			result.first.insert(i->name);
+	}
 ***REMOVED***
 	// Find removed streams
-	for (auto i = structures[Parent].begin(); i != structures[Parent].end(); ++i)
-		if (structures[Child].find(*i) == structures[Child].end())
+	for (auto i = structures[Parent].begin(); i != structures[Parent].end(); ++i) {
+		// Using the own find operator because find doesent use def. comperator
+		if (std::find_if(structures[Child].begin(), structures[Child].end(),
+			Queries::find_field(*i)) == structures[Child].end())
 			result.second.insert(i->name);
+	}
 ***REMOVED***
 	return result;
 }
