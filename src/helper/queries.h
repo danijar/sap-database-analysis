@@ -25,7 +25,29 @@ namespace Queries {
 		{
 			return name == other.name;
 		}
+		bool operator==(const std::string &other) const
+		{
+			return name == other;
+		}
+		bool operator==(const Field *other) const
+		{
+			return name == other->name;
+		}
+		bool operator==(const std::vector<Field>::iterator iter) const
+		{
+			return name == iter->name;
+		}
 	};
+***REMOVED***
+	// Implement a find function for the difference check
+	struct find_field : std::unary_function<Field, bool> {
+		std::string name;
+		find_field(Field f) :name(f.name) { }
+		bool operator()(Field const& f) const {
+			return f.name == name;
+		}
+	};
+***REMOVED***
 	Serialize &operator<<(Serialize &serialize, const Field &field);
 	Deserialize &operator>>(Deserialize &deserialize, Field &field);
 ***REMOVED***
@@ -39,6 +61,7 @@ namespace Queries {
 }
 ***REMOVED***
 namespace std {
+	
 	template <>
 	struct hash<Queries::Field>
 	{
