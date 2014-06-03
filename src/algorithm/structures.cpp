@@ -5,7 +5,7 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor checks dump and fetch data
-Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : ids(Ratios.ids), hierarchy(Hierarchy)
+Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : hierarchy(Hierarchy)
 {
 	// Try to load dump
 	if (Saved(Path) && Load(Path)) {
@@ -25,16 +25,21 @@ void Structures::Fetch(bool Output)
 	// Reset data
 	structures.clear();
 	differences.clear();
-	
+	names.clear();
+***REMOVED***
+	for (auto i = hierarchy.ratios.begin(); i != hierarchy.ratios.end(); i++){
+		names.insert(i->first);
+	}
 	// Fetch schemata from database
-	structures = Queries::Structures(ids);
+	
+	structures = Queries::Structures(names);
 ***REMOVED***
 	// Output
 	if (Output) {
 		// Count connections
 		size_t fields = 0;
 		for (auto i = structures.begin(); i != structures.end(); ++i)
-			fields += i->size();
+			fields += i->second.size();
 ***REMOVED***
 		// Print message
 		cout << fixed;
@@ -61,7 +66,7 @@ bool Structures::Load(string Path)
 	// Read data
 	in >> structures;
 	in >> differences;
-***REMOVED***
+	in >> names;
 	return true;
 }
 ***REMOVED***
@@ -76,7 +81,7 @@ bool Structures::Save(string Path)
 	// Structures
 	out << structures;
 	out << differences;
-***REMOVED***
+	out << names;
 	return true;
 }
 ***REMOVED***
@@ -90,7 +95,7 @@ bool Structures::Saved(string Path)
 }
 ***REMOVED***
 // Compute added and removed fields between any two tables
-pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t Parent, size_t Child)
+pair<unordered_set<string>, unordered_set<string>> Structures::Difference(string Parent, string Child)
 {
 	pair<unordered_set<string>, unordered_set<string>> result;
 	
@@ -114,10 +119,10 @@ pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t
 }
 ***REMOVED***
 // Return cached difference for a child to its parent
-pair<unordered_set<string>, unordered_set<string>> &Structures::Difference(size_t Child)
+pair<unordered_set<string>, unordered_set<string>> &Structures::Difference(string Child)
 {
 	// Check for valid table
-	if (Child > differences.size() - 1)
+	if (differences.find(Child) == differences.end())
 		throw exception("Table index out of range");
 ***REMOVED***
 	return differences[Child];
@@ -127,12 +132,12 @@ pair<unordered_set<string>, unordered_set<string>> &Structures::Difference(size_
 void Structures::Generate()
 {
 	// Initialize container
-	differences.resize(ids.size());
+	//differences.resize(ids.size());
 ***REMOVED***
 	// Compute for each children of current table
-	for (size_t i = 0; i < ids.size(); ++i)
-		for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j)
-				differences[*j] = Difference(i, *j);
+	for (auto i = names.begin(); i != names.end(); ++i)
+		for (auto j = hierarchy.children[*i].begin(); j != hierarchy.children[*i].end(); ++j)
+				differences[*j] = Difference(*i, *j);
 }
 ***REMOVED***
 // Calculate memory size in bytes
@@ -141,9 +146,9 @@ size_t Structures::Size()
 	size_t size = 0;
 ***REMOVED***
 	// Structures
-	size += structures.size() * sizeof(size_t);
+	size += structures.size() * sizeof(string);
 	for (auto i = structures.begin(); i != structures.end(); ++i)
-		size += i->size() * (sizeof(size_t)+sizeof(Queries::Field));
+		size += i->second.size() * (sizeof(string)+sizeof(Queries::Field));
 ***REMOVED***
 	// Differences
 	// ...

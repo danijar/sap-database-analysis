@@ -16,9 +16,9 @@ public:
 	bool Save(std::string Path = "data/ratios.dump");
 	bool Saved(std::string Path = "data/ratios.dump");
 	
-	std::unordered_map<std::string, size_t> ids;
-	std::vector<std::string> names;
-	std::vector<std::unordered_map<size_t, float>> ratios;
+	//std::unordered_map<std::string, size_t> ids;
+	//std::vector<std::string> names;
+	std::unordered_map<std::string, std::unordered_map<std::string, float>> ratios;
 ***REMOVED***
 private:
 	void Graph(std::vector<Queries::Ratio > &Rows);

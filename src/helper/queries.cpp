@@ -131,19 +131,19 @@ namespace Queries {
 	}
 ***REMOVED***
 	// Load the scemata of a set of tables from the database
-	vector<unordered_set<Field>> Structures(unordered_map<string, size_t> &Ids)
+	unordered_map<string, unordered_set<Field>> Structures(std::unordered_set<string> &Names)
 	{
-		vector<unordered_set<Field>> result;
+		unordered_map<string, unordered_set<Field>> result;
 ***REMOVED***
 		// Building table list for query
 		string table_list;
 		bool first = true;
-		for (auto name = Ids.begin(); name != Ids.end(); name++) {
+		for (auto name = Names.begin(); name != Names.end(); name++) {
 			if (first) {
-				table_list += "'" + name->first + "'";
+				table_list += "'" + *name + "'";
 				first = false;
 			}
-			else table_list += ", '" + name->first + "'";
+			else table_list += ", '" + *name + "'";
 		}
 		
 		// Initialize database driver
@@ -174,7 +174,7 @@ namespace Queries {
 ***REMOVED***
 			// Read input data into array
 			Bar bar("Query structures", count);
-			result.resize(count);
+			
 			while (!query.eof()) {
 				Field current;
 				string table, position;
@@ -182,9 +182,9 @@ namespace Queries {
 				current.position = (size_t)stoi(position);
 				
 				// Find corresponding id and add to result
-				auto i = Ids.find(table);
-				if (i != Ids.end())
-					result[i->second].insert(current);
+				auto i = Names.find(table);
+				if (i != Names.end())
+					result[*i].insert(current);
 ***REMOVED***
 				bar.Increment();
 			}

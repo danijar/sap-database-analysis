@@ -4,7 +4,7 @@
 #include <string>
 #include "algorithm/hierarchy.h"
 #include "algorithm/structures.h"
-#include "tool/benchmark.h"
+***REMOVED***
 ***REMOVED***
 /*
  * Console based navigation through our result set. Currently,
@@ -19,12 +19,12 @@ public:
 private:
 	struct Child{ std::string Name; float Ratio; size_t Children; };
 ***REMOVED***
-	float Ratio(size_t From, size_t To);
-	void Table(size_t Id, std::vector<Child> &Children, size_t Limit = 16);
+	float Ratio(std::string From, std::string To);
+	void Table(std::string Id, std::vector<Child> &Children, size_t Limit = 16);
 	void Difference(std::string Table);
 	void Clear();
 ***REMOVED***
 	Hierarchy &hierarchy;
 	Structures &structures;
-	std::vector<size_t> path;
+	std::vector<std::string> path;
 };

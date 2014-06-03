@@ -20,15 +20,15 @@ public:
 	bool Load(std::string Path = "data/structures.dump");
 	bool Save(std::string Path = "data/structures.dump");
 	bool Saved(std::string Path = "data/structures.dump");
-	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> Difference(size_t Parent, size_t Child);
-	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> &Difference(size_t Child);
+	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> Difference(std::string Parent, std::string Child);
+	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> &Difference(std::string Child);
 	
 private:
 	void Generate();
 	size_t Size();
-***REMOVED***
-	std::vector<std::unordered_set <Queries::Field>> structures;
-	std::vector<std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>>> differences;
-	std::unordered_map<std::string, size_t> &ids;
+	std::unordered_set<std::string> names;
+	std::unordered_map<std::string, std::unordered_set <Queries::Field>> structures;
+	std::unordered_map<std::string, std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>>> differences;
+	//std::unordered_map<std::string, size_t> &ids;
 	Hierarchy &hierarchy;
 };

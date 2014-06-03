@@ -42,7 +42,7 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 		// List scheme
 		else if (command == "scheme") {
 			if (path.size()) {
-				vector<Queries::Field> fields = Queries::Fields(hierarchy.names[path.back()]);
+				vector<Queries::Field> fields = Queries::Fields(path.back());
 				for (auto i : fields)
 					cout << i.name << " ";
 				cout << endl;
@@ -88,7 +88,7 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			cout << endl;
 ***REMOVED***
 			// Fetch and sort children
-			size_t id = path.size() ? path.back() : 0;
+			string id = path.size() ? path.back() : "<root>";
 			vector<size_t> data;
 			data.reserve(hierarchy.children[id].size());
 			for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i)
@@ -107,17 +107,17 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 ***REMOVED***
 		else if (command == "csv") {
 			// Fetch and children and amounts
-			size_t id = path.size() ? path.back() : 0;
+			string id = path.size() ? path.back() : "<root>";
 			vector<pair<string, size_t>> data;
 			data.reserve(hierarchy.children[id].size());
 			for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i)
-				data.push_back(make_pair(hierarchy.names[*i], hierarchy.amounts[*i]));
+				data.push_back(make_pair(*i, hierarchy.amounts[*i]));
 ***REMOVED***
 			// Sort data
 			sort(data.begin(), data.end(), [](pair<string, size_t> l, pair<string, size_t> r) { return l.second < r.second; });
 ***REMOVED***
 			// Table without special chars as file name
-			string name = hierarchy.names[id];
+			string name = id;
 			name.erase(remove(name.begin(), name.end(), '<'), name.end());
 			name.erase(remove(name.begin(), name.end(), '>'), name.end());
 			name += ".csv";
@@ -163,14 +163,14 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 bool Navigator::Go(string Name)
 {
 	// Find node navigating to
-	auto i = hierarchy.ids.find(Name);
+	auto i = hierarchy.names.find(Name);
 	
 	// Name doesn't match
-	if (i == hierarchy.ids.end())
+	if (i == hierarchy.names.end())
 		return false;
 ***REMOVED***
 	// Add to path
-	path.push_back(i->second);
+	path.push_back(*i);
 	return true;
 }
 ***REMOVED***
@@ -182,7 +182,7 @@ bool Navigator::Up()
 		return false;
 ***REMOVED***
 	// Remove last from path
-	size_t node = path.back();
+	string node = path.back();
 	path.pop_back();
 	return true;
 }
@@ -191,18 +191,18 @@ bool Navigator::Up()
 void Navigator::List(size_t Limit, bool Reverse)
 {
 	// If Benchmarking is active start the clock
-	if (BENCHMARK)
-		Benchmark::Start_Clock();
+	//if (BENCHMARK)
+	//	Benchmark::Start_Clock();
 ***REMOVED***
 	// Name and id of current table
-	size_t id = path.size() ? path.back() : 0;
+	string id = path.size() ? path.back() : "<root>";
 ***REMOVED***
 	// Prepare vector of children
 	vector<Child> children;
-	if (id < hierarchy.children.size()) {
+	if (hierarchy.children.find(id) == hierarchy.children.end()) {
 		for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i) {
 			Child child;
-			child.Name = hierarchy.names[*i];
+			child.Name = *i;
 			child.Children = hierarchy.children[*i].size();
 			child.Ratio = Ratio(id, *i);
 			children.push_back(child);
@@ -221,16 +221,16 @@ void Navigator::List(size_t Limit, bool Reverse)
 	// Print children
 	Table(id, children, Limit);
 ***REMOVED***
-	if (BENCHMARK) 
-		cout << "Listing took " << std::setprecision(5) << Benchmark::Stop_Clock().count() << " seconds" << endl;
+	//if (BENCHMARK) 
+	//	cout << "Listing took " << std::setprecision(5) << Benchmark::Stop_Clock().count() << " seconds" << endl;
 	
 }
 ***REMOVED***
 // Get ratio between to tables
-float Navigator::Ratio(size_t From, size_t To)
+float Navigator::Ratio(string From, string To)
 {
 	// Check for table
-	if (From > hierarchy.ratios.size() - 1)
+	if (hierarchy.ratios.find(From) == hierarchy.ratios.end())
 		return -1;
 ***REMOVED***
 	// Check for connection to child
@@ -242,14 +242,14 @@ float Navigator::Ratio(size_t From, size_t To)
 }
 ***REMOVED***
 // Print out the passed children as table
-void Navigator::Table(size_t Id, vector<Child> &Children, size_t Limit)
+void Navigator::Table(string Id, vector<Child> &Children, size_t Limit)
 {
 	// Store default formatting
 	auto format = cout.flags();
 ***REMOVED***
 	// Headline
-	cout << hierarchy.names[Id] << endl;
-	for (size_t i = 0; i < hierarchy.names[Id].length(); ++i)
+	cout << Id << endl;
+	for (size_t i = 0; i < Id.length(); ++i)
 		cout << "=";
 	cout << endl;
 ***REMOVED***
@@ -332,17 +332,17 @@ void Navigator::Table(size_t Id, vector<Child> &Children, size_t Limit)
 void Navigator::Difference(string Table)
 {
 	// If Benchmarking is active start the clock
-	if (BENCHMARK)
-		Benchmark::Start_Clock();
+	//if (BENCHMARK)
+	//	Benchmark::Start_Clock();
 ***REMOVED***
 	// Validate hierarchy
-	if (hierarchy.ids.find(Table) == hierarchy.ids.end()) {
+	if (hierarchy.names.find(Table) == hierarchy.names.end()) {
 		cout << "'" << Table << "' is no valid table name." << endl;
 		return;
 	}
 ***REMOVED***
 	// Get differences
-	size_t id = hierarchy.ids[Table];
+	string id = Table;
 	auto differences = structures.Difference(id);
 	unordered_set<string> &added = differences.first;
 	unordered_set<string> &removed = differences.second;
@@ -403,8 +403,8 @@ void Navigator::Difference(string Table)
 	cout.flags(format);
 ***REMOVED***
 	// If benchmarking print out time passed
-	if (BENCHMARK)
-		cout << "Difference took " << std::setprecision(5) << Benchmark::Stop_Clock().count() << " seconds" << endl;
+	//if (BENCHMARK)
+	//	cout << "Difference took " << std::setprecision(5) << Benchmark::Stop_Clock().count() << " seconds" << endl;
 }
 ***REMOVED***
 // Clear console window on multiple platforms

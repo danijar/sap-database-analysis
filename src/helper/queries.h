@@ -57,7 +57,7 @@ namespace Queries {
 ***REMOVED***
 	std::vector<Ratio> Ratios();
 	std::vector<Field> Fields(std::string Table);
-	std::vector<std::unordered_set<Field>> Structures(std::unordered_map<std::string, size_t> &Ids);
+	std::unordered_map<std::string, std::unordered_set<Field>> Structures(std::unordered_set<std::string> &Names);
 }
 ***REMOVED***
 namespace std {

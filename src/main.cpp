@@ -21,14 +21,14 @@ int main()
 	Queries::Password = "***REMOVED***";
 ***REMOVED***
 	
-	if (BENCHMARK) {
+	if (Benchmark::BENCHMARK) {
 		Benchmark::Start_Clock();
 	}
 	// Fetch input
 	Ratios ratios;
 	
 	// Take the time and print it
-	if (BENCHMARK) {
+	if (Benchmark::BENCHMARK) {
 		double duration = Benchmark::Stop_Clock().count();
 		cout << "Loading the Ratios took " << std::setprecision(5) << duration << " seconds" << endl;
 		Benchmark::Start_Clock();
@@ -38,7 +38,7 @@ int main()
 	Hierarchy hierarchy(ratios);
 	
 	// Take the time and print it
-	if (BENCHMARK) {
+	if (Benchmark::BENCHMARK) {
 		double duration = Benchmark::Stop_Clock().count();
 		cout << "Loading the Hirachy took " << std::setprecision(5) << duration << " seconds" << endl;
 		Benchmark::Start_Clock();
@@ -48,7 +48,7 @@ int main()
 	Structures structures(ratios, hierarchy);
 ***REMOVED***
 	// Take the time and print it
-	if (BENCHMARK) {
+	if (Benchmark::BENCHMARK) {
 		double duration = Benchmark::Stop_Clock().count();
 		cout << "Loading the Structues took " << std::setprecision(5) << duration << " seconds" << endl;
 	}
