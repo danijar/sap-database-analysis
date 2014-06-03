@@ -5,6 +5,9 @@ using namespace std;
 using namespace std::chrono;
 ***REMOVED***
 ***REMOVED***
+// Static member
+bool Bar::Output = true;
+***REMOVED***
 // Constructor
 Bar::Bar(string Label, size_t Max, size_t Width) : label(Label), max(Max), width(Width), current(0), redrawed(0), active(true)
 {
@@ -78,10 +81,12 @@ void Bar::Finish(bool Success)
 ***REMOVED***
 	// Redraw and add final line break
 	Draw();
-	auto format = cout.flags();
-	cout << " ";
-	cout << setw(7) << setprecision(1) << fixed << elapsed << "s" << endl;
-	cout.flags(format);
+	if (Output) {
+		auto format = cout.flags();
+		cout << " ";
+		cout << setw(7) << setprecision(1) << fixed << elapsed << "s" << endl;
+		cout.flags(format);
+	}
 ***REMOVED***
 	// Disable bar
 	active = false;
@@ -90,8 +95,8 @@ void Bar::Finish(bool Success)
 // Print current state of progress bar to console
 void Bar::Draw()
 {
-	// Only draw when line is still active
-	if (!active)
+	// Only draw when still active and output enabled
+	if (!active || !Output)
 		return;
 ***REMOVED***
 	// Calculate progress
