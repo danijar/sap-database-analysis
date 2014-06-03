@@ -8,7 +8,7 @@ using namespace std;
 Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : ids(Ratios.ids), hierarchy(Hierarchy)
 {
 	// Try to load dump
-	if (Saved(Path) && Load(Path)) {
+	if (Load(Path)) {
 		cout << "Loaded cached schemata." << endl;
 		return;
 	}
@@ -49,6 +49,9 @@ void Structures::Fetch(bool Output)
 // Reset and load data from disk
 bool Structures::Load(string Path)
 {
+	if (!Saved())
+		return false;
+***REMOVED***
 	// Reset data
 	structures.clear();
 	differences.clear();
@@ -89,6 +92,18 @@ bool Structures::Saved(string Path)
 	return result;
 }
 ***REMOVED***
+// Batch compute differences from all tables to their parents
+void Structures::Generate()
+{
+	// Initialize container
+	differences.resize(ids.size());
+***REMOVED***
+	// Compute for each children of current table
+	for (size_t i = 0; i < ids.size(); ++i)
+	for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j)
+		differences[*j] = Difference(i, *j);
+}
+***REMOVED***
 // Compute added and removed fields between any two tables
 pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t Parent, size_t Child)
 {
@@ -121,18 +136,6 @@ pair<unordered_set<string>, unordered_set<string>> &Structures::Difference(size_
 		throw exception("Table index out of range");
 ***REMOVED***
 	return differences[Child];
-}
-***REMOVED***
-// Batch compute differences from all tables to their parents
-void Structures::Generate()
-{
-	// Initialize container
-	differences.resize(ids.size());
-***REMOVED***
-	// Compute for each children of current table
-	for (size_t i = 0; i < ids.size(); ++i)
-		for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j)
-				differences[*j] = Difference(i, *j);
 }
 ***REMOVED***
 // Calculate memory size in bytes

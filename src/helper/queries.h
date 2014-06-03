@@ -16,6 +16,8 @@ namespace Queries {
 		std::string parent, child;
 		float parentratio, childratio;
 	};
+	Serialize &operator<<(Serialize &serialize, const Ratio &ratio);
+	Deserialize &operator>>(Deserialize &deserialize, Ratio &ratio);
 ***REMOVED***
 	// Struct for the field values
 	struct Field {
@@ -25,19 +27,9 @@ namespace Queries {
 		{
 			return name == other.name;
 		}
-		bool operator==(const std::string &other) const
-		{
-			return name == other;
-		}
-		bool operator==(const Field *other) const
-		{
-			return name == other->name;
-		}
-		bool operator==(const std::vector<Field>::iterator iter) const
-		{
-			return name == iter->name;
-		}
 	};
+	Serialize &operator<<(Serialize &serialize, const Field &field);
+	Deserialize &operator>>(Deserialize &deserialize, Field &field);
 ***REMOVED***
 	// Implement a find function for the difference check
 	struct find_field : std::unary_function<Field, bool> {
@@ -47,9 +39,6 @@ namespace Queries {
 			return f.name == name;
 		}
 	};
-***REMOVED***
-	Serialize &operator<<(Serialize &serialize, const Field &field);
-	Deserialize &operator>>(Deserialize &deserialize, Field &field);
 ***REMOVED***
 	static std::string Dsn = "HANA";
 	static std::string User = "***REMOVED***";

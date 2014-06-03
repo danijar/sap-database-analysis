@@ -8,7 +8,7 @@ using namespace std;
 Hierarchy::Hierarchy(Ratios &Ratios, string Path) : ids(Ratios.ids), names(Ratios.names), ratios(Ratios.ratios)
 {
 	// Try to load dump
-	if (Saved(Path) && Load(Path)) {
+	if (Load(Path)) {
 		cout << "Loaded cached hierarchy." << endl;
 		return;
 	}
@@ -21,6 +21,9 @@ Hierarchy::Hierarchy(Ratios &Ratios, string Path) : ids(Ratios.ids), names(Ratio
 // Reset and load data from disk
 bool Hierarchy::Load(string Path)
 {
+	if (!Saved())
+		return false;
+***REMOVED***
 	// Reset data
 	children.clear();
 ***REMOVED***
@@ -94,6 +97,7 @@ void Hierarchy::Generate()
 	// Add children of all nodes to hierarchy
 	Bar bar("Build hierarchy", ids.size());
 	processed.clear();
+	children.clear();
 	children.resize(names.size());
 	for (size_t i = 1; i < names.size(); ++i) {
 		Children(i);
