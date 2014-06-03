@@ -27,7 +27,7 @@ void Ratios::Fetch(bool Output)
 {
 	// Reset data
 	//ids.clear();
-	//names.clear();
+	names.clear();
 	ratios.clear();
 ***REMOVED***
 	// Query rows from database
@@ -57,7 +57,7 @@ bool Ratios::Load(string Path)
 {
 	// Reset data
 //	ids.clear();
-//	names.clear();
+	names.clear();
 	ratios.clear();
 	
 	// Initialize stream
@@ -67,7 +67,7 @@ bool Ratios::Load(string Path)
 ***REMOVED***
 	// Read data
 //	in >> ids;
-//	in >> names;
+	in >> names;
 	in >> ratios;
 ***REMOVED***
 	return true;
@@ -83,7 +83,7 @@ bool Ratios::Save(string Path)
 ***REMOVED***
 	// Write data
 //	out << ids;
-//	out << names;
+    out << names;
 	out << ratios;
 ***REMOVED***
 	return true;
@@ -125,21 +125,24 @@ void Ratios::Graph(vector<Queries::Ratio> &Rows)
 	}
 ***REMOVED***
 	// Push root node at index zero
-	//names.push_back("<root>");
+	names.insert("<root>");
+	
 	//ids.insert(make_pair("<root>", 0));
-	//ratios.insert(makemake_pair("<root>", 0));
+	//ratios.insert(make_pair("<root>", 0));
 ***REMOVED***
 	// Fetch distinct table names
 	Bar bar("Unpack data", Rows.size() * 2);
-	/*
+	
 	for (auto i = Rows.begin(); i != Rows.end(); ++i) {
 		// Create nodes
-		Id(i->parent);
-		Id(i->child);
+		names.insert(i->parent);
+		names.insert(i->child);
+	//	Id(i->parent);
+	//	Id(i->child);
 ***REMOVED***
 		bar.Increment();
 	}
-	*/
+***REMOVED***
 	// Create graph from query rows
 	//ratios.resize(names.size());
 	for (auto i = Rows.begin(); i != Rows.end(); ++i) {
@@ -155,7 +158,7 @@ void Ratios::Graph(vector<Queries::Ratio> &Rows)
 		//ratios[parent][child] = i->parentratio;
 		
 		// For now, ignore child ratio completely
-		// Ratio(child, parent, i->childratio);
+		//Ratio(child, parent, i->childratio);
 ***REMOVED***
 		bar.Increment();
 	}

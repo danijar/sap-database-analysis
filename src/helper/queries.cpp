@@ -174,7 +174,7 @@ namespace Queries {
 ***REMOVED***
 			// Read input data into array
 			Bar bar("Query structures", count);
-			
+			result.reserve(count);
 			while (!query.eof()) {
 				Field current;
 				string table, position;

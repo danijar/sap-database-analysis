@@ -5,7 +5,7 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor checks dump and fetch data
-Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : hierarchy(Hierarchy)
+Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : hierarchy(Hierarchy), names(Hierarchy.names)
 {
 	// Try to load dump
 	if (Saved(Path) && Load(Path)) {
@@ -25,11 +25,7 @@ void Structures::Fetch(bool Output)
 	// Reset data
 	structures.clear();
 	differences.clear();
-	names.clear();
 ***REMOVED***
-	for (auto i = hierarchy.ratios.begin(); i != hierarchy.ratios.end(); i++){
-		names.insert(i->first);
-	}
 	// Fetch schemata from database
 	
 	structures = Queries::Structures(names);
@@ -57,7 +53,7 @@ bool Structures::Load(string Path)
 	// Reset data
 	structures.clear();
 	differences.clear();
-***REMOVED***
+	names.clear();
 	// Initialize stream
 	Deserialize in(Path);
 	if (!in.Good())
@@ -132,7 +128,7 @@ pair<unordered_set<string>, unordered_set<string>> &Structures::Difference(strin
 void Structures::Generate()
 {
 	// Initialize container
-	//differences.resize(ids.size());
+	differences.reserve(names.size());
 ***REMOVED***
 	// Compute for each children of current table
 	for (auto i = names.begin(); i != names.end(); ++i)

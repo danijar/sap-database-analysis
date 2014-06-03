@@ -5,7 +5,7 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor
-Hierarchy::Hierarchy(Ratios &Ratios, string Path) : ratios(Ratios.ratios)
+Hierarchy::Hierarchy(Ratios &Ratios, string Path) : ratios(Ratios.ratios), names(Ratios.names)
 {
 	// Try to load dump
 	if (Saved(Path) && Load(Path)) {
@@ -32,7 +32,7 @@ bool Hierarchy::Load(string Path)
 	// Read data
 	in >> children;
 	in >> amounts;
-	in >> names;
+	//in >> names;
 	return true;
 }
 ***REMOVED***
@@ -47,7 +47,7 @@ bool Hierarchy::Save(string Path)
 	// Write data
 	out << children;
 	out << amounts;
-	out << names;
+	//out << names;
 	return true;
 }
 ***REMOVED***
@@ -98,11 +98,6 @@ void Hierarchy::Generate()
 	Bar bar("Build hierarchy", ratios.size());
 	processed.clear();
 	children.clear();
-	names.clear();
-	
-	for (auto i = ratios.begin(); i != ratios.end(); ++i) 
-		if (names.find(i->first) == names.end())
-			names.insert(i->first);
 	
 	children.reserve(names.size());
 	for (auto i = names.begin(); i != names.end(); ++i) {

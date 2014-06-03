@@ -20,44 +20,56 @@ int main()
 	Queries::User = "***REMOVED***";
 	Queries::Password = "***REMOVED***";
 ***REMOVED***
-	
-	if (BENCHMARK) {
-		Benchmark::Start_Clock();
-	}
-	// Fetch input
-	Ratios ratios;
-	
-	// Take the time and print it
-	if (BENCHMARK) {
-		double duration = Benchmark::Stop_Clock().count();
-		cout << "Loading the Ratios took " << std::setprecision(5) << duration << " seconds" << endl;
-		Benchmark::Start_Clock();
+	double ratios_d, hirach_d, struct_d;
+	ratios_d = hirach_d = struct_d = 0;
+***REMOVED***
+	for (int i = 0; i < 50; i++){
+		if (BENCHMARK) {
+			Benchmark::Start_Clock();
+		}
+		// Fetch input
+		Ratios ratios;
+***REMOVED***
+		// Take the time and print it
+		if (BENCHMARK) {
+			double duration = Benchmark::Stop_Clock().count();
+			//cout << "Loading the Ratios took " << std::setprecision(5) << duration << " seconds" << endl;
+			ratios_d += duration;
+			Benchmark::Start_Clock();
+		}
+***REMOVED***
+		// Build hierarchy
+		Hierarchy hierarchy(ratios);
+***REMOVED***
+		// Take the time and print it
+		if (BENCHMARK) {
+			double duration = Benchmark::Stop_Clock().count();
+			//cout << "Loading the Hirachy took " << std::setprecision(5) << duration << " seconds" << endl;
+			hirach_d += duration;
+			Benchmark::Start_Clock();
+		}
+***REMOVED***
+		// Fetch structures
+		Structures structures(ratios, hierarchy);
+***REMOVED***
+		// Take the time and print it
+		if (BENCHMARK) {
+			double duration = Benchmark::Stop_Clock().count();
+			struct_d += duration;
+			//cout << "Loading the Structues took " << std::setprecision(5) << duration << " seconds" << endl;
+		}
+***REMOVED***
+		/*structures.~Structures();
+		hierarchy.~Hierarchy();
+		ratios.~Ratios();*/
 	}
 ***REMOVED***
-	// Build hierarchy
-	Hierarchy hierarchy(ratios);
-	
-	// Take the time and print it
-	if (BENCHMARK) {
-		double duration = Benchmark::Stop_Clock().count();
-		cout << "Loading the Hirachy took " << std::setprecision(5) << duration << " seconds" << endl;
-		Benchmark::Start_Clock();
-	}
-***REMOVED***
-	// Fetch structures
-	Structures structures(ratios, hierarchy);
-***REMOVED***
-	// Take the time and print it
-	if (BENCHMARK) {
-		double duration = Benchmark::Stop_Clock().count();
-		cout << "Loading the Structues took " << std::setprecision(5) << duration << " seconds" << endl;
-	}
-***REMOVED***
+	cout << "Loading took " << std::setprecision(5) << ratios_d/10 << "\t" << hirach_d << "\t" << struct_d << " seconds" << endl;
 	// Wait for user input
 	cout << "Press enter to start hierarchy navigator..." << endl;
 	cout.flush();
 	cin.get();
 	
 	// Navigate through hierarchie
-	Navigator navigator(hierarchy, structures);
+	//Navigator navigator(hierarchy, structures);
 }

@@ -26,7 +26,7 @@ public:
 private:
 	void Generate();
 	size_t Size();
-	std::unordered_set<std::string> names;
+	std::unordered_set<std::string> &names;
 	std::unordered_map<std::string, std::unordered_set <Queries::Field>> structures;
 	std::unordered_map<std::string, std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>>> differences;
 	//std::unordered_map<std::string, size_t> &ids;
