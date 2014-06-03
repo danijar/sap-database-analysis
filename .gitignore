@@ -13,6 +13,8 @@
 *.v12.suo
 ***REMOVED***
 # Binaries
-*.dump
+*.exe
 ***REMOVED***
-test.json
+# Dumps
+*.dump
+*.json
