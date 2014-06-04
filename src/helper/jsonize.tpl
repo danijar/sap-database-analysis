@@ -43,9 +43,11 @@ template <typename TKey, typename TVal> Jsonize &Jsonize::operator<<(const std::
 {
 	stream << "{";
 	if (Value.begin() != Value.end()) {
-		*this << to_string(Value.begin()->first) << ":" << Value.begin()->second;
+		if (typeid(Value.begin()->first) != typeid(string))
+			throw exception("To jasonize, map keys must be strings.");
+		*this << Value.begin()->first << ":" << Value.begin()->second;
 		for (auto i = (++Value.begin()); i != Value.end(); ++i)
-			*this << "," << to_string(i->first) << ":" << i->second;
+			*this << "," << i->first << ":" << i->second;
 	}
 	stream << "}";
 	return *this;
