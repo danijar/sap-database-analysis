@@ -9,7 +9,8 @@
 #include "algorithm/structures.h"
 #include "tool/benchmark.h"
 #include "tool/navigator.h"
-#include "helper/jsonize.h"
+#include "helper/benchmark.h"
+#include "helper/bar.h"
 using namespace std;
 ***REMOVED***
 ***REMOVED***
@@ -20,38 +21,24 @@ int main()
 	Queries::User = "***REMOVED***";
 	Queries::Password = "***REMOVED***";
 ***REMOVED***
-	
-	if (BENCHMARK) {
-		Benchmark::Start_Clock();
-	}
-	// Fetch input
+	// Compute ratio graph, hierarchy and differences
 	Ratios ratios;
-	
-	// Take the time and print it
-	if (BENCHMARK) {
-		double duration = Benchmark::Stop_Clock().count();
-		cout << "Loading the Ratios took " << std::setprecision(5) << duration << " seconds" << endl;
-		Benchmark::Start_Clock();
-	}
-***REMOVED***
-	// Build hierarchy
 	Hierarchy hierarchy(ratios);
-	
-	// Take the time and print it
-	if (BENCHMARK) {
-		double duration = Benchmark::Stop_Clock().count();
-		cout << "Loading the Hirachy took " << std::setprecision(5) << duration << " seconds" << endl;
-		Benchmark::Start_Clock();
-	}
-***REMOVED***
-	// Fetch structures
 	Structures structures(ratios, hierarchy);
 ***REMOVED***
-	// Take the time and print it
-	if (BENCHMARK) {
-		double duration = Benchmark::Stop_Clock().count();
-		cout << "Loading the Structues took " << std::setprecision(5) << duration << " seconds" << endl;
+	/*
+	// Benchmark structure generation
+	Benchmark::Output = true;
+	Bar::Output = false;
+	cout << "Start benchmark." << endl;
+	Benchmark benchmark("Overall");
+	for (size_t i = 0; i < 100; ++i) {
+		benchmark.Round();
+		ratios.Generate();
+		hierarchy.Generate();
 	}
+	benchmark.Finish();
+	*/
 ***REMOVED***
 	// Wait for user input
 	cout << "Press enter to start hierarchy navigator..." << endl;

@@ -2,17 +2,17 @@
 #include "serialize.h"
 ***REMOVED***
 ***REMOVED***
-template <typename TLeft, typename TRight> Serialize &Serialize::operator<<(const std::pair<TLeft, TRight> Value)
-{
-	*this << Value.first << Value.second;
-	return *this;
-}
-***REMOVED***
 template <typename T> Serialize &Serialize::operator<<(const std::vector<T> Value)
 {
 	*this << Value.size();
 	for (auto i = Value.begin(); i != Value.end(); ++i)
 		*this << *i;
+	return *this;
+}
+***REMOVED***
+template <typename TLeft, typename TRight> Serialize &Serialize::operator<<(const std::pair<TLeft, TRight> Value)
+{
+	*this << Value.first << Value.second;
 	return *this;
 }
 ***REMOVED***

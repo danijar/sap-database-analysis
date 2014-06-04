@@ -10,21 +10,10 @@ Jsonize::Jsonize(std::string Path) : path(Path)
 Jsonize::~Jsonize()
 {
 	// Write to file
-	write_to_file();
-	stream.flush();
-}
-***REMOVED***
-***REMOVED***
-void Jsonize::write_to_file()
-{
-	ofstream out_file(path, ios_base::out);
-	if (out_file.bad()) {
-		cout << "Could not open file" << path << endl;
-		return;
+	if (!flushed) {
+		Flush();
+		stream.flush();
 	}
-	
-	out_file << stream.rdbuf();
-	out_file.close();
 }
 ***REMOVED***
 Jsonize &Jsonize::operator<<(const std::string &Value)
@@ -33,4 +22,16 @@ Jsonize &Jsonize::operator<<(const std::string &Value)
 	return *this;
 }
 ***REMOVED***
+bool Jsonize::Flush()
+{
+	ofstream file(path, ios_base::out);
+	if (file.bad() || !file.is_open()) {
+		cout << "Could not open file \"" << path << "\" to write." << endl;
+		return false;
+	}
 ***REMOVED***
+	file << stream.rdbuf();
+	file.close();
+	flushed = true;
+	return true;
+}
