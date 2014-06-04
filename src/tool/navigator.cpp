@@ -437,7 +437,6 @@ bool Navigator::Json(string Folder, size_t Root)
 		create_directories(folder);
 ***REMOVED***
 	// Create json streams
-	Jsonize out_names(Folder + "/names.json");
 	Jsonize out_children(Folder + "/children.json");
 	Jsonize out_differences(Folder + "/differences.json");
 ***REMOVED***
@@ -448,31 +447,39 @@ bool Navigator::Json(string Folder, size_t Root)
 	cout << "Exporting cluster of " << subchildren.size() + 1 << " tables." << endl;
 ***REMOVED***
 	// Fetch properties
-	unordered_map<size_t, string> names;
-	unordered_map<size_t, unordered_set<size_t>> children;
-	unordered_map<size_t, pair<unordered_set<string>, unordered_set<string>>> differences;
+	unordered_map<string, unordered_set<string>> children;
+	unordered_map<string, pair<unordered_set<string>, unordered_set<string>>> differences;
 ***REMOVED***
-	names.reserve(subchildren.size() + 1);
 	children.reserve(subchildren.size() + 1);
 	differences.reserve(subchildren.size() + 1);
-***REMOVED***
-	names.insert(make_pair(Root, hierarchy.names[Root]));
-	children.insert(make_pair(Root, hierarchy.children[Root]));
-	differences.insert(make_pair(Root, structures.differences[Root]));
+	
+	// Convert children to strings
+	unordered_set<string> current;
+	current.reserve(hierarchy.children[Root].size());
+	for (auto i = hierarchy.children[Root].begin(); i != hierarchy.children[Root].end(); ++i)
+		current.insert(hierarchy.names[*i]);
+	children.insert(make_pair(hierarchy.names[Root], current));
+	differences.insert(make_pair(hierarchy.names[Root], structures.differences[Root]));
 ***REMOVED***
 	for (auto i = subchildren.begin(); i != subchildren.end(); ++i) {
-		names.insert(make_pair(*i, hierarchy.names[*i]));
-		children.insert(make_pair(*i, hierarchy.children[*i]));
-		differences.insert(make_pair(*i, structures.differences[*i]));
+		string name = hierarchy.names[*i];
+***REMOVED***
+		// Convert children to strings
+		unordered_set<string> current;
+		current.reserve(hierarchy.children[*i].size());
+		for (auto j = hierarchy.children[*i].begin(); j != hierarchy.children[*i].end(); ++j)
+			current.insert(hierarchy.names[*j]);
+***REMOVED***
+		children.insert(make_pair(name, current));
+		differences.insert(make_pair(name, structures.differences[*i]));
 	}
 ***REMOVED***
 	// Write to JSON streams
-	out_names << names;
 	out_children << children;
 	out_differences << differences;
 ***REMOVED***
 	// Flush files
-	bool result = out_names.Flush() && out_children.Flush() && out_differences.Flush();
+	bool result = out_children.Flush() && out_differences.Flush();
 	return result;
 }
 ***REMOVED***
