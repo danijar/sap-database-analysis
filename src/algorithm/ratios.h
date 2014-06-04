@@ -15,13 +15,14 @@ public:
 	bool Load(std::string Path = "data/ratios.dump");
 	bool Save(std::string Path = "data/ratios.dump");
 	bool Saved(std::string Path = "data/ratios.dump");
-	
+	void Generate();
+***REMOVED***
+	std::vector<Queries::Ratio > rows;
 	std::unordered_map<std::string, size_t> ids;
 	std::vector<std::string> names;
 	std::vector<std::unordered_map<size_t, float>> ratios;
 ***REMOVED***
 private:
-	void Graph(std::vector<Queries::Ratio > &Rows);
 	size_t Size();
 	size_t Id(std::string name);
 };

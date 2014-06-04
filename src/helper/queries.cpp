@@ -6,6 +6,35 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 namespace Queries {
+***REMOVED***
+	// Serializer for ratio type
+	Serialize &operator<<(Serialize &serialize, const Queries::Ratio &ratio)
+	{
+		serialize << ratio.parent << ratio.child << ratio.parentratio << ratio.childratio;
+		return serialize;
+	}
+***REMOVED***
+	// Deserializer for ratio type
+	Deserialize &operator>>(Deserialize &deserialize, Queries::Ratio &ratio)
+	{
+		deserialize >> ratio.parent >> ratio.child >> ratio.parentratio >> ratio.childratio;
+		return deserialize;
+	}
+***REMOVED***
+	// Serializer for query field type
+	Serialize &operator<<(Serialize &serialize, const Queries::Field &field)
+	{
+		serialize << field.name << field.roll << field.domain << field.position;
+		return serialize;
+	}
+***REMOVED***
+	// Deserializer for query field type
+	Deserialize &operator>>(Deserialize &deserialize, Queries::Field &field)
+	{
+		deserialize >> field.name >> field.roll >> field.domain >> field.position;
+		return deserialize;
+	}
+***REMOVED***
 	// Load input data from database into memory
 	vector<Ratio> Ratios()
 	{
@@ -57,20 +86,6 @@ namespace Queries {
 		db.logoff();
 ***REMOVED***
 		return rows;
-	}
-***REMOVED***
-	// Serializer for query field type
-	Serialize &operator<<(Serialize &serialize, const Queries::Field &field)
-	{
-		serialize << field.name << field.roll << field.domain << field.position;
-		return serialize;
-	}
-***REMOVED***
-	// Deserializer for query field type
-	Deserialize &operator>>(Deserialize &deserialize, Queries::Field &field)
-	{
-		deserialize >> field.name >> field.roll >> field.domain >> field.position;
-		return deserialize;
 	}
 ***REMOVED***
 	// Load field data from database into memory for certain table

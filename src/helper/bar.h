@@ -14,8 +14,12 @@ public:
 	size_t Current();
 	void Resize(size_t Remaining);
 	void Finish(bool Success = true);
+***REMOVED***
+	static bool Output;
+***REMOVED***
 private:
 	void Draw();
+***REMOVED***
 	std::string label;
 	size_t max;
 	const size_t width;

@@ -1,12 +1,15 @@
 #include "navigator.h"
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <iomanip>
-#include <functional>
+#include <filesystem>
 #include <cstdlib>
 #include "helper/queries.h"
 #include "helper/charts.h"
+#include "helper/jsonize.h"
 using namespace std;
+using namespace std::tr2::sys;
 ***REMOVED***
 ***REMOVED***
 // Constructor
@@ -27,7 +30,8 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			if (Up()) {
 				Clear();
 				List();
-			} else {
+			}
+			else {
 				cout << "No previous table to go to." << endl;
 			}
 		}
@@ -46,7 +50,8 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 				for (auto i : fields)
 					cout << i.name << " ";
 				cout << endl;
-			} else {
+			}
+			else {
 				cout << "Select a table first." << endl;
 			}
 		}
@@ -105,6 +110,31 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			Charts::Histogram(data);
 		}
 ***REMOVED***
+		// Write JSON files of names, children and differences for current tree
+		else if (command == "json") {
+			/*
+			// Ask for parameters
+			string folder;
+			cout << "Folder: ";
+			cin >> folder;
+			cout << endl;
+			*/
+***REMOVED***
+			// Get current table id and name
+			size_t id = path.size() ? path.back() : 0;
+			string name = hierarchy.names[id];
+			name.erase(remove(name.begin(), name.end(), '<'), name.end());
+			name.erase(remove(name.begin(), name.end(), '>'), name.end());
+			name = "data/" + name;
+***REMOVED***
+			// Create dump
+			if (Json(name, id))
+				cout << "Successfully wrote JSON files to \"" << name << "\" folder." << endl;
+			else
+				cout << "Error writing the file" << endl;
+		}
+***REMOVED***
+		// Write CSV file of current children and their number of children
 		else if (command == "csv") {
 			// Fetch and children and amounts
 			size_t id = path.size() ? path.back() : 0;
@@ -137,14 +167,15 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 		// Show available commands
 		else if (command == "help") {
 			cout << "To navigate to a table, enter its name." << endl;
-			cout << "back"   << "\t" << "Go back to the table you saw before." << endl;
-			cout << "root"   << "\t" << "Go to the root level that lists all table heads." << endl;
+			cout << "back" << "\t" << "Go back to the table you saw before." << endl;
+			cout << "root" << "\t" << "Go to the root level that lists all table heads." << endl;
 			cout << "scheme" << "\t" << "List column scheme of the current table. Needs connection to database." << endl;
-			cout << "more"   << "\t" << "List all children of the current table." << endl;
-			cout << "diff"	 << "\t" << "Show changes from current table to a child." << endl;
-			cout << "histo"  << "\t" << "Draw histogram of children and their number of occurrence." << endl;
-			cout << "csv"    << "\t" << "Write CSV file of current children and their number of children." << endl;
-			cout << "exit"   << "\t" << "Exit the navigator. Synonyms: quit." << endl;
+			cout << "more" << "\t" << "List all children of the current table." << endl;
+			cout << "diff" << "\t" << "Show changes from current table to a child." << endl;
+			cout << "histo" << "\t" << "Draw histogram of children and their number of occurrence." << endl;
+			cout << "json" << "\t" << "Write JSON files of names, children and differences for current tree." << endl;
+			cout << "csv" << "\t" << "Write CSV file of current children and their number of children." << endl;
+			cout << "exit" << "\t" << "Exit the navigator. Synonyms: quit." << endl;
 		}
 ***REMOVED***
 		// Navigate to table
@@ -152,7 +183,8 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			if (Go(command)) {
 				Clear();
 				List();
-			} else {
+			}
+			else {
 				cout << "'" << command << "' is neither a table name nor a command. Enter 'help' to see a list of all available commands." << endl;
 			}
 		}
@@ -164,7 +196,7 @@ bool Navigator::Go(string Name)
 {
 	// Find node navigating to
 	auto i = hierarchy.ids.find(Name);
-	
+***REMOVED***
 	// Name doesn't match
 	if (i == hierarchy.ids.end())
 		return false;
@@ -213,11 +245,12 @@ void Navigator::List(size_t Limit, bool Reverse)
 	if (path.size()) {
 		auto comparator = [Reverse](const Child &A, const Child &B) { return A.Ratio > B.Ratio != Reverse; };
 		sort(children.begin(), children.end(), comparator);
-	} else {
+	}
+	else {
 		auto comparator = [Reverse](const Child &A, const Child &B) { return A.Children > B.Children != Reverse; };
 		sort(children.begin(), children.end(), comparator);
 	}
-	
+***REMOVED***
 	// Print children
 	Table(id, children, Limit);
 ***REMOVED***
@@ -311,7 +344,8 @@ void Navigator::Table(size_t Id, vector<Child> &Children, size_t Limit)
 		Child child = Children[i];
 		if (child.Ratio > 0) {
 			cout << setw(width_ratio) << right << setprecision(2) << fixed << child.Ratio << " ";
-		} else {
+		}
+		else {
 			for (size_t j = 0; j < width_ratio - 1; ++j)
 				cout << " ";
 			cout << "- ";
@@ -350,11 +384,11 @@ void Navigator::Difference(string Table)
 	// Find column widths
 	size_t width_added = 5, width_removed = 7;
 	for (auto i = added.begin(); i != added.end(); ++i)
-		if (i->length() > width_added)
-			width_added = i->length();
+	if (i->length() > width_added)
+		width_added = i->length();
 	for (auto i = removed.begin(); i != removed.end(); ++i)
-		if (i->length() > width_removed)
-			width_removed = i->length();
+	if (i->length() > width_removed)
+		width_removed = i->length();
 ***REMOVED***
 	// Store default formatting
 	auto format = cout.flags();
@@ -387,7 +421,7 @@ void Navigator::Difference(string Table)
 			a++;
 		}
 		else cout << " " << " ";
-		
+***REMOVED***
 		// Removed column
 		cout << setw(width_removed);
 		if (r != removed.end()) {
@@ -395,7 +429,7 @@ void Navigator::Difference(string Table)
 			r++;
 		}
 		else cout << " " << " ";
-		
+***REMOVED***
 		cout << endl;
 	}
 ***REMOVED***
@@ -405,6 +439,57 @@ void Navigator::Difference(string Table)
 	// If benchmarking print out time passed
 	if (BENCHMARK)
 		cout << "Difference took " << std::setprecision(5) << Benchmark::Stop_Clock().count() << " seconds" << endl;
+}
+***REMOVED***
+bool Navigator::Json(string Folder, size_t Root)
+{
+	// Check for bounds
+	if (Root > hierarchy.names.size() - 1)
+		return false;
+***REMOVED***
+	// Create folder
+	auto folder = initial_path<tr2::sys::path>() /= Folder;
+	if (!exists(folder))
+		create_directories(folder);
+***REMOVED***
+	// Create json streams
+	Jsonize out_names(Folder + "/names.json");
+	Jsonize out_children(Folder + "/children.json");
+	Jsonize out_differences(Folder + "/differences.json");
+***REMOVED***
+	// Get recursive children
+	unordered_set<size_t> subchildren = hierarchy.Subchildren(Root);
+***REMOVED***
+	// Output
+	cout << "Exporting cluster of " << subchildren.size() + 1 << " tables." << endl;
+***REMOVED***
+	// Fetch properties
+	unordered_map<size_t, string> names;
+	unordered_map<size_t, unordered_set<size_t>> children;
+	unordered_map<size_t, pair<unordered_set<string>, unordered_set<string>>> differences;
+***REMOVED***
+	names.reserve(subchildren.size() + 1);
+	children.reserve(subchildren.size() + 1);
+	differences.reserve(subchildren.size() + 1);
+***REMOVED***
+	names.insert(make_pair(Root, hierarchy.names[Root]));
+	children.insert(make_pair(Root, hierarchy.children[Root]));
+	differences.insert(make_pair(Root, structures.differences[Root]));
+***REMOVED***
+	for (auto i = subchildren.begin(); i != subchildren.end(); ++i) {
+		names.insert(make_pair(*i, hierarchy.names[*i]));
+		children.insert(make_pair(*i, hierarchy.children[*i]));
+		differences.insert(make_pair(*i, structures.differences[*i]));
+	}
+***REMOVED***
+	// Write to JSON streams
+	out_names << names;
+	out_children << children;
+	out_differences << differences;
+***REMOVED***
+	// Flush files
+	bool result = out_names.Flush() && out_children.Flush() && out_differences.Flush();
+	return result;
 }
 ***REMOVED***
 // Clear console window on multiple platforms
