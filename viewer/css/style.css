@@ -1,0 +1,10 @@
+body { font-size: 10px; font-family: sans-serif; }
+.content { text-align: center; }
+***REMOVED***
+.table { display: inline-block; position: relative; margin: .5em; vertical-align: top; }
+***REMOVED***
+.inner { display: inline-block; font-size: 1.5em; padding: 1em; border: 1px solid #aaa; border-radius: .5em; }
+.inner h2 { font-size: 1.0em; margin: 0; }
+***REMOVED***
+.children { display: none; position: relative; padding: .5em 1em 0; overflow: hidden; }
+.table:hover > .children { display: inline-block; }
