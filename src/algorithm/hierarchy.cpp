@@ -8,7 +8,7 @@ using namespace std;
 Hierarchy::Hierarchy(Ratios &Ratios, string Path) : ids(Ratios.ids), names(Ratios.names), ratios(Ratios.ratios)
 {
 	// Try to load dump
-	if (Saved(Path) && Load(Path)) {
+	if (Load(Path)) {
 		cout << "Loaded cached hierarchy." << endl;
 		return;
 	}
@@ -21,6 +21,9 @@ Hierarchy::Hierarchy(Ratios &Ratios, string Path) : ids(Ratios.ids), names(Ratio
 // Reset and load data from disk
 bool Hierarchy::Load(string Path)
 {
+	if (!Saved())
+		return false;
+***REMOVED***
 	// Reset data
 	children.clear();
 ***REMOVED***
@@ -94,6 +97,7 @@ void Hierarchy::Generate()
 	// Add children of all nodes to hierarchy
 	Bar bar("Build hierarchy", ids.size());
 	processed.clear();
+	children.clear();
 	children.resize(names.size());
 	for (size_t i = 1; i < names.size(); ++i) {
 		Children(i);
@@ -112,6 +116,24 @@ void Hierarchy::Generate()
 	Bar amount_bar("Calculate depth", names.size());
 	Amount(0, &amount_bar);
 	amount_bar.Finish();
+}
+***REMOVED***
+// Return list of all tables under the specified one
+unordered_set<size_t> Hierarchy::Subchildren(size_t Root)
+{
+	unordered_set<size_t> result;
+***REMOVED***
+	// Iterate over direct children
+	for (auto i = children[Root].begin(); i != children[Root].end(); ++i) {
+		// Add direct children itself
+		result.insert(*i);
+***REMOVED***
+		// Recusrively add next levels
+		auto current = Subchildren(*i);
+		result.insert(current.begin(), current.end());
+	}
+	
+	return result;
 }
 ***REMOVED***
 // Add children of given table to hierarchy
@@ -157,6 +179,8 @@ void Hierarchy::Children(size_t Id)
 // Calculate recursive amount of children
 size_t Hierarchy::Amount(size_t Id, Bar *Bar)
 {
+	cout << ".";
+***REMOVED***
 	// Calculate amount if not cached
 	if (!amounts[Id]) {
 		size_t sum = children[Id].size();

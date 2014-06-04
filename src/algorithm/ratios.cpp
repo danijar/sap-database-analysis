@@ -12,7 +12,7 @@ using namespace std;
 Ratios::Ratios(string Path)
 {
 	// Try to load dump
-	if (Saved(Path) && Load(Path)) {
+	if (Load(Path)) {
 		cout << "Loaded cached ratios." << endl;
 		return;
 	}
@@ -31,8 +31,8 @@ void Ratios::Fetch(bool Output)
 	ratios.clear();
 ***REMOVED***
 	// Query rows from database
-	auto rows = Queries::Ratios();
-	Graph(rows);
+	rows = Queries::Ratios();
+	Generate();
 ***REMOVED***
 	// Output
 	if (Output) {
@@ -55,7 +55,11 @@ void Ratios::Fetch(bool Output)
 // Reset and load data from disk
 bool Ratios::Load(string Path)
 {
+	if (!Saved())
+		return false;
+***REMOVED***
 	// Reset data
+	rows.clear();
 	ids.clear();
 	names.clear();
 	ratios.clear();
@@ -66,6 +70,7 @@ bool Ratios::Load(string Path)
 		return false;
 ***REMOVED***
 	// Read data
+	in >> rows;
 	in >> ids;
 	in >> names;
 	in >> ratios;
@@ -82,6 +87,7 @@ bool Ratios::Save(string Path)
 		return false;
 ***REMOVED***
 	// Write data
+	out << rows;
 	out << ids;
 	out << names;
 	out << ratios;
@@ -96,6 +102,56 @@ bool Ratios::Saved(string Path)
 	bool result = stream.good();
 	stream.close();
 	return result;
+}
+***REMOVED***
+// Build ratio graph
+void Ratios::Generate()
+{
+	// Skip if empty
+	if (!rows.size()) {
+		cout << "No rows to process." << endl;
+		return;
+	}
+***REMOVED***
+	// Clear data
+	names.clear();
+	ids.clear();
+	ratios.clear();
+***REMOVED***
+	// Push root node at index zero
+	names.push_back("<root>");
+	ids.insert(make_pair("<root>", 0));
+	ratios.emplace_back();
+***REMOVED***
+	// Fetch distinct table names
+	Bar bar("Unpack data", rows.size() * 2);
+	for (auto i = rows.begin(); i != rows.end(); ++i) {
+		// Create nodes
+		Id(i->parent);
+		Id(i->child);
+***REMOVED***
+		bar.Increment();
+	}
+***REMOVED***
+	// Create graph from query rows
+	ratios.resize(names.size());
+	for (auto i = rows.begin(); i != rows.end(); ++i) {
+		// Get table ids from row
+		size_t parent = ids[i->parent];
+		size_t child = ids[i->child];
+***REMOVED***
+		if (parent > ratios.size() - 1)
+			cout << endl << parent << endl << ratios.size();
+***REMOVED***
+		// Add parent ratio
+		ratios[parent][child] = i->parentratio;
+		
+		// For now, ignore child ratio completely
+		// Ratio(child, parent, i->childratio);
+***REMOVED***
+		bar.Increment();
+	}
+	bar.Finish();
 }
 ***REMOVED***
 // Get or create id of a table name
@@ -113,51 +169,6 @@ size_t Ratios::Id(string name)
 	// Otherwise return existing
 	else
 		return i->second;
-}
-***REMOVED***
-// Build ratio graph
-void Ratios::Graph(vector<Queries::Ratio> &Rows)
-{
-	// Skip if empty
-	if (!Rows.size()) {
-		cout << "No rows to process." << endl;
-		return;
-	}
-***REMOVED***
-	// Push root node at index zero
-	names.push_back("<root>");
-	ids.insert(make_pair("<root>", 0));
-	ratios.emplace_back();
-***REMOVED***
-	// Fetch distinct table names
-	Bar bar("Unpack data", Rows.size() * 2);
-	for (auto i = Rows.begin(); i != Rows.end(); ++i) {
-		// Create nodes
-		Id(i->parent);
-		Id(i->child);
-***REMOVED***
-		bar.Increment();
-	}
-***REMOVED***
-	// Create graph from query rows
-	ratios.resize(names.size());
-	for (auto i = Rows.begin(); i != Rows.end(); ++i) {
-		// Get table ids from row
-		size_t parent = ids[i->parent];
-		size_t child = ids[i->child];
-***REMOVED***
-		if (parent > ratios.size() - 1)
-			cout << endl << parent << endl << ratios.size();
-***REMOVED***
-		// Add parent ratio
-		ratios[parent][child] = i->parentratio;
-		
-		// For now, ignore child ratio completely
-		// Ratio(child, parent, i->childratio);
-***REMOVED***
-		bar.Increment();
-	}
-	bar.Finish();
 }
 ***REMOVED***
 // Calculate memory size in bytes
