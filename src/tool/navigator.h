@@ -22,6 +22,7 @@ private:
 	float Ratio(size_t From, size_t To);
 	void Table(size_t Id, std::vector<Child> &Children, size_t Limit = 16);
 	void Difference(std::string Table);
+	bool Json(std::string Folder = "root", size_t Root = 0);
 	void Clear();
 ***REMOVED***
 	Hierarchy &hierarchy;

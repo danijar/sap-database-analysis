@@ -15,16 +15,17 @@ class Jsonize {
 public:
 	Jsonize(std::string Path);
 	~Jsonize();
-	void write_to_file();
-***REMOVED***
 	Jsonize &operator<<(const std::string &Value);
 	template <typename T> Jsonize &operator<<(const T &Value);
+	template <typename TLeft, typename TRight> Jsonize &operator<<(const std::pair<TLeft, TRight> Value);
 	template <typename T> Jsonize &operator<<(const std::vector<T> &Value);
 	template <typename T> Jsonize &operator<<(const std::unordered_set<T> &Value);
 	template <typename TKey, typename TVal> Jsonize &operator<<(const std::unordered_map<TKey, TVal> &Value);
+	bool Flush();
 private:
 	std::stringstream stream;
 	std::string path;
+	bool flushed = false;
 };
 ***REMOVED***
 // Templates
