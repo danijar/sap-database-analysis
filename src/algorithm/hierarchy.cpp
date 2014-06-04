@@ -118,6 +118,24 @@ void Hierarchy::Generate()
 	amount_bar.Finish();
 }
 ***REMOVED***
+// Return list of all tables under the specified one
+unordered_set<size_t> Hierarchy::Subchildren(size_t Root)
+{
+	unordered_set<size_t> result;
+***REMOVED***
+	// Iterate over direct children
+	for (auto i = children[Root].begin(); i != children[Root].end(); ++i) {
+		// Add direct children itself
+		result.insert(*i);
+***REMOVED***
+		// Recusrively add next levels
+		auto current = Subchildren(*i);
+		result.insert(current.begin(), current.end());
+	}
+	
+	return result;
+}
+***REMOVED***
 // Add children of given table to hierarchy
 void Hierarchy::Children(size_t Id)
 {
@@ -161,6 +179,8 @@ void Hierarchy::Children(size_t Id)
 // Calculate recursive amount of children
 size_t Hierarchy::Amount(size_t Id, Bar *Bar)
 {
+	cout << ".";
+***REMOVED***
 	// Calculate amount if not cached
 	if (!amounts[Id]) {
 		size_t sum = children[Id].size();

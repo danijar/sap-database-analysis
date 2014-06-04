@@ -104,23 +104,6 @@ bool Ratios::Saved(string Path)
 	return result;
 }
 ***REMOVED***
-// Get or create id of a table name
-size_t Ratios::Id(string name)
-{
-	// Add if not already in map
-	auto i = ids.find(name);
-	if (i == ids.end()) {
-		size_t id = names.size();
-		names.push_back(name);
-		ids[name] = id;
-		return id;
-	}
-***REMOVED***
-	// Otherwise return existing
-	else
-		return i->second;
-}
-***REMOVED***
 // Build ratio graph
 void Ratios::Generate()
 {
@@ -169,6 +152,23 @@ void Ratios::Generate()
 		bar.Increment();
 	}
 	bar.Finish();
+}
+***REMOVED***
+// Get or create id of a table name
+size_t Ratios::Id(string name)
+{
+	// Add if not already in map
+	auto i = ids.find(name);
+	if (i == ids.end()) {
+		size_t id = names.size();
+		names.push_back(name);
+		ids[name] = id;
+		return id;
+	}
+***REMOVED***
+	// Otherwise return existing
+	else
+		return i->second;
 }
 ***REMOVED***
 // Calculate memory size in bytes

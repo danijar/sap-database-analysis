@@ -24,11 +24,12 @@ public:
 	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> Difference(size_t Parent, size_t Child);
 	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> &Difference(size_t Child);
 	
+	std::vector<std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>>> differences;
+***REMOVED***
 private:
 	size_t Size();
 ***REMOVED***
-	std::vector<std::unordered_set <Queries::Field>> structures;
-	std::vector<std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>>> differences;
+	std::vector<std::unordered_set<Queries::Field>> structures;
 	std::unordered_map<std::string, size_t> &ids;
 	Hierarchy &hierarchy;
 };

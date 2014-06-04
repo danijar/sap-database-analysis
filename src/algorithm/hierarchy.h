@@ -17,6 +17,7 @@ public:
 	bool Save(std::string Path = "data/hierarchy.dump");
 	bool Saved(std::string Path = "data/hierarchy.dump");
 	void Generate();
+	std::unordered_set<size_t> Subchildren(size_t Root);
 ***REMOVED***
 	std::unordered_map<std::string, size_t> &ids;
 	std::vector<std::string> &names;
