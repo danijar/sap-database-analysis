@@ -222,10 +222,6 @@ bool Navigator::Up()
 // List children of current table
 void Navigator::List(size_t Limit, bool Reverse)
 {
-	// If Benchmarking is active start the clock
-	if (BENCHMARK)
-		Benchmark::Start_Clock();
-***REMOVED***
 	// Name and id of current table
 	size_t id = path.size() ? path.back() : 0;
 ***REMOVED***
@@ -253,10 +249,6 @@ void Navigator::List(size_t Limit, bool Reverse)
 ***REMOVED***
 	// Print children
 	Table(id, children, Limit);
-***REMOVED***
-	if (BENCHMARK) 
-		cout << "Listing took " << std::setprecision(5) << Benchmark::Stop_Clock().count() << " seconds" << endl;
-	
 }
 ***REMOVED***
 // Get ratio between to tables
@@ -365,10 +357,6 @@ void Navigator::Table(size_t Id, vector<Child> &Children, size_t Limit)
 // Show a diff between two tables
 void Navigator::Difference(string Table)
 {
-	// If Benchmarking is active start the clock
-	if (BENCHMARK)
-		Benchmark::Start_Clock();
-***REMOVED***
 	// Validate hierarchy
 	if (hierarchy.ids.find(Table) == hierarchy.ids.end()) {
 		cout << "'" << Table << "' is no valid table name." << endl;
@@ -435,10 +423,6 @@ void Navigator::Difference(string Table)
 ***REMOVED***
 	// Reset formatting options
 	cout.flags(format);
-***REMOVED***
-	// If benchmarking print out time passed
-	if (BENCHMARK)
-		cout << "Difference took " << std::setprecision(5) << Benchmark::Stop_Clock().count() << " seconds" << endl;
 }
 ***REMOVED***
 bool Navigator::Json(string Folder, size_t Root)
