@@ -12,10 +12,22 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json'], function(
 ***REMOVED***
 		// Event listeners
 		$(document).on('click', 'div.inner', function() {
-			$(this).parent().children('.children').toggleClass('visible');
+			// Get name
+			var current = $(this).parent().attr('id');
+***REMOVED***
+			// Load children
+			var empty = $(this).siblings('.children').children().length < 1; 
+			if (empty)
+				for (var i = 0; i < children[current].length; ++i)
+					table(children[current][i], current);
+***REMOVED***
+			// Expand or collapse
+			$(this).siblings('.children').toggleClass('visible');
 		});
 	}
 ***REMOVED***
+	// Iteratively render all tables
+	// Currently not used because of performance problems
 	var jobs = [];
 	function hierarchy(table) {
 		// Add job for root table
@@ -45,18 +57,37 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json'], function(
 			else
 				$('.content').append(container);
 ***REMOVED***
-			// Add children to job list
+			// Render all children
 			for (var j = 0; j < children[current].length; ++j)
 				jobs.push({ child: children[current][j], parent: id });
 		}
 	}
 ***REMOVED***
+	// Render a table
+	function table(current, parent) {
+		// Remove specialchars for use as id
+		var id = current.replace(/[^a-zA-Z0-9-_]/g, '');
+***REMOVED***
+		// Create node
+		var container = $('<div class="table" id="' + id + '">');
+		var inner = $('<div class="inner">');
+		inner.append('<h2>' + current + '</h2>');
+***REMOVED***
+		container.append(inner);
+		container.append('<br>');
+		container.append('<div class="children">');
+***REMOVED***
+		// Append to parent
+		if (parent)
+			$('#' + parent + ' > .children').append(container);
+		else
+			$('.content').append(container);
+	}
+***REMOVED***
 ***REMOVED***
 	function main() {
 		initialize();
-		hierarchy(root);
-		
-		console.log('jobs: ' + jobs.length + ', elements: ' + $('.table').length );
+		table(root);
 	}
 	
 	return main;
