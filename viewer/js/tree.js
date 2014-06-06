@@ -1,16 +1,14 @@
 define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../../data/root/differences.json'], function($, _, Children, Differences) {
 	var element, children, differences, root;
 ***REMOVED***
-	function initialize() {
-		// Attach to DOM
-		element = $('<section class="content">');
-		$('body').append(element);
+	function initialize(container) {
+		element = $('<div class="tree">');
+		container.append(element);
 ***REMOVED***
 		// Parse input data
 		children = JSON.parse(Children);
 		differences = JSON.parse(Differences);
-		root = Children.match(/^{"([^"]+)"/m)[1];
-***REMOVED***
+		
 		// Lazy load children when clicking a table
 		$(document).on('click', 'div.inner', function() {
 			// Get name
@@ -58,7 +56,7 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 			if (parent)
 				$('#' + parent + ' > .children').append(container);
 			else
-				$('.content').append(container);
+				element.append(container);
 ***REMOVED***
 			// Render all children
 			for (var j = 0; j < children[current].length; ++j)
@@ -104,12 +102,12 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		if (parent)
 			$('#' + parent + ' > .children').append(container);
 		else
-			$('.content').append(container);
+			element.append(container);
 	}
 ***REMOVED***
 ***REMOVED***
-	function main() {
-		initialize();
+	function main(container, root) {
+		initialize(container);
 		table(root);
 	}
 	
