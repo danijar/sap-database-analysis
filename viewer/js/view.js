@@ -1,5 +1,5 @@
-define(['jquery', 'underscore', 'text!../../data/root/children.json'], function($, _, Children) {
-	var element, children, root;
+define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../../data/root/differences.json'], function($, _, Children, Differences) {
+	var element, children, differences, root;
 ***REMOVED***
 	function initialize() {
 		// Attach to DOM
@@ -8,18 +8,21 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json'], function(
 ***REMOVED***
 		// Parse input data
 		children = JSON.parse(Children);
+		differences = JSON.parse(Differences);
 		root = Children.match(/^{"([^"]+)"/m)[1];
 ***REMOVED***
-		// Event listeners
+		// Lazy load children when clicking a table
 		$(document).on('click', 'div.inner', function() {
 			// Get name
 			var current = $(this).parent().attr('id');
 ***REMOVED***
 			// Load children
 			var empty = $(this).siblings('.children').children().length < 1; 
-			if (empty)
-				for (var i = 0; i < children[current].length; ++i)
-					table(children[current][i], current);
+			if (empty) {
+				_.each(children[current], function(child) {
+					table(child, current);
+				});
+			}
 ***REMOVED***
 			// Expand or collapse
 			$(this).siblings('.children').toggleClass('visible');
@@ -69,10 +72,30 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json'], function(
 		var id = current.replace(/[^a-zA-Z0-9-_]/g, '');
 ***REMOVED***
 		// Create node
-		var container = $('<div class="table" id="' + id + '">');
+		var difference = $('<div class="difference">');
+		if (differences[id]) {
+			if (differences[id][0].length) {
+				var added = $('<ul class="added">');
+				_.each(differences[id][0], function(field) {
+					added.append('<li>' + field + '</li>');
+				});
+				difference.append(added);
+			}
+			if (differences[id][1].length) {
+				var removed = $('<ul class="removed">');
+				_.each(differences[id][1], function(field) {
+					removed.append('<li>' + field + '</li>');
+				});
+				difference.append(removed);
+			}
+		}
+***REMOVED***
 		var inner = $('<div class="inner">');
 		inner.append('<h2>' + current + '</h2>');
+		inner.append(difference);
+		inner.append('<p>' + children[current].length + ' children</p>');
 ***REMOVED***
+		var container = $('<div class="table" id="' + id + '">');
 		container.append(inner);
 		container.append('<br>');
 		container.append('<div class="children">');

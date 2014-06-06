@@ -1,13 +1,24 @@
+/* general */
 body { position: relative; font-size: 10px; width: 100%; margin: 0; padding: 0; font-family: sans-serif; overflow: auto; }
 div { position: relative; box-sizing: border-box; }
-***REMOVED***
 .content { text-align: center; }
 ***REMOVED***
+/* contianer for inner and children */
 .table { display: inline-block; position: relative; padding: .5em; vertical-align: top; }
 ***REMOVED***
-.inner { display: inline-block; font-size: 1.5em; padding: 1em; background: #eee; border: 1px solid #aaa; border-radius: .5em; transition: background .2s; }
+/* box for a single table */
+.inner { display: inline-block; font-size: 1.5em; padding: 1em; text-align: left; background: #eee; border: 1px solid #aaa; border-radius: .5em; cursor: pointer; transition: background .2s; }
 .inner:hover { background: #ccc; }
-.inner h2 { font-size: 1.0em; margin: 0; }
 ***REMOVED***
+/* elements of inner */
+h2 { font-size: 1.0em; margin: 0; text-align: center; }
+.difference { margin: .5em 0; }
+ul { box-sizing: border-box; display: inline-block; max-height: 10em; margin: 0; padding: .5em 1.5em .5em .5em; list-style-type: none; border-style: solid; border-width: .2em; overflow-x: hidden; overflow-y: auto; vertical-align: top; }
+.added { background: rgba(92, 184, 92, .2); border-color: rgb(92, 184, 92); }
+.removed { background: rgba(255, 0, 0, .2); border-color: rgb(255, 0, 0); }
+.added + .removed {  margin-left: 1em !important;  }
+p { margin: 0; color: #666; text-align: center; clear: both; }
+***REMOVED***
+/* box for holding hideable children */
 .children { display: none; position: relative; padding: .5em 1em 0; white-space: nowrap; overflow-y: hidden; overflow-x: hidden; }
 .visible { display: inline-block; }
