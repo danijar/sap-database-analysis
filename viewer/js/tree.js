@@ -91,7 +91,8 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		var inner = $('<div class="inner">');
 		inner.append('<h2>' + current + '</h2>');
 		inner.append(difference);
-		inner.append('<p>' + children[current].length + ' children</p>');
+		if (children[current] && children[current].length)
+			inner.append('<p>' + children[current].length + ' children</p>');
 ***REMOVED***
 		var container = $('<div class="table" id="' + id + '">');
 		container.append(inner);
