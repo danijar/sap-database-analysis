@@ -12,22 +12,19 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 ***REMOVED***
 	// Render a tile
 	function tile(current) {
-		// Remove specialchars for use as id
-		var id = current.replace(/[^a-zA-Z0-9-_]/g, '');
-***REMOVED***
 		// Create node
 		var difference = $('<div class="difference">');
 		var added = $('<ul class="added">');
-		if (differences[id]) {
-			if (differences[id][0].length) {
-				_.each(differences[id][0], function(field) {
+		if (differences[current]) {
+			if (differences[current][0].length) {
+				_.each(differences[current][0], function(field) {
 					added.append('<li>' + field + '</li>');
 				});
 			}
 		}
 		difference.append(added);
 ***REMOVED***
-		var tile = $('<a class="tile" href="#/table/' + id + '">');
+		var tile = $('<a class="tile" href="#/table/' + current + '">');
 		tile.append('<h2>' + current + '</h2>');
 		tile.append(difference);
 		tile.append('<p>' + children[current].length + ' children</p>');

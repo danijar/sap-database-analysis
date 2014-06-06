@@ -54,7 +54,7 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 ***REMOVED***
 			// Append to parent
 			if (parent)
-				$('#' + parent + ' > .children').append(container);
+				$('#' + escape(parent) + ' > .children').append(container);
 			else
 				element.append(container);
 ***REMOVED***
@@ -64,24 +64,34 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		}
 	}
 ***REMOVED***
+	// Escape special chars for proper id selectors
+	function escape(name) {
+		var result = "";
+		for (var i = 0; i < name.length; i++) {
+			if (name[i].match(/[^a-zA-Z0-9-_]/))
+				result += '\\';
+			result += name[i];
+		}
+		return result;
+	}
+***REMOVED***
 	// Render a table
 	function table(current, parent) {
 		// Remove specialchars for use as id
-		var id = current.replace(/[^a-zA-Z0-9-_]/g, '');
-***REMOVED***
+		
 		// Create node
 		var difference = $('<div class="difference">');
-		if (differences[id]) {
-			if (differences[id][0].length) {
+		if (differences[current]) {
+			if (differences[current][0].length) {
 				var added = $('<ul class="added">');
-				_.each(differences[id][0], function(field) {
+				_.each(differences[current][0], function(field) {
 					added.append('<li>' + field + '</li>');
 				});
 				difference.append(added);
 			}
-			if (differences[id][1].length) {
+			if (differences[current][1].length) {
 				var removed = $('<ul class="removed">');
-				_.each(differences[id][1], function(field) {
+				_.each(differences[current][1], function(field) {
 					removed.append('<li>' + field + '</li>');
 				});
 				difference.append(removed);
@@ -94,18 +104,16 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		if (children[current] && children[current].length)
 			inner.append('<p>' + children[current].length + ' children</p>');
 ***REMOVED***
-		var container = $('<div class="table" id="' + id + '">');
+		var container = $('<div class="table" current="' + current + '">');
 		container.append(inner);
 		container.append('<br>');
 		container.append('<div class="children">');
 ***REMOVED***
-		// Append to parent
 		if (parent)
-			$('#' + parent + ' > .children').append(container);
+			$('#' + escape(parent) + ' > .children').append(container);
 		else
 			element.append(container);
 	}
-***REMOVED***
 ***REMOVED***
 	function main(container, root) {
 		initialize(container);
