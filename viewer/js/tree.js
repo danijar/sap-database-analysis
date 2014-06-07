@@ -1,14 +1,15 @@
-define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../../data/root/differences.json'], function($, _, Children, Differences) {
-	var element, children, differences, root;
+define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../../data/root/differences.json', 'text!../../data/root/amounts.json'], function($, _, Children, Differences, Amounts) {
+	var element, children, differences, amounts, root;
 ***REMOVED***
 	function initialize(container) {
 		element = $('<div class="tree">');
 		container.append(element);
-***REMOVED***
+		
 		// Parse input data
 		children = JSON.parse(Children);
 		differences = JSON.parse(Differences);
-		
+		amounts 	= JSON.parse(Amounts);
+***REMOVED***
 		// Lazy load children when clicking a table
 		$(document).on('click', 'div.inner', function() {
 			// Get name
@@ -89,6 +90,7 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 				});
 				difference.append(added);
 			}
+***REMOVED***
 			if (differences[current][1].length) {
 				var removed = $('<ul class="removed">');
 				_.each(differences[current][1], function(field) {
@@ -101,17 +103,17 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		var inner = $('<div class="inner">');
 		inner.append('<h2>' + current + '</h2>');
 		inner.append(difference);
-		if (children[current] && children[current].length)
-			inner.append('<p>' + children[current].length + ' children</p>');
+		if (amounts[current])
+			inner.append('<p>' + amounts[current] + ' children</p>');
 ***REMOVED***
-		var container = $('<div class="table" current="' + current + '">');
+		var container = $('<div class="table" id="' + current + '">');
 		container.append(inner);
 		container.append('<br>');
 		container.append('<div class="children">');
 ***REMOVED***
-		if (parent)
+		if (parent) 
 			$('#' + escape(parent) + ' > .children').append(container);
-		else
+		else 
 			element.append(container);
 	}
 ***REMOVED***
