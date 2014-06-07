@@ -439,6 +439,7 @@ bool Navigator::Json(string Folder, size_t Root)
 	// Create json streams
 	Jsonize out_children(Folder + "/children.json");
 	Jsonize out_differences(Folder + "/differences.json");
+	Jsonize out_amounts(Folder + "/amounts.json");
 ***REMOVED***
 	// Get recursive children
 	unordered_set<size_t> subchildren = hierarchy.Subchildren(Root);
@@ -449,9 +450,11 @@ bool Navigator::Json(string Folder, size_t Root)
 	// Fetch properties
 	unordered_map<string, unordered_set<string>> children;
 	unordered_map<string, pair<unordered_set<string>, unordered_set<string>>> differences;
+	unordered_map<string, size_t> amounts;
 ***REMOVED***
 	children.reserve(subchildren.size() + 1);
 	differences.reserve(subchildren.size() + 1);
+	amounts.reserve(subchildren.size() + 1);
 	
 	// Convert children to strings
 	unordered_set<string> current;
@@ -460,6 +463,7 @@ bool Navigator::Json(string Folder, size_t Root)
 		current.insert(hierarchy.names[*i]);
 	children.insert(make_pair(hierarchy.names[Root], current));
 	differences.insert(make_pair(hierarchy.names[Root], structures.differences[Root]));
+	amounts.insert(make_pair(hierarchy.names[Root], hierarchy.amounts[Root]));
 ***REMOVED***
 	for (auto i = subchildren.begin(); i != subchildren.end(); ++i) {
 		string name = hierarchy.names[*i];
@@ -472,14 +476,16 @@ bool Navigator::Json(string Folder, size_t Root)
 ***REMOVED***
 		children.insert(make_pair(name, current));
 		differences.insert(make_pair(name, structures.differences[*i]));
+		amounts.insert(make_pair(name, hierarchy.amounts[*i]));
 	}
 ***REMOVED***
 	// Write to JSON streams
 	out_children << children;
 	out_differences << differences;
+	out_amounts << amounts;
 ***REMOVED***
 	// Flush files
-	bool result = out_children.Flush() && out_differences.Flush();
+	bool result = out_children.Flush() && out_differences.Flush() && out_amounts.Flush();
 	return result;
 }
 ***REMOVED***
