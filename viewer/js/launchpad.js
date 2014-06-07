@@ -1,13 +1,14 @@
-define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../../data/root/differences.json'], function($, _, Children, Differences) {
-	var element, children, differences;
+define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../../data/root/differences.json', 'text!../../data/root/amounts.json'], function($, _, Children, Differences, Amounts) {
+	var element, children, differences, amounts;
 ***REMOVED***
 	function initialize(container) {
 		element = $('<div class="launchpad">');
 		container.append(element);
 ***REMOVED***
 		// Parse input data
-		children = JSON.parse(Children);
+		children 	= JSON.parse(Children);
 		differences = JSON.parse(Differences);
+		amounts 	= JSON.parse(Amounts);
 	}
 ***REMOVED***
 	// Render a tile
@@ -27,7 +28,7 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		var tile = $('<a class="tile" href="#/table/' + current + '">');
 		tile.append('<h2>' + current + '</h2>');
 		tile.append(difference);
-		tile.append('<p>' + children[current].length + ' children</p>');
+		tile.append('<p>' + amounts[current] + ' children</p>');
 ***REMOVED***
 		element.append(tile);
 	}
