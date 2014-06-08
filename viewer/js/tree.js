@@ -6,7 +6,7 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		container.append(element);
 		
 		// Parse input data
-		children = JSON.parse(Children);
+		children    = JSON.parse(Children);
 		differences = JSON.parse(Differences);
 		amounts 	= JSON.parse(Amounts);
 ***REMOVED***
@@ -28,43 +28,6 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		});
 	}
 ***REMOVED***
-	// Iteratively render all tables
-	// Currently not used because of performance problems
-	var jobs = [];
-	function hierarchy(table) {
-		// Add job for root table
-		jobs.push({ child: table, parent: null });
-***REMOVED***
-		// Work through all jobs
-		// The list will become longer while iterating
-		for (var i = 0; i < jobs.length && i < 12000; ++i) {
-			var current = jobs[i].child;
-			var parent  = jobs[i].parent;
-***REMOVED***
-			// Remove specialchars for use as id
-			var id = current.replace(/[^a-zA-Z0-9-_]/g, '');
-***REMOVED***
-			// Create node
-			var container = $('<div class="table" id="' + id + '">');
-			var inner = $('<div class="inner">');
-			inner.append('<h2>' + current + '</h2>');
-***REMOVED***
-			container.append(inner);
-			container.append('<br>');
-			container.append('<div class="children">');
-***REMOVED***
-			// Append to parent
-			if (parent)
-				$('#' + escape(parent) + ' > .children').append(container);
-			else
-				element.append(container);
-***REMOVED***
-			// Render all children
-			for (var j = 0; j < children[current].length; ++j)
-				jobs.push({ child: children[current][j], parent: id });
-		}
-	}
-***REMOVED***
 	// Escape special chars for proper id selectors
 	function escape(name) {
 		var result = "";
@@ -78,9 +41,7 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 ***REMOVED***
 	// Render a table
 	function table(current, parent) {
-		// Remove specialchars for use as id
-		
-		// Create node
+		// Structure changes
 		var difference = $('<div class="difference">');
 		if (differences[current]) {
 			if (differences[current][0].length) {
@@ -100,17 +61,28 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 			}
 		}
 ***REMOVED***
+		// Table
 		var inner = $('<div class="inner">');
 		inner.append('<h2>' + current + '</h2>');
 		inner.append(difference);
-		if (amounts[current])
-			inner.append('<p>' + amounts[current] + ' children</p>');
 ***REMOVED***
+		// Information about descendants
+		var paragraph = '<p>';
+		var number = children[current] ? children[current].length : 0;
+		if (amounts[current] > number)
+			paragraph += amounts[current] + ' tables ';
+		if (number)
+			paragraph += number + (number > 1 ? ' children' : ' child');
+		paragraph += '</p>';
+		inner.append(paragraph);
+***REMOVED***
+		// Wrapper containing table and children
 		var container = $('<div class="table" id="' + current + '">');
 		container.append(inner);
 		container.append('<br>');
 		container.append('<div class="children">');
 ***REMOVED***
+		// Append to parent
 		if (parent) 
 			$('#' + escape(parent) + ' > .children').append(container);
 		else 

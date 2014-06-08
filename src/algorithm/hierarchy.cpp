@@ -179,8 +179,6 @@ void Hierarchy::Children(size_t Id)
 // Calculate recursive amount of children
 size_t Hierarchy::Amount(size_t Id, Bar *Bar)
 {
-	cout << ".";
-***REMOVED***
 	// Calculate amount if not cached
 	if (!amounts[Id]) {
 		size_t sum = children[Id].size();
