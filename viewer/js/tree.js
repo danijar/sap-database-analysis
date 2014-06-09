@@ -18,7 +18,7 @@ define(['jquery', 'underscore', 'connection', 'text!../../data/root/children.jso
 		amounts 	= JSON.parse(Amounts);
 ***REMOVED***
 		// Lazy load children when clicking a table
-		$(document).on('click', 'div.inner', function() {
+		element.on('click', '.inner', function() {
 			var table = $(this).parent().attr('id');
 			toggle(table);
 		});
