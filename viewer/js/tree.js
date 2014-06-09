@@ -88,6 +88,9 @@ define(['jquery', 'underscore', 'connection', 'text!../../data/root/children.jso
 		var childrenbox = tablebox.children('.children');
 		var innerbox = tablebox.children('.inner');
 ***REMOVED***
+		// Keep view
+		var oldoffset = innerbox.offset();
+***REMOVED***
 		// Load children
 		var empty = childrenbox.children().length < 1;
 		if (empty)
@@ -115,6 +118,11 @@ define(['jquery', 'underscore', 'connection', 'text!../../data/root/children.jso
 				connections[key] = Connection(tablebox, $(this), innerbox);
 			});
 		}
+***REMOVED***
+		// Restore view
+		var newoffset = innerbox.offset();
+		$('body').scrollTop($('body').scrollTop() - (oldoffset.top - newoffset.top));
+		$('body').scrollLeft($('body').scrollLeft() - (oldoffset.left - newoffset.left));
 ***REMOVED***
 		// Update all connections
 		_.each(connections, function(connection) {
