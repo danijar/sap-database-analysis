@@ -2,6 +2,10 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 	var element, children, differences, amounts;
 ***REMOVED***
 	function initialize(container) {
+		// Change window title
+		document.title = 'SAP Database Analysis';
+***REMOVED***
+		// Create and attach container
 		element = $('<div class="launchpad">');
 		container.append(element);
 ***REMOVED***
@@ -49,6 +53,6 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 			tile(head);
 		});
 	}
-	
+***REMOVED***
 	return main;
 });
