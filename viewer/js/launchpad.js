@@ -32,7 +32,7 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		var tile = $('<a class="tile" href="#/table/' + current + '">');
 		tile.append('<h2>' + current + '</h2>');
 		tile.append(difference);
-		tile.append('<p>' + amounts[current] + ' tables</p>');
+		tile.append('<p>' + (amounts[current] + 1) + ' tables</p>');
 ***REMOVED***
 		element.append(tile);
 	}
