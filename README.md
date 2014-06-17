@@ -37,3 +37,9 @@ Team
 ----
 ***REMOVED***
 Algorithm and applications are created by Danijar Hafner and Jakob Frick. This project is part of our undergraduate studies.
+***REMOVED***
+Open Source Licences
+--------------------
+***REMOVED***
+- OTL Library
+- Background image from Subtlepatterns by Mizanur Rahman
