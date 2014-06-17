@@ -16,7 +16,7 @@ nav a { display: inline-block; font-size: 1.5em; padding: 1em; color: #fff; font
 .inner:hover, .tile:hover { background: #ddd; }
 ***REMOVED***
 /* elements of inner */
-h2 { font-size: 1.0em; margin: 0; }
+h2 { font-size: 1.0em; margin: 0; padding: .5em 0; }
 .difference { margin: .5em 0; }
 ul { box-sizing: border-box; display: inline-block; height: 10em; margin: 0; padding: .5em 1.5em .5em .5em; list-style-type: none; text-align: left; border-style: solid; border-width: .2em; overflow-x: hidden; overflow-y: auto; vertical-align: top; }
 .added { background: rgba(92, 184, 92, .2); border-color: rgb(92, 184, 92); }
@@ -35,3 +35,7 @@ p { margin: 0; color: #666; clear: both; }
 ***REMOVED***
 /* line connections */
 svg{ position: absolute; pointer-events: none; z-index: 0; }
+***REMOVED***
+/* popup */
+.popup { position: fixed; font-size: 1.5em; left: 1em; top: 1em; right: 1em; bottom: 1em; padding: 1em; background: #fff; border-radius: .3em; box-shadow: 0 0 .5em rgba(0, 0, 0, .5); z-index: 4; }
+.popup .close { position: absolute; right: 1em; top: .95em; width: 3em; height: 3em; background: #ccc url(../img/close.png) no-repeat center; background-size: 61.8% auto; border-radius: .2em; }
