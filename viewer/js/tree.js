@@ -25,8 +25,10 @@ define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/chi
 		});
 		element.on('click', 'h2', function() {
 			// Open structure popup when clicking table name
+			var table = $(this).parent().parent().attr('id');
 			var popup = Popup();
-			popup.append('<p>Hello World</p>');
+			popup.append('<h1>' + table + '</h1>');
+			//popup.append('<hr>');
 		});
 	}
 ***REMOVED***
