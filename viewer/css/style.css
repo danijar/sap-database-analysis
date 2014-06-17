@@ -2,7 +2,7 @@
 body { position: relative; font-size: 10px; width: 100%; margin: 0; padding: 0; font-family: sans-serif; background: #f5f5f5 url(../img/background.png); overflow: auto; }
 div { position: relative; box-sizing: border-box; }
 nav { position: fixed; width: 100%; background: #fff; box-shadow: 0 0 1em rgba(0, 0, 0, .5); z-index: 3; }
-nav a { display: inline-block; font-size: 2em; padding: .75em; color: #999; font-weight: bold; text-decoration: none; }
+nav a { display: inline-block; font-size: 2em; padding: .8em 1em .7em; color: #999; font-weight: bold; text-decoration: none; }
 .container { position: relative; padding: 7em; }
 ***REMOVED***
 /* hierarchy tree view */

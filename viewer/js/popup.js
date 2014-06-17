@@ -8,9 +8,10 @@ define(['jquery', 'underscore'], function($, _) {
 		element.append('<div class="close">');
 ***REMOVED***
 		// Events
-		element.on('click', '.close', function() {
-			element.hide();
-			element.remove();
+		element.on('click', '.close', close);
+		$(document).on('keydown', function(e) {
+			if (e.which == 27)
+				close();
 		});
 	}
 ***REMOVED***
@@ -24,13 +25,19 @@ define(['jquery', 'underscore'], function($, _) {
 		element.append(content);
 	}
 ***REMOVED***
+	function close() {
+		element.hide();
+		element.remove();
+	}
+***REMOVED***
 	function main() {
 		initialize();
 ***REMOVED***
 		// Return reference to element to allow adding content
 		return {
 			append: append,
-			html: html
+			html: html,
+			close: close
 		};
 	}
 ***REMOVED***

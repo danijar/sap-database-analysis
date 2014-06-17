@@ -29,6 +29,9 @@ define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/chi
 			var popup = Popup();
 			popup.append('<h1>' + table + '</h1>');
 			//popup.append('<hr>');
+***REMOVED***
+			// Prevent expanding children
+			return false;
 		});
 	}
 ***REMOVED***
