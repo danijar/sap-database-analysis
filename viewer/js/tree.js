@@ -53,7 +53,7 @@ define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/chi
 		if (differences[current]) {
 			if (differences[current][0].length) {
 				var added = $('<ul class="added">');
-				_.each(differences[current][0], function(field) {
+				_.each(differences[current][0].sort(), function(field) {
 					added.append('<li>' + field + '</li>');
 				});
 				difference.append(added);
@@ -61,7 +61,7 @@ define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/chi
 ***REMOVED***
 			if (differences[current][1].length) {
 				var removed = $('<ul class="removed">');
-				_.each(differences[current][1], function(field) {
+				_.each(differences[current][1].sort(), function(field) {
 					removed.append('<li>' + field + '</li>');
 				});
 				difference.append(removed);
