@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'connection', 'text!../../data/root/children.json', 'text!../../data/root/differences.json', 'text!../../data/root/amounts.json'], function($, _, Connection, Children, Differences, Amounts) {
+define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/children.json', 'text!../../data/root/differences.json', 'text!../../data/root/amounts.json'], function($, _, Connection, Popup, Children, Differences, Amounts) {
 	// Members
 	var element;
 	var children, differences, amounts;
@@ -17,10 +17,16 @@ define(['jquery', 'underscore', 'connection', 'text!../../data/root/children.jso
 		differences = JSON.parse(Differences);
 		amounts 	= JSON.parse(Amounts);
 ***REMOVED***
-		// Lazy load children when clicking a table
+		// Events
 		element.on('click', '.inner', function() {
+			// Lazy load children when clicking a table
 			var table = $(this).parent().attr('id');
 			toggle(table);
+		});
+		element.on('click', 'h2', function() {
+			// Open structure popup when clicking table name
+			var popup = Popup();
+			popup.append('<p>Hello World</p>');
 		});
 	}
 ***REMOVED***
