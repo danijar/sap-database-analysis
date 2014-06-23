@@ -11,9 +11,11 @@
  * This namespace holds all code that connects to the database.
  */
 namespace Queries {
+	using namespace std;
+***REMOVED***
 	// Struct for the ratio rows
 	struct Ratio {
-		std::string parent, child;
+		string parent, child;
 		float parentratio, childratio;
 	};
 	Serialize &operator<<(Serialize &serialize, const Ratio &ratio);
@@ -21,36 +23,41 @@ namespace Queries {
 ***REMOVED***
 	// Struct for the field values
 	struct Field {
-		std::string name, roll, domain;
+		string name, roll, domain;
 		size_t position;
-		bool operator==(const Field &other) const
-		{
-			return name == other.name;
-		}
+		bool operator==(const Field &other) const { return name == other.name; }
 	};
 	Serialize &operator<<(Serialize &serialize, const Field &field);
 	Deserialize &operator>>(Deserialize &deserialize, Field &field);
 ***REMOVED***
 	// Implement a find function for the difference check
-	struct find_field : std::unary_function<Field, bool> {
-		std::string name;
+	struct find_field : unary_function<Field, bool> {
+		string name;
 		find_field(Field f) :name(f.name) { }
-		bool operator()(Field const& f) const {
-			return f.name == name;
-		}
+		bool operator()(Field const& f) const { return f.name == name; }
 	};
 ***REMOVED***
-	static std::string Dsn = "***REMOVED***";
-	static std::string User = "***REMOVED***";
-	static std::string Password = "***REMOVED***";
+	// Global connection details
+	static string Dsn = "***REMOVED***";
+	static string User = "***REMOVED***";
+	static string Password = "***REMOVED***";
 ***REMOVED***
-	std::vector<Ratio> Ratios();
-	std::vector<Field> Fields(std::string Table);
-	std::vector<std::unordered_set<Field>> Structures(std::unordered_map<std::string, size_t> &Ids);
+	// Fetching functions
+	vector<Ratio> Ratios();
+	vector<Field> Fields(string Table);
+	vector<unordered_set<Field>> Structures(unordered_map<string, size_t> &Ids);
+***REMOVED***
+	// Inserting functions
+	bool Store(size_t Id,
+		unordered_map<size_t, float> &Ratios,
+		unordered_set<string> &Names,
+		unordered_set<size_t> &Children,
+		size_t Amount,
+		pair<unordered_set<string>, unordered_set<string>> &Differences);
 }
 ***REMOVED***
+// Type traits
 namespace std {
-	
 	template <>
 	struct hash<Queries::Field>
 	{

@@ -43,12 +43,20 @@ template <typename TKey, typename TVal> Jsonize &Jsonize::operator<<(const std::
 {
 	stream << "{";
 	if (Value.begin() != Value.end()) {
-		if (typeid(Value.begin()->first) != typeid(string))
-			throw exception("To jasonize, map keys must be strings.");
-		*this << Value.begin()->first << ":" << Value.begin()->second;
+		*this << tolerant_to_string(Value.begin()->first) << ":" << Value.begin()->second;
 		for (auto i = (++Value.begin()); i != Value.end(); ++i)
 			*this << "," << i->first << ":" << i->second;
 	}
 	stream << "}";
 	return *this;
+}
+***REMOVED***
+template <typename T> std::string Jsonize::tolerant_to_string(T Value)
+{
+	return std::to_string(Value);
+}
+***REMOVED***
+template <> std::string Jsonize::tolerant_to_string(std::string Value)
+{
+	return Value;
 }

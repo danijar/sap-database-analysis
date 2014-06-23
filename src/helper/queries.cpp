@@ -2,11 +2,11 @@
 #define OTL_ODBC
 #define OTL_STL
 #include "otlv4.h"
+#include "helper/jsonize.h"
 using namespace std;
 ***REMOVED***
 ***REMOVED***
 namespace Queries {
-***REMOVED***
 	// Serializer for ratio type
 	Serialize &operator<<(Serialize &serialize, const Queries::Ratio &ratio)
 	{
@@ -217,5 +217,61 @@ namespace Queries {
 		db.logoff();
 		
 		return result;
+	}
+***REMOVED***
+	bool Store(size_t Id,
+		unordered_map<size_t, float> &Ratios,
+		unordered_set<string> &Names,
+		unordered_set<size_t> &Children,
+		size_t Amount,
+		pair<unordered_set<string>, unordered_set<string>> &Differences)
+	{
+		// Initialize database driver
+		otl_connect db;
+		otl_connect::otl_initialize();
+***REMOVED***
+		try {
+			// Connect to database
+			string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
+			db.rlogon(connect.c_str());
+***REMOVED***
+			// Set up table
+			string table = "ABAP.ANALYSIS";
+			string length = "1000";
+			otl_cursor::direct_exec(db, string("DROP TABLE " + table).c_str());
+			otl_cursor::direct_exec(db, string("CREATE TABLE " + table + " (id INT, ratios VARCHAR(" + length + "), names VARCHAR(" + length + "), children VARCHAR(" + length + "), amount INT, differences VARCHAR(" + length + "), PRIMARY KEY(id))").c_str());
+			db.commit();
+***REMOVED***
+			// Generate query
+			string query_string = "INSERT INTO " + table + " (id, ratios, names, children, amount, differences) VALUES (";
+			Jsonize json;
+			query_string += to_string(Id) + ", ";
+			json << Ratios;
+			query_string += "'" + json.Dissolve() + "', ";
+			json << Names;
+			query_string += "'" + json.Dissolve() + "', ";
+			json << Children;
+			query_string += "'" + json.Dissolve() + "', ";
+			query_string += to_string(Amount) + ", ";
+			json << Differences;
+			query_string += "'" + json.Dissolve() + "')";
+			
+			// Insert row
+			otl_stream query(50, query_string.c_str(), db);
+			query.flush();
+		}
+***REMOVED***
+		catch (otl_exception& e) {
+			// Print database errors
+			cerr << e.msg << endl;
+			cerr << e.stm_text << endl;
+			cerr << e.sqlstate << endl;
+			cerr << e.var_info << endl;
+			return false;
+		}
+***REMOVED***
+		// Cleanup
+		db.logoff();
+		return true;
 	}
 }

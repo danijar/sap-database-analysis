@@ -164,18 +164,35 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			cout << "Wrote table names and their amount of children to " << name << "." << endl;
 		}
 ***REMOVED***
+		// Write all informations of current table to database
+		else if (command == "store") {
+			// Get current table
+			size_t id = path.size() ? path.back() : 0;
+***REMOVED***
+			// Collect all information
+			auto ratios = hierarchy.ratios[id];
+			unordered_set<string> names = { hierarchy.names[id] };
+			auto children = hierarchy.children[id];
+			size_t amount = hierarchy.amounts[id];
+			auto differences = structures.differences[id];
+***REMOVED***
+			// Store to database
+			bool result = Queries::Store(id, ratios, names, children, amount, differences);
+		}
+***REMOVED***
 		// Show available commands
 		else if (command == "help") {
 			cout << "To navigate to a table, enter its name." << endl;
-			cout << "back" << "\t" << "Go back to the table you saw before." << endl;
-			cout << "root" << "\t" << "Go to the root level that lists all table heads." << endl;
+			cout << "back"   << "\t" << "Go back to the table you saw before." << endl;
+			cout << "root"   << "\t" << "Go to the root level that lists all table heads." << endl;
 			cout << "scheme" << "\t" << "List column scheme of the current table. Needs connection to database." << endl;
-			cout << "more" << "\t" << "List all children of the current table." << endl;
-			cout << "diff" << "\t" << "Show changes from current table to a child." << endl;
-			cout << "histo" << "\t" << "Draw histogram of children and their number of occurrence." << endl;
-			cout << "json" << "\t" << "Write JSON files of names, children and differences for current tree." << endl;
-			cout << "csv" << "\t" << "Write CSV file of current children and their number of children." << endl;
-			cout << "exit" << "\t" << "Exit the navigator. Synonyms: quit." << endl;
+			cout << "more"   << "\t" << "List all children of the current table." << endl;
+			cout << "diff"   << "\t" << "Show changes from current table to a child." << endl;
+			cout << "histo"  << "\t" << "Draw histogram of children and their number of occurrence." << endl;
+			cout << "json"   << "\t" << "Write JSON files of names, children and differences for current tree." << endl;
+			cout << "csv"    << "\t" << "Write CSV file of current children and their number of children." << endl;
+			cout << "store"  << "\t" << "Write all informations of current table to database." << endl;
+			cout << "exit"   << "\t" << "Exit the navigator. Synonyms: quit." << endl;
 		}
 ***REMOVED***
 		// Navigate to table
