@@ -13,7 +13,7 @@
  */
 class Jsonize {
 public:
-	Jsonize(std::string Path);
+	Jsonize(std::string Path = "");
 	~Jsonize();
 	Jsonize &operator<<(const std::string &Value);
 	template <typename T> Jsonize &operator<<(const T &Value);
@@ -22,7 +22,11 @@ public:
 	template <typename T> Jsonize &operator<<(const std::unordered_set<T> &Value);
 	template <typename TKey, typename TVal> Jsonize &operator<<(const std::unordered_map<TKey, TVal> &Value);
 	bool Flush();
+	std::string Dissolve();
 private:
+	template <typename T> std::string tolerant_to_string(T Value);
+	template <> std::string tolerant_to_string(std::string Value);
+***REMOVED***
 	std::stringstream stream;
 	std::string path;
 	bool flushed = false;
