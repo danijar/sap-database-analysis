@@ -96,12 +96,12 @@ bool Structures::Saved(string Path)
 void Structures::Generate()
 {
 	// Initialize container
-	differences.resize(ids.size());
+	differences.resize(hierarchy.names.size());
 ***REMOVED***
 	// Compute for each children of current table
-	for (size_t i = 0; i < ids.size(); ++i)
-	for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j)
-		differences[*j] = Difference(i, *j);
+	for (size_t i = 0; i < hierarchy.names.size(); ++i) 
+		for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j)
+			differences[*j] = Difference(i, *j);
 }
 ***REMOVED***
 // Compute added and removed fields between any two tables
