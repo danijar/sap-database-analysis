@@ -119,17 +119,27 @@ void Ratios::Generate()
 	ratios.clear();
 ***REMOVED***
 	// Push root node at index zero
-	names.push_back("<root>");
+	names.push_back({"<root>"});
 	ids.insert(make_pair("<root>", 0));
 	ratios.emplace_back();
 ***REMOVED***
 	// Fetch distinct table names
 	Bar bar("Unpack data", rows.size() * 2);
-	for (auto i = rows.begin(); i != rows.end(); ++i) {
-		// Create nodes
-		Id(i->parent);
-		Id(i->child);
 ***REMOVED***
+	for (auto i = rows.begin(); i != rows.end(); ++i) {
+		// Get or generate parent id		
+		size_t parent_id = Id(i->parent);
+***REMOVED***
+		// Don't add if child and parent are the same
+		if (i->parentratio >= 1.0f && i->childratio >= 1.0f) {
+			// Add to the mapping of names and id
+			names[parent_id].insert(i->child);
+			ids[i->child] = parent_id;
+			continue;
+		}
+		
+		// Create node for child
+		Id(i->child);
 		bar.Increment();
 	}
 ***REMOVED***
@@ -139,16 +149,16 @@ void Ratios::Generate()
 		// Get table ids from row
 		size_t parent = ids[i->parent];
 		size_t child = ids[i->child];
-***REMOVED***
+		
+		// Do not add ratio for copies
+		if (parent == child) continue;
+	
 		if (parent > ratios.size() - 1)
 			cout << endl << parent << endl << ratios.size();
 ***REMOVED***
 		// Add parent ratio
 		ratios[parent][child] = i->parentratio;
 		
-		// For now, ignore child ratio completely
-		// Ratio(child, parent, i->childratio);
-***REMOVED***
 		bar.Increment();
 	}
 	bar.Finish();
@@ -160,8 +170,14 @@ size_t Ratios::Id(string name)
 	// Add if not already in map
 	auto i = ids.find(name);
 	if (i == ids.end()) {
+		size_t counter = 0;
+		// Check in all names if we already have an id 
+		for (auto j = names.begin(); j != names.end(); j++, counter++)
+			if (j->find(name) != j->end())
+				return counter;
+***REMOVED***
 		size_t id = names.size();
-		names.push_back(name);
+		names.push_back({ name });
 		ids[name] = id;
 		return id;
 	}

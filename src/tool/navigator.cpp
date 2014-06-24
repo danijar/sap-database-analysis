@@ -46,7 +46,7 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 		// List scheme
 		else if (command == "scheme") {
 			if (path.size()) {
-				vector<Queries::Field> fields = Queries::Fields(hierarchy.names[path.back()]);
+				vector<Queries::Field> fields = Queries::Fields(*hierarchy.names[path.back()].begin());
 				for (auto i : fields)
 					cout << i.name << " ";
 				cout << endl;
@@ -122,7 +122,11 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 ***REMOVED***
 			// Get current table id and name
 			size_t id = path.size() ? path.back() : 0;
-			string name = hierarchy.names[id];
+			// Implode all string names for one id
+			string name = "";
+			for (auto i = hierarchy.names[id].begin(); i != hierarchy.names[id].end(); i++)
+				name += *i;
+***REMOVED***
 			name.erase(remove(name.begin(), name.end(), '<'), name.end());
 			name.erase(remove(name.begin(), name.end(), '>'), name.end());
 			name = "data/" + name;
@@ -141,13 +145,13 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			vector<pair<string, size_t>> data;
 			data.reserve(hierarchy.children[id].size());
 			for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i)
-				data.push_back(make_pair(hierarchy.names[*i], hierarchy.amounts[*i]));
+				data.push_back(make_pair(*hierarchy.names[*i].begin(), hierarchy.amounts[*i]));
 ***REMOVED***
 			// Sort data
 			sort(data.begin(), data.end(), [](pair<string, size_t> l, pair<string, size_t> r) { return l.second < r.second; });
 ***REMOVED***
 			// Table without special chars as file name
-			string name = hierarchy.names[id];
+			string name = *hierarchy.names[id].begin();
 			name.erase(remove(name.begin(), name.end(), '<'), name.end());
 			name.erase(remove(name.begin(), name.end(), '>'), name.end());
 			name += ".csv";
@@ -230,7 +234,8 @@ void Navigator::List(size_t Limit, bool Reverse)
 	if (id < hierarchy.children.size()) {
 		for (auto i = hierarchy.children[id].begin(); i != hierarchy.children[id].end(); ++i) {
 			Child child;
-			child.Name = hierarchy.names[*i];
+			child.Name = *hierarchy.names[*i].begin();
+			if(hierarchy.names[*i].size() > 1) child.Name += " " + hierarchy.names[*i].size();
 			child.Children = hierarchy.children[*i].size();
 			child.Ratio = Ratio(id, *i);
 			children.push_back(child);
@@ -273,8 +278,8 @@ void Navigator::Table(size_t Id, vector<Child> &Children, size_t Limit)
 	auto format = cout.flags();
 ***REMOVED***
 	// Headline
-	cout << hierarchy.names[Id] << endl;
-	for (size_t i = 0; i < hierarchy.names[Id].length(); ++i)
+	cout << *hierarchy.names[Id].begin() << (hierarchy.names[Id].size() > 1 ? " " + to_string(hierarchy.names[Id].size()) : " ")  << endl;
+	for (size_t i = 0; i < hierarchy.names[Id].begin()->length() + 2; ++i)
 		cout << "=";
 	cout << endl;
 ***REMOVED***
@@ -440,6 +445,7 @@ bool Navigator::Json(string Folder, size_t Root)
 	Jsonize out_children(Folder + "/children.json");
 	Jsonize out_differences(Folder + "/differences.json");
 	Jsonize out_amounts(Folder + "/amounts.json");
+	Jsonize out_names(Folder + "/names.json");
 ***REMOVED***
 	// Get recursive children
 	unordered_set<size_t> subchildren = hierarchy.Subchildren(Root);
@@ -448,41 +454,46 @@ bool Navigator::Json(string Folder, size_t Root)
 	cout << "Exporting cluster of " << subchildren.size() + 1 << " tables." << endl;
 ***REMOVED***
 	// Fetch properties
-	unordered_map<string, unordered_set<string>> children;
-	unordered_map<string, pair<unordered_set<string>, unordered_set<string>>> differences;
-	unordered_map<string, size_t> amounts;
+	unordered_map<size_t, unordered_set<size_t>> children;
+	unordered_map<size_t, pair<unordered_set<string>, unordered_set<string>>> differences;
+	unordered_map<size_t, size_t> amounts;
+	unordered_map<size_t, std::unordered_set<std::string>> names;
 ***REMOVED***
 	children.reserve(subchildren.size() + 1);
 	differences.reserve(subchildren.size() + 1);
 	amounts.reserve(subchildren.size() + 1);
+	names.reserve(subchildren.size() + 1);
 	
 	// Convert children to strings
-	unordered_set<string> current;
+	unordered_set<size_t> current;
 	current.reserve(hierarchy.children[Root].size());
 	for (auto i = hierarchy.children[Root].begin(); i != hierarchy.children[Root].end(); ++i)
-		current.insert(hierarchy.names[*i]);
-	children.insert(make_pair(hierarchy.names[Root], current));
-	differences.insert(make_pair(hierarchy.names[Root], structures.differences[Root]));
-	amounts.insert(make_pair(hierarchy.names[Root], hierarchy.amounts[Root]));
+		current.insert(*i);
+	
+	children.insert(make_pair(Root, current));
+	differences.insert(make_pair(Root, structures.differences[Root]));
+	amounts.insert(make_pair(Root, hierarchy.amounts[Root]));
+	names.insert(make_pair(Root, hierarchy.names[Root]));
 ***REMOVED***
 	for (auto i = subchildren.begin(); i != subchildren.end(); ++i) {
-		string name = hierarchy.names[*i];
-***REMOVED***
+		
 		// Convert children to strings
-		unordered_set<string> current;
+		unordered_set<size_t> current;
 		current.reserve(hierarchy.children[*i].size());
 		for (auto j = hierarchy.children[*i].begin(); j != hierarchy.children[*i].end(); ++j)
-			current.insert(hierarchy.names[*j]);
+			current.insert(*j);
 ***REMOVED***
-		children.insert(make_pair(name, current));
-		differences.insert(make_pair(name, structures.differences[*i]));
-		amounts.insert(make_pair(name, hierarchy.amounts[*i]));
+		children.insert(make_pair(*i, current));
+		differences.insert(make_pair(*i, structures.differences[*i]));
+		amounts.insert(make_pair(*i, hierarchy.amounts[*i]));
+		names.insert(make_pair(*i, hierarchy.names[*i]));
 	}
 ***REMOVED***
 	// Write to JSON streams
 	out_children << children;
 	out_differences << differences;
 	out_amounts << amounts;
+	out_names << names;
 ***REMOVED***
 	// Flush files
 	bool result = out_children.Flush() && out_differences.Flush() && out_amounts.Flush();
