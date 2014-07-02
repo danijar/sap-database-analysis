@@ -25,7 +25,8 @@ void Structures::Fetch(bool Output)
 	// Reset data
 	structures.clear();
 	differences.clear();
-	categories.clear();
+	changes_type.clear();
+	changes_percent.clear();
 	
 	// Fetch schemata from database
 	structures = Queries::Structures(ids);
@@ -56,7 +57,8 @@ bool Structures::Load(string Path)
 	// Reset data
 	structures.clear();
 	differences.clear();
-	categories.clear();
+	changes_type.clear();
+	changes_percent.clear();
 ***REMOVED***
 	// Initialize stream
 	Deserialize in(Path);
@@ -66,7 +68,8 @@ bool Structures::Load(string Path)
 	// Read data
 	in >> structures;
 	in >> differences;
-	in >> categories;
+	in >> changes_type;
+	in >> changes_percent;
 ***REMOVED***
 	return true;
 }
@@ -82,7 +85,8 @@ bool Structures::Save(string Path)
 	// Structures
 	out << structures;
 	out << differences;
-	out << categories;
+	out << changes_type;
+	out << changes_percent;
 ***REMOVED***
 	return true;
 }
@@ -101,14 +105,17 @@ void Structures::Generate()
 {
 	// Initialize container
 	differences.resize(hierarchy.names.size());
-	categories.resize(hierarchy.names.size());
+	changes_percent.resize(hierarchy.names.size());
+	changes_type.resize(hierarchy.names.size());
 ***REMOVED***
 	// Compute for each children of current table
 	for (size_t i = 0; i < hierarchy.names.size(); ++i) 
 		for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j) {
 			pair<unordered_set<string>, unordered_set<string>> difference = Difference(i, *j);
 			differences[*j] = difference;
-			categories[*j] = categorize(difference, i, *j);
+			
+			changes_percent[*j] = (size_t)(100 * ((float)structures.at(*j).size()) / (difference.first.size() + difference.second.size()));
+			changes_type[*j] = (difference.second.size() == 0) ? 1 : 2;
 		}
 }
 ***REMOVED***
@@ -134,20 +141,6 @@ pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t
 	}
 	
 	return result;
-}
-***REMOVED***
-size_t Structures::categorize(pair<unordered_set<string>, unordered_set<string>> difference, size_t parent, size_t child) {
-	size_t category = 0;
-	// Categories the relationship
-***REMOVED***
-	// If only added add 1000 to the categorie
-	if (difference.second.size() == 0)
-		category += 1000;
-	// Calculate a percentage value for how many fields have changed
-	if ((difference.first.size() + difference.second.size()) > 0)
-		category += (size_t)(100 * ((float)structures.at(child).size()) / (difference.first.size() + difference.second.size()));
-***REMOVED***
-	return category;
 }
 ***REMOVED***
 // Return cached difference for a child to its parent
