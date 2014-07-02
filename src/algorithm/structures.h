@@ -22,10 +22,12 @@ public:
 	bool Saved(std::string Path = "data/structures.dump");
 	void Generate();
 	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> Difference(size_t Parent, size_t Child);
+	size_t categorize(std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> difference, size_t parent, size_t child);
 	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> &Difference(size_t Child);
 	
 	std::vector<std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>>> differences;
-***REMOVED***
+	// Qualifies a child parent relation with an 8-bit flag
+	std::vector<size_t> categories;
 private:
 	size_t Size();
 ***REMOVED***
