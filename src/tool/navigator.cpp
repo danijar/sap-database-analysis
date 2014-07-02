@@ -446,6 +446,7 @@ bool Navigator::Json(string Folder, size_t Root)
 	Jsonize out_differences(Folder + "/differences.json");
 	Jsonize out_amounts(Folder + "/amounts.json");
 	Jsonize out_names(Folder + "/names.json");
+	Jsonize out_categories(Folder + "/categories.json");
 ***REMOVED***
 	// Get recursive children
 	unordered_set<size_t> subchildren = hierarchy.Subchildren(Root);
@@ -458,22 +459,25 @@ bool Navigator::Json(string Folder, size_t Root)
 	unordered_map<size_t, pair<unordered_set<string>, unordered_set<string>>> differences;
 	unordered_map<size_t, size_t> amounts;
 	unordered_map<size_t, std::unordered_set<std::string>> names;
+	unordered_map<size_t, size_t> categories;
 ***REMOVED***
 	children.reserve(subchildren.size() + 1);
 	differences.reserve(subchildren.size() + 1);
 	amounts.reserve(subchildren.size() + 1);
 	names.reserve(subchildren.size() + 1);
-	
+	categories.reserve(subchildren.size() + 1);
+***REMOVED***
 	// Convert children to strings
 	unordered_set<size_t> current;
 	current.reserve(hierarchy.children[Root].size());
 	for (auto i = hierarchy.children[Root].begin(); i != hierarchy.children[Root].end(); ++i)
 		current.insert(*i);
-	
+***REMOVED***
 	children.insert(make_pair(Root, current));
 	differences.insert(make_pair(Root, structures.differences[Root]));
 	amounts.insert(make_pair(Root, hierarchy.amounts[Root]));
 	names.insert(make_pair(Root, hierarchy.names[Root]));
+	categories.insert(make_pair(Root, structures.categories[Root]));
 ***REMOVED***
 	for (auto i = subchildren.begin(); i != subchildren.end(); ++i) {
 		
@@ -487,6 +491,7 @@ bool Navigator::Json(string Folder, size_t Root)
 		differences.insert(make_pair(*i, structures.differences[*i]));
 		amounts.insert(make_pair(*i, hierarchy.amounts[*i]));
 		names.insert(make_pair(*i, hierarchy.names[*i]));
+		categories.insert(make_pair(*i, structures.categories[*i]));
 	}
 ***REMOVED***
 	// Write to JSON streams
@@ -494,6 +499,7 @@ bool Navigator::Json(string Folder, size_t Root)
 	out_differences << differences;
 	out_amounts << amounts;
 	out_names << names;
+	out_categories << categories;
 ***REMOVED***
 	// Flush files
 	bool result = out_children.Flush() && out_differences.Flush() && out_amounts.Flush();
