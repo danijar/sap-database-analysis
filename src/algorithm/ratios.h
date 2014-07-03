@@ -19,7 +19,7 @@ public:
 ***REMOVED***
 	std::vector<Queries::Ratio > rows;
 	std::unordered_map<std::string, size_t> ids;
-	std::vector<std::string> names;
+	std::vector<std::unordered_set<std::string>> names;
 	std::vector<std::unordered_map<size_t, float>> ratios;
 ***REMOVED***
 private:

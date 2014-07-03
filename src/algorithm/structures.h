@@ -22,15 +22,16 @@ public:
 	bool Saved(std::string Path = "data/structures.dump");
 	void Generate();
 	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> Difference(size_t Parent, size_t Child);
-	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> &Difference(size_t Child);
-	
-	std::vector<std::unordered_set<std::string>> added;
-	std::vector<std::unordered_set<std::string>> removed;
+	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> Difference(size_t Child);
+***REMOVED***
+	std::vector<std::unordered_set<std::string>> added, removed;
+	std::vector<size_t> changes_percent;
+	std::vector<size_t> changes_type;
 ***REMOVED***
 private:
 	size_t Size();
 ***REMOVED***
 	std::vector<std::unordered_set<Queries::Field>> structures;
-	std::unordered_map<size_t, std::unordered_set<std::string>> &names;
+	Ratios &ratios;
 	Hierarchy &hierarchy;
 };

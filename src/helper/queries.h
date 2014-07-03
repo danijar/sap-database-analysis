@@ -45,15 +45,10 @@ namespace Queries {
 	// Fetching functions
 	vector<Ratio> Ratios();
 	vector<Field> Fields(string Table);
-	vector<unordered_set<Field>> Structures(vector<string> &Names);
+	unordered_map<string, unordered_set<Field>> Structures(vector<string> &Names);
 ***REMOVED***
 	// Inserting functions
-	bool Store(size_t Id,
-		unordered_map<size_t, float> &Ratios,
-		unordered_set<string> &Names,
-		unordered_set<size_t> &Children,
-		size_t Amount,
-		pair<unordered_set<string>, unordered_set<string>> &Differences);
+	bool Store(size_t Id, unordered_map<size_t, float> &Ratios, unordered_set<string> &Names, unordered_set<size_t> &Children, size_t Amount, unordered_set<string> &Added, unordered_set<string> &Removed);
 }
 ***REMOVED***
 // Type traits

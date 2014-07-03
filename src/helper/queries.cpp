@@ -146,19 +146,20 @@ namespace Queries {
 	}
 ***REMOVED***
 	// Load the scemata of a set of tables from the database
-	vector<unordered_set<Field>> Structures(vector<string> &Names)
+	unordered_map<string, unordered_set<Field>> Structures(vector<string> &Names)
 	{
-		vector<unordered_set<Field>> result;
+		unordered_map<string, unordered_set<Field>> result;
 ***REMOVED***
 		// Building table list for query
 		string table_list;
 		bool first = true;
-		for (auto name = Ids.begin(); name != Ids.end(); name++) {
+		for (auto i = Names.begin(); i != Names.end(); ++i) {
 			if (first) {
-				table_list += "'" + name->first + "'";
+				table_list += "'" + *i + "'";
 				first = false;
+			} else {
+				table_list += ", '" + *i + "'";
 			}
-			else table_list += ", '" + name->first + "'";
 		}
 		
 		// Initialize database driver
@@ -189,7 +190,7 @@ namespace Queries {
 ***REMOVED***
 			// Read input data into array
 			Bar bar("Query structures", count);
-			result.resize(count);
+			result.reserve(count);
 			while (!query.eof()) {
 				Field current;
 				string table, position;
@@ -197,9 +198,7 @@ namespace Queries {
 				current.position = (size_t)stoi(position);
 				
 				// Find corresponding id and add to result
-				auto i = Ids.find(table);
-				if (i != Ids.end())
-					result[i->second].insert(current);
+				result[table].insert(current);
 ***REMOVED***
 				bar.Increment();
 			}
@@ -219,12 +218,7 @@ namespace Queries {
 		return result;
 	}
 ***REMOVED***
-	bool Store(size_t Id,
-		unordered_map<size_t, float> &Ratios,
-		unordered_set<string> &Names,
-		unordered_set<size_t> &Children,
-		size_t Amount,
-		pair<unordered_set<string>, unordered_set<string>> &Differences)
+	bool Store(size_t Id, unordered_map<size_t, float> &Ratios, unordered_set<string> &Names, unordered_set<size_t> &Children, size_t Amount, unordered_set<string> &Added, unordered_set<string> &Removed)
 	{
 		// Initialize database driver
 		otl_connect db;
@@ -239,7 +233,7 @@ namespace Queries {
 			string table = "ABAP.ANALYSIS";
 			string length = "1000";
 			otl_cursor::direct_exec(db, string("DROP TABLE " + table).c_str());
-			otl_cursor::direct_exec(db, string("CREATE TABLE " + table + " (id INT, ratios VARCHAR(" + length + "), names VARCHAR(" + length + "), children VARCHAR(" + length + "), amount INT, differences VARCHAR(" + length + "), PRIMARY KEY(id))").c_str());
+			otl_cursor::direct_exec(db, string("CREATE TABLE " + table + " (id INT, ratios VARCHAR(" + length + "), names VARCHAR(" + length + "), children VARCHAR(" + length + "), amount INT, added VARCHAR(" + length + "), removed VARCHAR(" + length + "), PRIMARY KEY(id))").c_str());
 			db.commit();
 ***REMOVED***
 			// Generate query
@@ -253,7 +247,9 @@ namespace Queries {
 			json << Children;
 			query_string += "'" + json.Dissolve() + "', ";
 			query_string += to_string(Amount) + ", ";
-			json << Differences;
+			json << Added;
+			query_string += "'" + json.Dissolve() + "', ";
+			json << Removed;
 			query_string += "'" + json.Dissolve() + "')";
 			
 			// Insert row

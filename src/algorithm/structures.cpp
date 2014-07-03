@@ -5,7 +5,7 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor checks dump and fetch data
-Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : names(Ratios.names), hierarchy(Hierarchy)
+Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : ratios(Ratios), hierarchy(Hierarchy)
 {
 	// Try to load dump
 	if (Load(Path)) {
@@ -26,18 +26,17 @@ void Structures::Fetch(bool Output)
 	structures.clear();
 	added.clear();
 	removed.clear();
-***REMOVED***
-	// Assert
+	changes_type.clear();
+	changes_percent.clear();
 ***REMOVED***
 	// Fetch schemata from database
 	vector<string> representatives;
-	representatives.resize(names.size());
-	for (auto i = names.begin(); i != names.end(); ++i) {
-		size_t id = i->first;
-		string representant = *(i->second.begin());
-		representatives[id] = representant;
-	}
-	structures = Queries::Structures(representatives);
+	representatives.reserve(ratios.ids.size());
+	for (size_t i = 0; i < ratios.ids.size(); ++i)
+		representatives.push_back(*ratios.names[i].begin());
+	auto result = Queries::Structures(representatives);
+	for (auto i = result.begin(); i != result.end(); ++i)
+		structures[ratios.ids[i->first]] = i->second;
 ***REMOVED***
 	// Output
 	if (Output) {
@@ -66,6 +65,8 @@ bool Structures::Load(string Path)
 	structures.clear();
 	added.clear();
 	removed.clear();
+	changes_type.clear();
+	changes_percent.clear();
 ***REMOVED***
 	// Initialize stream
 	Deserialize in(Path);
@@ -76,6 +77,8 @@ bool Structures::Load(string Path)
 	in >> structures;
 	in >> added;
 	in >> removed;
+	in >> changes_type;
+	in >> changes_percent;
 ***REMOVED***
 	return true;
 }
@@ -92,6 +95,8 @@ bool Structures::Save(string Path)
 	out << structures;
 	out << added;
 	out << removed;
+	out << changes_type;
+	out << changes_percent;
 ***REMOVED***
 	return true;
 }
@@ -109,23 +114,27 @@ bool Structures::Saved(string Path)
 void Structures::Generate()
 {
 	// Initialize container
-	added.resize(names.size());
-	removed.resize(names.size());
+	added.resize(ratios.ids.size());
+	removed.resize(ratios.ids.size());
+	changes_percent.resize(ratios.ids.size());
+	changes_type.resize(ratios.names.size());
 ***REMOVED***
 	// Compute for each children of current table
-	for (size_t i = 0; i < names.size(); ++i)
-	for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j) {
-		auto differences = Difference(i, *j);
-		added[*j] = differences.first;
-		removed[*j] = differences.second;
-	}
+	for (size_t i = 0; i < hierarchy.names.size(); ++i)
+		for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j) {
+			pair<unordered_set<string>, unordered_set<string>> difference = Difference(i, *j);
+			added[*j] = difference.first;
+			removed[*j] = difference.second;
+			changes_percent[*j] = (size_t)(100 * ((float)structures.at(*j).size()) / (difference.first.size() + difference.second.size()));
+			changes_type[*j] = (difference.second.size() == 0) ? 1 : 2;
+		}
 }
 ***REMOVED***
 // Compute added and removed fields between any two tables
 pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t Parent, size_t Child)
 {
 	pair<unordered_set<string>, unordered_set<string>> result;
-	
+***REMOVED***
 	// Find added fields
 	for (auto i = structures[Child].begin(); i != structures[Child].end(); ++i) {
 		// Using the own find operator because find doesent use def. comperator
@@ -146,7 +155,7 @@ pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t
 }
 ***REMOVED***
 // Return cached difference for a child to its parent
-pair<unordered_set<string>, unordered_set<string>> &Structures::Difference(size_t Child)
+pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t Child)
 {
 	// Check for valid table
 	if (Child > added.size() - 1 || Child > removed.size() - 1)
