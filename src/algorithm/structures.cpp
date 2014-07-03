@@ -5,7 +5,7 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor checks dump and fetch data
-Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : ids(Ratios.ids), hierarchy(Hierarchy)
+Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : names(Ratios.names), hierarchy(Hierarchy)
 {
 	// Try to load dump
 	if (Load(Path)) {
@@ -24,10 +24,20 @@ void Structures::Fetch(bool Output)
 {
 	// Reset data
 	structures.clear();
-	differences.clear();
-	
+	added.clear();
+	removed.clear();
+***REMOVED***
+	// Assert
+***REMOVED***
 	// Fetch schemata from database
-	structures = Queries::Structures(ids);
+	vector<string> representatives;
+	representatives.resize(names.size());
+	for (auto i = names.begin(); i != names.end(); ++i) {
+		size_t id = i->first;
+		string representant = *(i->second.begin());
+		representatives[id] = representant;
+	}
+	structures = Queries::Structures(representatives);
 ***REMOVED***
 	// Output
 	if (Output) {
@@ -54,7 +64,8 @@ bool Structures::Load(string Path)
 ***REMOVED***
 	// Reset data
 	structures.clear();
-	differences.clear();
+	added.clear();
+	removed.clear();
 ***REMOVED***
 	// Initialize stream
 	Deserialize in(Path);
@@ -63,7 +74,8 @@ bool Structures::Load(string Path)
 ***REMOVED***
 	// Read data
 	in >> structures;
-	in >> differences;
+	in >> added;
+	in >> removed;
 ***REMOVED***
 	return true;
 }
@@ -78,7 +90,8 @@ bool Structures::Save(string Path)
 ***REMOVED***
 	// Structures
 	out << structures;
-	out << differences;
+	out << added;
+	out << removed;
 ***REMOVED***
 	return true;
 }
@@ -96,12 +109,16 @@ bool Structures::Saved(string Path)
 void Structures::Generate()
 {
 	// Initialize container
-	differences.resize(ids.size());
+	added.resize(names.size());
+	removed.resize(names.size());
 ***REMOVED***
 	// Compute for each children of current table
-	for (size_t i = 0; i < ids.size(); ++i)
-	for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j)
-		differences[*j] = Difference(i, *j);
+	for (size_t i = 0; i < names.size(); ++i)
+	for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j) {
+		auto differences = Difference(i, *j);
+		added[*j] = differences.first;
+		removed[*j] = differences.second;
+	}
 }
 ***REMOVED***
 // Compute added and removed fields between any two tables
@@ -132,10 +149,10 @@ pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t
 pair<unordered_set<string>, unordered_set<string>> &Structures::Difference(size_t Child)
 {
 	// Check for valid table
-	if (Child > differences.size() - 1)
+	if (Child > added.size() - 1 || Child > removed.size() - 1)
 		throw exception("Table index out of range");
 ***REMOVED***
-	return differences[Child];
+	return { added[Child], removed[Child] };
 }
 ***REMOVED***
 // Calculate memory size in bytes

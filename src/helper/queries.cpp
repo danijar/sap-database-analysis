@@ -146,7 +146,7 @@ namespace Queries {
 	}
 ***REMOVED***
 	// Load the scemata of a set of tables from the database
-	vector<unordered_set<Field>> Structures(unordered_map<string, size_t> &Ids)
+	vector<unordered_set<Field>> Structures(vector<string> &Names)
 	{
 		vector<unordered_set<Field>> result;
 ***REMOVED***

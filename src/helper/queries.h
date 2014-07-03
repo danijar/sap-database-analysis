@@ -45,7 +45,7 @@ namespace Queries {
 	// Fetching functions
 	vector<Ratio> Ratios();
 	vector<Field> Fields(string Table);
-	vector<unordered_set<Field>> Structures(unordered_map<string, size_t> &Ids);
+	vector<unordered_set<Field>> Structures(vector<string> &Names);
 ***REMOVED***
 	// Inserting functions
 	bool Store(size_t Id,
