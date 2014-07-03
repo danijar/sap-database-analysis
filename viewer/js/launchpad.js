@@ -2,6 +2,10 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 	var element, children, differences, amounts;
 ***REMOVED***
 	function initialize(container) {
+		// Change window title
+		document.title = 'SAP Database Analysis';
+***REMOVED***
+		// Create and attach container
 		element = $('<div class="launchpad">');
 		container.append(element);
 ***REMOVED***
@@ -28,7 +32,7 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		var tile = $('<a class="tile" href="#/table/' + current + '">');
 		tile.append('<h2>' + current + '</h2>');
 		tile.append(difference);
-		tile.append('<p>' + amounts[current] + ' children</p>');
+		tile.append('<p>' + (amounts[current] + 1) + ' tables</p>');
 ***REMOVED***
 		element.append(tile);
 	}
@@ -37,10 +41,18 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 	function main(container) {
 		initialize(container);
 ***REMOVED***
-		_.each(children['root'], function(head) {
+		// Sort head tables by cluster size
+		var heads = children['<root>'];
+		heads = _.sortBy(heads, function(head) {
+			return amounts[head];
+		});
+		heads.reverse();
+***REMOVED***
+		// Add head tables as tiles
+		_.each(heads, function(head) {
 			tile(head);
 		});
 	}
-	
+***REMOVED***
 	return main;
 });

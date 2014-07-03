@@ -21,7 +21,7 @@ require(['tree', 'launchpad'], function(View, Launchpad) {
 ***REMOVED***
     // Initialize routes
     var routes = {
-        '/?':              function() { Launchpad(container); },
+        '/?':            function() { Launchpad(container); },
         '/table/(.+)/?': function(table) { View(container, table); },
     };
 ***REMOVED***

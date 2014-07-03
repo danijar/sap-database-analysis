@@ -1,68 +1,37 @@
-define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../../data/root/differences.json', 'text!../../data/root/amounts.json'], function($, _, Children, Differences, Amounts) {
-	var element, children, differences, amounts, root;
+define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/children.json', 'text!../../data/root/differences.json', 'text!../../data/root/amounts.json'], function($, _, Connection, Popup, Children, Differences, Amounts) {
+	// Members
+	var element;
+	var children, differences, amounts;
+	var connections = {};
 ***REMOVED***
-	function initialize(container) {
+	function initialize(container, root) {
+		// Change window title
+		document.title = root;
+***REMOVED***
+		// Create and attach container
 		element = $('<div class="tree">');
 		container.append(element);
 		
 		// Parse input data
-		children = JSON.parse(Children);
+		children    = JSON.parse(Children);
 		differences = JSON.parse(Differences);
 		amounts 	= JSON.parse(Amounts);
-***REMOVED***
-		// Lazy load children when clicking a table
-		$(document).on('click', 'div.inner', function() {
-			// Get name
-			var current = $(this).parent().attr('id');
-***REMOVED***
-			// Load children
-			var empty = $(this).siblings('.children').children().length < 1; 
-			if (empty) {
-				_.each(children[current], function(child) {
-					table(child, current);
-				});
-			}
-***REMOVED***
-			// Expand or collapse
-			$(this).siblings('.children').toggleClass('visible');
+		// Events
+		element.on('click', '.inner', function() {
+			// Lazy load children when clicking a table
+			var table = $(this).parent().attr('id');
+			toggle(table);
 		});
-	}
+		element.on('click', 'h2', function() {
+			// Open structure popup when clicking table name
+			var table = $(this).parent().parent().attr('id');
+			var popup = Popup();
+			popup.append('<h1>' + table + '</h1>');
+			//popup.append('<hr>');
 ***REMOVED***
-	// Iteratively render all tables
-	// Currently not used because of performance problems
-	var jobs = [];
-	function hierarchy(table) {
-		// Add job for root table
-		jobs.push({ child: table, parent: null });
-***REMOVED***
-		// Work through all jobs
-		// The list will become longer while iterating
-		for (var i = 0; i < jobs.length && i < 12000; ++i) {
-			var current = jobs[i].child;
-			var parent  = jobs[i].parent;
-***REMOVED***
-			// Remove specialchars for use as id
-			var id = current.replace(/[^a-zA-Z0-9-_]/g, '');
-***REMOVED***
-			// Create node
-			var container = $('<div class="table" id="' + id + '">');
-			var inner = $('<div class="inner">');
-			inner.append('<h2>' + current + '</h2>');
-***REMOVED***
-			container.append(inner);
-			container.append('<br>');
-			container.append('<div class="children">');
-***REMOVED***
-			// Append to parent
-			if (parent)
-				$('#' + escape(parent) + ' > .children').append(container);
-			else
-				element.append(container);
-***REMOVED***
-			// Render all children
-			for (var j = 0; j < children[current].length; ++j)
-				jobs.push({ child: children[current][j], parent: id });
-		}
+			// Prevent expanding children
+			return false;
+		});
 	}
 ***REMOVED***
 	// Escape special chars for proper id selectors
@@ -76,16 +45,25 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 		return result;
 	}
 ***REMOVED***
-	// Render a table
-	function table(current, parent) {
-		// Remove specialchars for use as id
-		
-		// Create node
+	// Escape special chars for proper id selectors
+	function escape(name) {
+		var result = "";
+		for (var i = 0; i < name.length; i++) {
+			if (name[i].match(/[^a-zA-Z0-9-_]/))
+				result += '\\';
+			result += name[i];
+		}
+		return result;
+	}
+***REMOVED***
+	// Render a node
+	function node(current, parent) {
+		// Structure changes
 		var difference = $('<div class="difference">');
 		if (differences[current]) {
 			if (differences[current][0].length) {
 				var added = $('<ul class="added">');
-				_.each(differences[current][0], function(field) {
+				_.each(differences[current][0].sort(), function(field) {
 					added.append('<li>' + field + '</li>');
 				});
 				difference.append(added);
@@ -93,34 +71,92 @@ define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../.
 ***REMOVED***
 			if (differences[current][1].length) {
 				var removed = $('<ul class="removed">');
-				_.each(differences[current][1], function(field) {
+				_.each(differences[current][1].sort(), function(field) {
 					removed.append('<li>' + field + '</li>');
 				});
 				difference.append(removed);
 			}
 		}
 ***REMOVED***
+		// Table
 		var inner = $('<div class="inner">');
 		inner.append('<h2>' + current + '</h2>');
 		inner.append(difference);
-		if (amounts[current])
-			inner.append('<p>' + amounts[current] + ' children</p>');
+		// Information about descendants
+		var paragraph = '<p>';
+		var number = children[current] ? children[current].length : 0;
+		if (amounts[current] > number)
+			paragraph += amounts[current] + ' tables ';
+		if (number)
+			paragraph += number + (number > 1 ? ' children' : ' child');
+		paragraph += '</p>';
+		inner.append(paragraph);
 ***REMOVED***
-		var container = $('<div class="table" id="' + current + '">');
-		container.append(inner);
-		container.append('<br>');
-		container.append('<div class="children">');
+		// Wrapper containing table and children
+		var table = $('<div class="table" id="' + current + '">');
+		table.append(inner);
+		table.append('<br>');
+		table.append('<div class="children">');
 ***REMOVED***
-		if (parent) 
-			$('#' + escape(parent) + ' > .children').append(container);
-		else 
-			element.append(container);
+		// Append to parent
+		var container = parent ? $('#' + escape(parent) + ' > .children') : element;
+		container.append(table);
+	}
+***REMOVED***
+	function toggle(table) {
+		var tablebox = $('#' + escape(table));
+		var childrenbox = tablebox.children('.children');
+		var innerbox = tablebox.children('.inner');
+***REMOVED***
+		// Keep view
+		var oldoffset = innerbox.offset();
+***REMOVED***
+		// Load children
+		var empty = childrenbox.children().length < 1;
+		if (empty)
+			for (var i = 0; i < children[table].length; ++i)
+				node(children[table][i], table);
+***REMOVED***
+		// Expand or collapse
+		if (childrenbox.hasClass('visible')) {
+			// Remove line connections
+			childrenbox.children().each(function() {
+				var key = $(this).attr('id');
+				connections[key].remove();
+				delete connections[key];
+			});
+***REMOVED***
+			// Hide
+			childrenbox.removeClass('visible');
+		} else {
+			// Show
+			childrenbox.addClass('visible');
+***REMOVED***
+			// Add line connections
+			childrenbox.children().each(function() {
+				var key = $(this).attr('id');
+				connections[key] = Connection(tablebox, $(this), innerbox);
+			});
+		}
+***REMOVED***
+		// Restore view
+		var newoffset = innerbox.offset();
+		$('body').scrollTop($('body').scrollTop() - (oldoffset.top - newoffset.top));
+		$('body').scrollLeft($('body').scrollLeft() - (oldoffset.left - newoffset.left));
+***REMOVED***
+		// Update all connections
+		_.each(connections, function(connection) {
+			connection.update();
+		});
 	}
 ***REMOVED***
 	function main(container, root) {
-		initialize(container);
-		table(root);
+		initialize(container, root);
+		node(root);
+***REMOVED***
+		// Open first level of children
+		$('#' + escape(root) + ' > .inner').click();
 	}
-	
+***REMOVED***
 	return main;
 });
