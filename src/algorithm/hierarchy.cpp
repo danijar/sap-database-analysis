@@ -95,7 +95,7 @@ unordered_set<size_t> Hierarchy::Heads()
 void Hierarchy::Generate()
 {
 	// Add children of all nodes to hierarchy
-	Bar bar("Build hierarchy", ids.size());
+	Bar bar("Build hierarchy", names.size());
 	processed.clear();
 	children.clear();
 	children.resize(names.size());

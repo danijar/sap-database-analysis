@@ -20,7 +20,7 @@ public:
 	std::unordered_set<size_t> Subchildren(size_t Root);
 ***REMOVED***
 	std::unordered_map<std::string, size_t> &ids;
-	std::vector<std::string> &names;
+	std::vector<std::unordered_set<std::string>> &names;
 	std::vector<std::unordered_map<size_t, float>> &ratios;
 	std::vector<std::unordered_set<size_t>> children;
 	std::vector<size_t> amounts;
