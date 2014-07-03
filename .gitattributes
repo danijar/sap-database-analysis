@@ -1,2 +1,5 @@
 # Unix line endings
 * text eol=lf
+***REMOVED***
+# Binary files
+*.png binary

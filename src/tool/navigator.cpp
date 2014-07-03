@@ -456,9 +456,6 @@ bool Navigator::Json(string Folder, size_t Root)
 	cout << "Exporting cluster of " << subchildren.size() + 1 << " tables." << endl;
 ***REMOVED***
 	// Fetch properties
-	unordered_map<size_t, unordered_set<size_t>> children;
-	unordered_map<size_t, pair<unordered_set<string>, unordered_set<string>>> differences;
-	unordered_map<size_t, size_t> amounts;
 	unordered_map<size_t, std::unordered_set<std::string>> names;
 	unordered_map<size_t, size_t> changes_percent;
 	unordered_map<size_t, size_t> changes_type;
@@ -469,12 +466,14 @@ bool Navigator::Json(string Folder, size_t Root)
 	names.reserve(subchildren.size() + 1);
 	changes_percent.reserve(subchildren.size() + 1);
 	changes_type.reserve(subchildren.size() + 1);
-***REMOVED***
 	// Convert children to strings
 	unordered_set<size_t> current;
 	current.reserve(hierarchy.children[Root].size());
 	for (auto i = hierarchy.children[Root].begin(); i != hierarchy.children[Root].end(); ++i)
-		current.insert(*i);
+		current.insert(hierarchy.names[*i]);
+	children.insert(make_pair(hierarchy.names[Root], current));
+	differences.insert(make_pair(hierarchy.names[Root], structures.differences[Root]));
+	amounts.insert(make_pair(hierarchy.names[Root], hierarchy.amounts[Root]));
 ***REMOVED***
 	children.insert(make_pair(Root, current));
 	differences.insert(make_pair(Root, structures.differences[Root]));
@@ -489,15 +488,15 @@ bool Navigator::Json(string Folder, size_t Root)
 		unordered_set<size_t> current;
 		current.reserve(hierarchy.children[*i].size());
 		for (auto j = hierarchy.children[*i].begin(); j != hierarchy.children[*i].end(); ++j)
-			current.insert(*j);
+			current.insert(hierarchy.names[*j]);
 ***REMOVED***
-		children.insert(make_pair(*i, current));
-		differences.insert(make_pair(*i, structures.differences[*i]));
-		amounts.insert(make_pair(*i, hierarchy.amounts[*i]));
+		children.insert(make_pair(name, current));
+		differences.insert(make_pair(name, structures.differences[*i]));
+		amounts.insert(make_pair(name, hierarchy.amounts[*i]));
 		names.insert(make_pair(*i, hierarchy.names[*i]));
 		changes_percent.insert(make_pair(*i, structures.changes_percent[*i]));
 		changes_type.insert(make_pair(*i, structures.changes_type[*i]));
-	}
+}
 ***REMOVED***
 	// Write to JSON streams
 	out_children << children;
