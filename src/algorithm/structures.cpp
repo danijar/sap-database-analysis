@@ -29,14 +29,21 @@ void Structures::Fetch(bool Output)
 	changes_type.clear();
 	changes_percent.clear();
 ***REMOVED***
+	structures.resize(ratios.ids.size());
+***REMOVED***
 	// Fetch schemata from database
 	vector<string> representatives;
 	representatives.reserve(ratios.ids.size());
 	for (size_t i = 0; i < ratios.ids.size(); ++i)
-		representatives.push_back(*ratios.names[i].begin());
-	auto result = Queries::Structures(representatives);
-	for (auto i = result.begin(); i != result.end(); ++i)
-		structures[ratios.ids[i->first]] = i->second;
+		if (ratios.names[i].size())
+			representatives.push_back(*ratios.names[i].begin());
+	auto result = Queries::Structures(representatives); // For some reason result has fever items than parameter
+	
+	for (auto i = result.begin(); i != result.end(); ++i) {
+		auto j = ratios.ids.find(i->first);
+		if (j != ratios.ids.end())
+			structures[j->second] = i->second;
+	}
 ***REMOVED***
 	// Output
 	if (Output) {
