@@ -45,7 +45,7 @@ template <typename TKey, typename TVal> Jsonize &Jsonize::operator<<(const std::
 	if (Value.begin() != Value.end()) {
 		*this << tolerant_to_string(Value.begin()->first) << ":" << Value.begin()->second;
 		for (auto i = (++Value.begin()); i != Value.end(); ++i)
-			*this << "," << i->first << ":" << i->second;
+			*this << "," << tolerant_to_string(i->first) << ":" << i->second;
 	}
 	stream << "}";
 	return *this;
