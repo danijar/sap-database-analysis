@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "helper/queries.h"
+#include "type/ratio.h"
 ***REMOVED***
 /*
  * Responsible for querying input data from database and
@@ -17,7 +17,7 @@ public:
 	bool Saved(std::string Path = "data/ratios.dump");
 	void Generate();
 ***REMOVED***
-	std::vector<Queries::Ratio > rows;
+	std::vector<Ratio> rows;
 	std::unordered_map<std::string, size_t> ids;
 	std::vector<std::unordered_set<std::string>> names;
 	std::vector<std::unordered_map<size_t, float>> ratios;

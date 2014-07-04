@@ -7,34 +7,6 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 namespace Queries {
-	// Serializer for ratio type
-	Serialize &operator<<(Serialize &serialize, const Queries::Ratio &ratio)
-	{
-		serialize << ratio.parent << ratio.child << ratio.parentratio << ratio.childratio;
-		return serialize;
-	}
-***REMOVED***
-	// Deserializer for ratio type
-	Deserialize &operator>>(Deserialize &deserialize, Queries::Ratio &ratio)
-	{
-		deserialize >> ratio.parent >> ratio.child >> ratio.parentratio >> ratio.childratio;
-		return deserialize;
-	}
-***REMOVED***
-	// Serializer for query field type
-	Serialize &operator<<(Serialize &serialize, const Queries::Field &field)
-	{
-		serialize << field.name << field.roll << field.domain << field.position;
-		return serialize;
-	}
-***REMOVED***
-	// Deserializer for query field type
-	Deserialize &operator>>(Deserialize &deserialize, Queries::Field &field)
-	{
-		deserialize >> field.name >> field.roll >> field.domain >> field.position;
-		return deserialize;
-	}
-***REMOVED***
 	// Load input data from database into memory
 	vector<Ratio> Ratios()
 	{
@@ -218,8 +190,51 @@ namespace Queries {
 		return result;
 	}
 ***REMOVED***
+	void Create(string Table, string Columns)
+	{
+		// Initialize database driver
+		otl_connect db;
+		otl_connect::otl_initialize();
+***REMOVED***
+		try {
+			// Connect to database
+			string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
+			db.rlogon(connect.c_str());
+***REMOVED***
+			// Drop table if exists
+			try {
+				otl_cursor::direct_exec(db, string("DROP TABLE " + Table).c_str());
+				db.commit();
+			}
+			catch (otl_exception&) {
+				
+			}
+***REMOVED***
+			// Create new table
+			otl_cursor::direct_exec(db, string("CREATE TABLE " + Table + " " + Columns).c_str());
+			db.commit();
+		}
+		catch (otl_exception& e) {
+			// Print database errors
+			cerr << e.msg << endl;
+			cerr << e.stm_text << endl;
+			cerr << e.sqlstate << endl;
+			cerr << e.var_info << endl;
+		}
+***REMOVED***
+		// Cleanup
+		db.logoff();
+	}
+***REMOVED***
 	bool Store(size_t Id, unordered_map<size_t, float> &Ratios, unordered_set<string> &Names, unordered_set<size_t> &Children, size_t Amount, unordered_set<string> &Added, unordered_set<string> &Removed)
 	{
+		// Create schema
+		Create("ABAP.ANALYSIS_META", "(id INT, amount INT, ratio FLOAT, changes FLOAT, category VARCHAR(16)) PRIMARY KEY(id)");
+		Create("ABAP.ANALYSIS_NAMES", "(id INT, name VARCHAR(128))");
+		Create("ABAP.ANALYSIS_CHILDREN", "(id INT, child INT)");
+		Create("ABAP.ANALYSIS_ADDED", "(id INT, field VARCHAR(128))");
+		Create("ABAP.ANALYSIS_REMOVED", "(id INT, field VARCHAR(128))");
+		
 		// Initialize database driver
 		otl_connect db;
 		otl_connect::otl_initialize();

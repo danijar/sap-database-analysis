@@ -53,12 +53,7 @@ void Structures::Fetch(bool Output)
 			fields += i->size();
 ***REMOVED***
 		// Print message
-		cout << fixed;
-		cout << "Loaded "
-			<< fields << " fields stored in "
-			<< 0.001 * (1000 * Size() / 1024 / 1024) << " megabytes of memory."
-			<< endl;
-		cout << scientific;
+		cout << "Loaded " << fields << " fields." << endl;
 	}
 }
 ***REMOVED***
@@ -146,7 +141,7 @@ pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t
 	for (auto i = structures[Child].begin(); i != structures[Child].end(); ++i) {
 		// Using the own find operator because find doesent use def. comperator
 		if (std::find_if(structures[Parent].begin(), structures[Parent].end(),
-				Queries::find_field(*i)) == structures[Parent].end())
+				Field::find(*i)) == structures[Parent].end())
 			result.first.insert(i->name);
 	}
 ***REMOVED***
@@ -154,7 +149,7 @@ pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t
 	for (auto i = structures[Parent].begin(); i != structures[Parent].end(); ++i) {
 		// Using the own find operator because find doesent use def. comperator
 		if (std::find_if(structures[Child].begin(), structures[Child].end(),
-			Queries::find_field(*i)) == structures[Child].end())
+			Field::find(*i)) == structures[Child].end())
 			result.second.insert(i->name);
 	}
 ***REMOVED***
@@ -169,20 +164,4 @@ pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t
 		throw exception("Table index out of range");
 ***REMOVED***
 	return { added[Child], removed[Child] };
-}
-***REMOVED***
-// Calculate memory size in bytes
-size_t Structures::Size()
-{
-	size_t size = 0;
-***REMOVED***
-	// Structures
-	size += structures.size() * sizeof(size_t);
-	for (auto i = structures.begin(); i != structures.end(); ++i)
-		size += i->size() * (sizeof(size_t)+sizeof(Queries::Field));
-***REMOVED***
-	// Differences
-	// ...
-***REMOVED***
-	return size;
 }

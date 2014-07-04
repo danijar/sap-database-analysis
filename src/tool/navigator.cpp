@@ -46,7 +46,7 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 		// List scheme
 		else if (command == "scheme") {
 			if (path.size()) {
-				vector<Queries::Field> fields = Queries::Fields(*hierarchy.names[path.back()].begin());
+				vector<Field> fields = Queries::Fields(*hierarchy.names[path.back()].begin());
 				for (auto i : fields)
 					cout << i.name << " ";
 				cout << endl;
