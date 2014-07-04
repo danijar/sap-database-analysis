@@ -3,8 +3,9 @@
 #include <string>
 #include <unordered_set>
 #include <unordered_map>
+#include "type/field.h"
+#include "type/ratio.h"
 #include "helper/bar.h"
-#include "helper/serialize.h"
 ***REMOVED***
 ***REMOVED***
 /*
@@ -12,30 +13,6 @@
  */
 namespace Queries {
 	using namespace std;
-***REMOVED***
-	// Struct for the ratio rows
-	struct Ratio {
-		string parent, child;
-		float parentratio, childratio;
-	};
-	Serialize &operator<<(Serialize &serialize, const Ratio &ratio);
-	Deserialize &operator>>(Deserialize &deserialize, Ratio &ratio);
-***REMOVED***
-	// Struct for the field values
-	struct Field {
-		string name, roll, domain;
-		size_t position;
-		bool operator==(const Field &other) const { return name == other.name; }
-	};
-	Serialize &operator<<(Serialize &serialize, const Field &field);
-	Deserialize &operator>>(Deserialize &deserialize, Field &field);
-***REMOVED***
-	// Implement a find function for the difference check
-	struct find_field : unary_function<Field, bool> {
-		string name;
-		find_field(Field f) :name(f.name) { }
-		bool operator()(Field const& f) const { return f.name == name; }
-	};
 ***REMOVED***
 	// Global connection details
 	static string Dsn = "***REMOVED***";
@@ -48,20 +25,6 @@ namespace Queries {
 	unordered_map<string, unordered_set<Field>> Structures(vector<string> &Names);
 ***REMOVED***
 	// Inserting functions
+	void Create(string Table, string Columns);
 	bool Store(size_t Id, unordered_map<size_t, float> &Ratios, unordered_set<string> &Names, unordered_set<size_t> &Children, size_t Amount, unordered_set<string> &Added, unordered_set<string> &Removed);
-}
-***REMOVED***
-// Type traits
-namespace std {
-	template <>
-	struct hash<Queries::Field>
-	{
-		size_t operator()(const Queries::Field &f) const {
-			using std::hash;
-			return (hash<string>()(f.name)
-				^ ((hash<string>()(f.roll)     << 1) >> 1)
-				^ ((hash<string>()(f.domain)   << 1) >> 1)
-				^ ((hash<size_t>()(f.position) << 1) >> 1));
-		}
-	};
 }

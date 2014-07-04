@@ -1,8 +1,9 @@
-#include "algorithm/ratios.h"
+#include "ratios.h"
 #include <iostream>
 #define OTL_ODBC
 #define OTL_STL
 #include "otlv4.h"
+#include "helper/queries.h"
 #include "helper/bar.h"
 #include "helper/serialize.h"
 using namespace std;

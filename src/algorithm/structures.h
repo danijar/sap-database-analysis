@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <iostream>
 #include <algorithm>
+#include "type/field.h"
 #include "algorithm/ratios.h"
 #include "algorithm/hierarchy.h"
 ***REMOVED***
@@ -29,9 +30,7 @@ public:
 	std::vector<size_t> changes_type;
 ***REMOVED***
 private:
-	size_t Size();
-***REMOVED***
-	std::vector<std::unordered_set<Queries::Field>> structures;
+	std::vector<std::unordered_set<Field>> structures;
 	Ratios &ratios;
 	Hierarchy &hierarchy;
 };
