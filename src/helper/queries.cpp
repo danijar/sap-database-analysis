@@ -7,6 +7,39 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 namespace Queries {
+	// Connect to database and execute given query
+	bool Query(string Querystring)
+	{
+		// Initialize database driver
+		otl_connect db;
+		otl_connect::otl_initialize();
+***REMOVED***
+		try {		
+			// Connect to database
+			string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
+			db.rlogon(connect.c_str());
+***REMOVED***
+			// Execute query
+			otl_stream query(50, Querystring.c_str(), db);
+			query.flush();
+***REMOVED***
+			// Cleanup
+			db.logoff();
+			return true;
+		}
+		catch (otl_exception& e) {
+			// Print database errors
+			cerr << e.msg << endl;
+			cerr << e.stm_text << endl;
+			cerr << e.sqlstate << endl;
+			cerr << e.var_info << endl;
+***REMOVED***
+			// Cleanup
+			db.logoff();
+			return false;
+		}
+	}
+***REMOVED***
 	// Load input data from database into memory
 	vector<Ratio> Ratios()
 	{
@@ -190,7 +223,7 @@ namespace Queries {
 		return result;
 	}
 ***REMOVED***
-	void Create(string Table, string Columns)
+	void Table(string Name, string Columns)
 	{
 		// Initialize database driver
 		otl_connect db;
@@ -203,15 +236,13 @@ namespace Queries {
 ***REMOVED***
 			// Drop table if exists
 			try {
-				otl_cursor::direct_exec(db, string("DROP TABLE " + Table).c_str());
+				otl_cursor::direct_exec(db, string("DROP TABLE " + Name).c_str());
 				db.commit();
 			}
-			catch (otl_exception&) {
-				
-			}
+			catch (otl_exception&) {}
 ***REMOVED***
 			// Create new table
-			otl_cursor::direct_exec(db, string("CREATE TABLE " + Table + " " + Columns).c_str());
+			otl_cursor::direct_exec(db, string("CREATE COLUMN TABLE " + Name + " (" + Columns + ")").c_str());
 			db.commit();
 		}
 		catch (otl_exception& e) {
@@ -225,64 +256,33 @@ namespace Queries {
 		// Cleanup
 		db.logoff();
 	}
+	
+	void Create()
+	{
+		// Create table schema for storing results
+		Table("ABAP.ANALYSIS_META",     "id INT, amount INT, ratio FLOAT, changes FLOAT, removing BINARY, PRIMARY KEY(id)");
+		Table("ABAP.ANALYSIS_NAMES",    "id INT, name VARCHAR(128)");
+		Table("ABAP.ANALYSIS_CHILDREN", "id INT, child INT");
+		Table("ABAP.ANALYSIS_ADDED",    "id INT, field VARCHAR(128)");
+		Table("ABAP.ANALYSIS_REMOVED",  "id INT, field VARCHAR(128)");
+	}
 ***REMOVED***
 	bool Store(size_t Id, unordered_map<size_t, float> &Ratios, unordered_set<string> &Names, unordered_set<size_t> &Children, size_t Amount, unordered_set<string> &Added, unordered_set<string> &Removed)
-	{
-		// Create schema
-		Create("ABAP.ANALYSIS_META", "(id INT, amount INT, ratio FLOAT, changes FLOAT, category VARCHAR(16)) PRIMARY KEY(id)");
-		Create("ABAP.ANALYSIS_NAMES", "(id INT, name VARCHAR(128))");
-		Create("ABAP.ANALYSIS_CHILDREN", "(id INT, child INT)");
-		Create("ABAP.ANALYSIS_ADDED", "(id INT, field VARCHAR(128))");
-		Create("ABAP.ANALYSIS_REMOVED", "(id INT, field VARCHAR(128))");
+	{		
+		Query("INSERT INTO ABAP.ANALYSIS_META (id, amount) VALUES (" + to_string(Id) + ", " + to_string(Amount) + ")");
 		
-		// Initialize database driver
-		otl_connect db;
-		otl_connect::otl_initialize();
+		for (auto i = Names.begin(); i != Names.end(); ++i)
+			Query("INSERT INTO ABAP.ANALYSIS_NAMES (id, name) VALUES (" + to_string(Id) + ", '" + *i + "')");
 ***REMOVED***
-		try {
-			// Connect to database
-			string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
-			db.rlogon(connect.c_str());
-***REMOVED***
-			// Set up table
-			string table = "ABAP.ANALYSIS";
-			string length = "1000";
-			otl_cursor::direct_exec(db, string("DROP TABLE " + table).c_str());
-			otl_cursor::direct_exec(db, string("CREATE TABLE " + table + " (id INT, ratios VARCHAR(" + length + "), names VARCHAR(" + length + "), children VARCHAR(" + length + "), amount INT, added VARCHAR(" + length + "), removed VARCHAR(" + length + "), PRIMARY KEY(id))").c_str());
-			db.commit();
-***REMOVED***
-			// Generate query
-			string query_string = "INSERT INTO " + table + " (id, ratios, names, children, amount, differences) VALUES (";
-			Jsonize json;
-			query_string += to_string(Id) + ", ";
-			json << Ratios;
-			query_string += "'" + json.Dissolve() + "', ";
-			json << Names;
-			query_string += "'" + json.Dissolve() + "', ";
-			json << Children;
-			query_string += "'" + json.Dissolve() + "', ";
-			query_string += to_string(Amount) + ", ";
-			json << Added;
-			query_string += "'" + json.Dissolve() + "', ";
-			json << Removed;
-			query_string += "'" + json.Dissolve() + "')";
+		for (auto i = Children.begin(); i != Children.end(); ++i)
+			Query("INSERT INTO ABAP.ANALYSIS_CHILDREN (id, child) VALUES (" + to_string(Id) + ", " + to_string(*i) + ")");
 			
-			// Insert row
-			otl_stream query(50, query_string.c_str(), db);
-			query.flush();
-		}
+		for (auto i = Added.begin(); i != Added.end(); ++i)
+			Query("INSERT INTO ABAP.ANALYSIS_ADDED (id, field) VALUES (" + to_string(Id) + ", '" + *i + "')");
 ***REMOVED***
-		catch (otl_exception& e) {
-			// Print database errors
-			cerr << e.msg << endl;
-			cerr << e.stm_text << endl;
-			cerr << e.sqlstate << endl;
-			cerr << e.var_info << endl;
-			return false;
-		}
+		for (auto i = Removed.begin(); i != Removed.end(); ++i)
+			Query("INSERT INTO ABAP.ANALYSIS_REMOVED (id, field) VALUES (" + to_string(Id) + ", '" + *i + "')");
 ***REMOVED***
-		// Cleanup
-		db.logoff();
 		return true;
 	}
 }

@@ -19,12 +19,16 @@ namespace Queries {
 	static string User = "***REMOVED***";
 	static string Password = "***REMOVED***";
 ***REMOVED***
+	// Helper functions
+	bool Query(string Querystring);
+***REMOVED***
 	// Fetching functions
 	vector<Ratio> Ratios();
 	vector<Field> Fields(string Table);
 	unordered_map<string, unordered_set<Field>> Structures(vector<string> &Names);
 ***REMOVED***
 	// Inserting functions
-	void Create(string Table, string Columns);
+	void Table(string Name, string Columns);
+	void Create();
 	bool Store(size_t Id, unordered_map<size_t, float> &Ratios, unordered_set<string> &Names, unordered_set<size_t> &Children, size_t Amount, unordered_set<string> &Added, unordered_set<string> &Removed);
 }
