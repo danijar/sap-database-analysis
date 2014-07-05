@@ -112,16 +112,9 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 ***REMOVED***
 		// Write JSON files of names, children and differences for current tree
 		else if (command == "json") {
-			/*
-			// Ask for parameters
-			string folder;
-			cout << "Folder: ";
-			cin >> folder;
-			cout << endl;
-			*/
-***REMOVED***
 			// Get current table id and name
 			size_t id = path.size() ? path.back() : 0;
+***REMOVED***
 			// Implode all string names for one id
 			string name = "";
 			for (auto i = hierarchy.names[id].begin(); i != hierarchy.names[id].end(); i++)
@@ -172,17 +165,28 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 		else if (command == "store") {
 			// Get current table
 			size_t id = path.size() ? path.back() : 0;
+			
+			// Reset tables
+			Queries::Create();
 ***REMOVED***
-			// Collect all information
-			auto ratios = hierarchy.ratios[id];
-			unordered_set<string> names = { hierarchy.names[id] };
-			auto children = hierarchy.children[id];
-			size_t amount = hierarchy.amounts[id];
-			auto added = structures.added[id];
-			auto removed = structures.removed[id];
+			// Fill with all tables in cluster
+			unordered_set<size_t> subchildren = hierarchy.Subchildren(id);
+			subchildren.insert(id);
+			Bar bar("Store", subchildren.size());
+			for (auto i = subchildren.begin(); i != subchildren.end(); ++i) {
+				// Collect all information
+				auto ratios = hierarchy.ratios[*i];
+				unordered_set<string> names = hierarchy.names[*i];
+				auto children = hierarchy.children[*i];
+				size_t amount = hierarchy.amounts[*i];
+				auto added = structures.added[*i];
+				auto removed = structures.removed[*i];
 ***REMOVED***
-			// Store to database
-			bool result = Queries::Store(id, ratios, names, children, amount, added, removed);
+				// Insert into database
+				bool result = Queries::Store(*i, ratios, names, children, amount, added, removed);
+				bar.Increment();
+			}
+			bar.Finish();
 		}
 ***REMOVED***
 		// Show available commands
@@ -308,7 +312,7 @@ void Navigator::Table(size_t Id, vector<Child> &Children, size_t Limit)
 	}
 ***REMOVED***
 	// Show number of rows
-	cout << "Found and " << hierarchy.amounts[Id] << " overall and " << Children.size() << (Children.size() > 1 ? " direct children." : " child.") << endl << endl;
+	cout << "Found " << hierarchy.amounts[Id] << " overall and " << Children.size() << (Children.size() > 1 ? " direct children." : " child.") << endl << endl;
 ***REMOVED***
 	// Find column widths
 	size_t width_name = 0, width_children = 0, width_ratio = 4;
