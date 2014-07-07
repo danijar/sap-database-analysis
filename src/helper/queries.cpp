@@ -175,32 +175,25 @@ namespace Queries {
 		int id = (int)Id;
 ***REMOVED***
 		const string prefix = "ABAP.ANALYSIS";
+		const size_t bulksize = 500;
 ***REMOVED***
 		bool result = Catch([&] {
 			static auto meta = Query("INSERT INTO " + prefix + "_META VALUES (:id<int>, :amount<int>, :ratio<float>, :changes<float>, :removing<int>)", 1);
 			*meta << id << (int)Amount << 0.0f << 0.0f << 0 << endr;
 ***REMOVED***
-			static auto names = Query("INSERT INTO " + prefix + "_NAMES VALUES (:id<int>, :name<char[128]>)");
-			if (Names.size())
-				names->setBufSize((int)Names.size());
+			static auto names = Query("INSERT INTO " + prefix + "_NAMES VALUES (:id<int>, :name<char[128]>)", bulksize);
 			for (auto i = Names.begin(); i != Names.end(); ++i)
 				*names << id << *i << endr;
 ***REMOVED***
-			static auto children = Query("INSERT INTO " + prefix + "_CHILDREN VALUES (:id<int>, :child<int>)");
-			if (Children.size())
-				children->setBufSize((int)Children.size());
+			static auto children = Query("INSERT INTO " + prefix + "_CHILDREN VALUES (:id<int>, :child<int>)", bulksize);
 			for (auto i = Children.begin(); i != Children.end(); ++i)
 				*children << id << (int)*i << endr;
 		
-			static auto added = Query("INSERT INTO " + prefix + "_ADDED VALUES (:id<int>, :field<char[128]>)");
-			if (Added.size())
-				added->setBufSize((int)Added.size());
+			static auto added = Query("INSERT INTO " + prefix + "_ADDED VALUES (:id<int>, :field<char[128]>)", bulksize);
 			for (auto i = Added.begin(); i != Added.end(); ++i)
 				*added << id << *i << endr;
 ***REMOVED***
-			static auto removed = Query("INSERT INTO " + prefix + "_REMOVED VALUES (:id<int>, :field<char[128]>)");
-			if (Removed.size())
-				removed->setBufSize((int)Removed.size());
+			static auto removed = Query("INSERT INTO " + prefix + "_REMOVED VALUES (:id<int>, :field<char[128]>)", bulksize);
 			for (auto i = Removed.begin(); i != Removed.end(); ++i)
 				*removed << id << *i << endr;
 		});
