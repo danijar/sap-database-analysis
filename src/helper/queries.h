@@ -22,12 +22,12 @@ namespace Queries {
 	static string User = "***REMOVED***";
 	static string Password = "***REMOVED***";
 	static otl_connect db;
-	static bool connected = false;
 ***REMOVED***
 	// Helper functions
 	void Connection();
-	shared_ptr<otl_stream> Query(string Querystring, int Batchsize = 1);
+	shared_ptr<otl_stream> Query(string QueryString, size_t BatchSize = 1, bool ErrorOutput = true);
 	bool Flush(otl_stream Query);
+	bool Catch(function<void()> Callback);
 ***REMOVED***
 	// Fetching functions
 	vector<Ratio> Ratios();

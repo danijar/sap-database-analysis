@@ -8,7 +8,7 @@ namespace Queries {
 	void Connection()
 	{
 		// Return if already connected
-		if (connected)
+		if (db.connected)
 			return;
 		
 		// Connect to database
@@ -17,40 +17,45 @@ namespace Queries {
 			string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
 			db.rlogon(connect.c_str());
 			db.auto_commit_on();
-			connected = true;
-		}
-		catch (...) {
-			connected = false;
-		}
+		} catch (...) {}
 	}
 ***REMOVED***
 	// Create query from string
 	// If it has no unbound parameters, directly execute it catching errors
-	shared_ptr<otl_stream> Query(string Querystring, int Batchsize)
+	shared_ptr<otl_stream> Query(string QueryString, size_t BatchSize, bool ErrorOutput)
 	{
 		// Ensure connection
 		Connection();
 ***REMOVED***
 		try {		
 			// Create query
-			otl_stream *query = new otl_stream(Batchsize, Querystring.c_str(), db);
+			otl_stream *query = new otl_stream((int)BatchSize, QueryString.c_str(), db);
 			return shared_ptr<otl_stream>(query);
 		}
 		catch (otl_exception& e) {
 			// Print database errors
-			cerr << e.msg << endl;
-			cerr << e.stm_text << endl;
-			cerr << e.sqlstate << endl;
-			cerr << e.var_info << endl;
+			if (ErrorOutput) {
+				cerr << e.msg << endl;
+				cerr << e.stm_text << endl;
+				cerr << e.sqlstate << endl;
+				cerr << e.var_info << endl;
+			}
 			return shared_ptr<otl_stream>();
 		}
 	}
 ***REMOVED***
 	bool Flush(otl_stream Query)
 	{
+		return Catch([&] {
+			Query.flush();
+		});
+	}
+***REMOVED***
+	bool Catch(function<void()> Callback)
+	{
 		try {
 			// Execute query
-			Query.flush();
+			Callback();
 			return true;
 		}
 		catch (otl_exception& e) {
@@ -119,9 +124,9 @@ namespace Queries {
 		unordered_map<string, unordered_set<Field>> result;
 ***REMOVED***
 		// Build table list for query
-		string tables = "'" + *Names.begin() + "'";
-		for (auto i = ++Names.begin(); i != Names.end(); ++i)
-			tables += ", '" + *i + "'";
+		string tables = "";
+		for (auto i = Names.begin(); i != Names.end(); ++i)
+			tables += "'" + *i + "'" + (i != Names.end() ? ", " : "");
 		
 		// Count number of result fields
 		int count;
@@ -148,7 +153,7 @@ namespace Queries {
 	void Table(string Name, string Columns)
 	{
 		// Drop table if exists
-		try { Query("DROP TABLE " + Name); } catch (otl_exception&) {}
+		try { Query("DROP TABLE " + Name, 1, false); } catch (otl_exception&) {}
 ***REMOVED***
 		// Create new table
 		Query("CREATE COLUMN TABLE " + Name + " (" + Columns + ")");
@@ -157,29 +162,49 @@ namespace Queries {
 	void Create()
 	{
 		// Create table schema for storing results
-		Table("ABAP.ANALYSIS_META",     "id INT, amount INT, ratio FLOAT, changes FLOAT, removing BINARY, PRIMARY KEY(id)");
-		Table("ABAP.ANALYSIS_NAMES",    "id INT, name VARCHAR(128)");
-		Table("ABAP.ANALYSIS_CHILDREN", "id INT, child INT");
-		Table("ABAP.ANALYSIS_ADDED",    "id INT, field VARCHAR(128)");
-		Table("ABAP.ANALYSIS_REMOVED",  "id INT, field VARCHAR(128)");
+		const string prefix = "ABAP.ANALYSIS";
+		Table(prefix + "_META",     "id INT, amount INT, ratio FLOAT, changes FLOAT, removing TINYINT, PRIMARY KEY(id)");
+		Table(prefix + "_NAMES",    "id INT, name VARCHAR(128)");
+		Table(prefix + "_CHILDREN", "id INT, child INT");
+		Table(prefix + "_ADDED",    "id INT, field VARCHAR(128)");
+		Table(prefix + "_REMOVED",  "id INT, field VARCHAR(128)");
 	}
 ***REMOVED***
 	bool Store(size_t Id, unordered_map<size_t, float> &Ratios, unordered_set<string> &Names, unordered_set<size_t> &Children, size_t Amount, unordered_set<string> &Added, unordered_set<string> &Removed)
-	{		
-		Query("INSERT INTO ABAP.ANALYSIS_META (id, amount) VALUES (" + to_string(Id) + ", " + to_string(Amount) + ")");
+	{
+		int id = (int)Id;
+***REMOVED***
+		const string prefix = "ABAP.ANALYSIS";
+***REMOVED***
+		bool result = Catch([&] {
+			static auto meta = Query("INSERT INTO " + prefix + "_META VALUES (:id<int>, :amount<int>, :ratio<float>, :changes<float>, :removing<int>)", 1);
+			*meta << id << (int)Amount << 0.0f << 0.0f << 0 << endr;
+***REMOVED***
+			static auto names = Query("INSERT INTO " + prefix + "_NAMES VALUES (:id<int>, :name<char[128]>)");
+			if (Names.size())
+				names->setBufSize((int)Names.size());
+			for (auto i = Names.begin(); i != Names.end(); ++i)
+				*names << id << *i << endr;
+***REMOVED***
+			static auto children = Query("INSERT INTO " + prefix + "_CHILDREN VALUES (:id<int>, :child<int>)");
+			if (Children.size())
+				children->setBufSize((int)Children.size());
+			for (auto i = Children.begin(); i != Children.end(); ++i)
+				*children << id << (int)*i << endr;
 		
-		for (auto i = Names.begin(); i != Names.end(); ++i)
-			Query("INSERT INTO ABAP.ANALYSIS_NAMES (id, name) VALUES (" + to_string(Id) + ", '" + *i + "')");
+			static auto added = Query("INSERT INTO " + prefix + "_ADDED VALUES (:id<int>, :field<char[128]>)");
+			if (Added.size())
+				added->setBufSize((int)Added.size());
+			for (auto i = Added.begin(); i != Added.end(); ++i)
+				*added << id << *i << endr;
 ***REMOVED***
-		for (auto i = Children.begin(); i != Children.end(); ++i)
-			Query("INSERT INTO ABAP.ANALYSIS_CHILDREN (id, child) VALUES (" + to_string(Id) + ", " + to_string(*i) + ")");
-			
-		for (auto i = Added.begin(); i != Added.end(); ++i)
-			Query("INSERT INTO ABAP.ANALYSIS_ADDED (id, field) VALUES (" + to_string(Id) + ", '" + *i + "')");
+			static auto removed = Query("INSERT INTO " + prefix + "_REMOVED VALUES (:id<int>, :field<char[128]>)");
+			if (Removed.size())
+				removed->setBufSize((int)Removed.size());
+			for (auto i = Removed.begin(); i != Removed.end(); ++i)
+				*removed << id << *i << endr;
+		});
 ***REMOVED***
-		for (auto i = Removed.begin(); i != Removed.end(); ++i)
-			Query("INSERT INTO ABAP.ANALYSIS_REMOVED (id, field) VALUES (" + to_string(Id) + ", '" + *i + "')");
-***REMOVED***
-		return true;
+		return result;
 	}
 }
