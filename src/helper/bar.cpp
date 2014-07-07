@@ -22,33 +22,41 @@ Bar::Bar(string Label, size_t Max, size_t Width) : label(Label), max(Max), width
 	Draw();
 }
 ***REMOVED***
-// Increment progress state
-bool Bar::Increment(int Step)
+// Finish on destruction
+Bar::~Bar()
 {
-	// If in progress increment state
+	Finish();
+}
+***REMOVED***
+// Increment progress state
+void Bar::operator+=(int Steps)
+{
+	// If in progress, increment state
 	if (current < max && active) {
-		current += Step;
+		current += Steps;
 		if (current > max)
 			current = max;
 ***REMOVED***
-		// Draw if necessary
-		if (current - redrawed > max / width - 1) {
+		// Draw if something changed
+		bool percentage = 100 * redrawed / max > 100 * current / max;
+		bool bars = current - redrawed > max / width - 1;
+		if (percentage || bars) {
 			redrawed = current;
 			Draw();
 		}
-	}
-	// Else finish up
-	else {
+	} else {
 		Finish();
 	}
-***REMOVED***
-	// Return state
-	return active;
 }
 ***REMOVED***
-// Get current state
-size_t Bar::Current()
+// Increment progress state by one
+void Bar::operator++(int)
 {
+	*this += 1;
+}
+***REMOVED***
+// Return current state
+Bar::operator size_t() const {
 	return current;
 }
 ***REMOVED***
@@ -68,20 +76,20 @@ void Bar::Resize(size_t Remaining)
 // Redraw and add final line break
 void Bar::Finish(bool Success)
 {
-	// Calculate execution time
-	double elapsed = 0.1 * (duration_cast<chrono::milliseconds>(high_resolution_clock::now() - start).count() / 100);
-***REMOVED***
 	// Only finish once
 	if (!active)
 		return;
-***REMOVED***
+	
 	// Fill up progress
 	if (Success)
 		current = max;
 ***REMOVED***
-	// Redraw and add final line break
-	Draw();
 	if (Output) {
+		// Calculate execution time
+		double elapsed = 0.1 * (duration_cast<chrono::milliseconds>(high_resolution_clock::now() - start).count() / 100);
+***REMOVED***
+		// Redraw and add final line break
+		Draw();
 		auto format = cout.flags();
 		cout << " ";
 		cout << setw(7) << setprecision(1) << fixed << elapsed << "s" << endl;
