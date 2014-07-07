@@ -74,11 +74,9 @@ unordered_set<size_t> Hierarchy::Heads()
 ***REMOVED***
 	// Remove tables that have parents
 	Bar bar("Find head tables", ratios.size());
-	for (auto i = ratios.begin(); i != ratios.end(); ++i) {
+	for (auto i = ratios.begin(); i != ratios.end(); i++, bar++)
 		for (auto j = i->begin(); j != i->end(); ++j)
 			heads.erase(j->first);
-		bar.Increment();
-	}
 	bar.Finish();
 ***REMOVED***
 	// Remove tables that have no children
@@ -99,10 +97,8 @@ void Hierarchy::Generate()
 	processed.clear();
 	children.clear();
 	children.resize(names.size());
-	for (size_t i = 1; i < names.size(); ++i) {
+	for (size_t i = 1; i < names.size(); i++, bar++)
 		Children(i);
-		bar.Increment();
-	}
 	bar.Finish();
 ***REMOVED***
 	// Attach head tables to root node
@@ -182,10 +178,9 @@ size_t Hierarchy::Amount(size_t Id, Bar *Bar)
 	// Calculate amount if not cached
 	if (!amounts[Id]) {
 		size_t sum = children[Id].size();
-		for (auto i = children[Id].begin(); i != children[Id].end(); ++i)
+		for (auto i = children[Id].begin(); i != children[Id].end(); i++, (*Bar)++)
 			sum += Amount(*i, Bar);
 		amounts[Id] = sum;
-		Bar->Increment();
 	}
 	
 	return amounts[Id];

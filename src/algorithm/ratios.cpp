@@ -127,7 +127,7 @@ void Ratios::Generate()
 	// Fetch distinct table names
 	Bar bar("Unpack data", rows.size() * 2);
 ***REMOVED***
-	for (auto i = rows.begin(); i != rows.end(); ++i) {
+	for (auto i = rows.begin(); i != rows.end(); i++, bar++) {
 		// Get or generate parent id		
 		size_t parent_id = Id(i->parent);
 ***REMOVED***
@@ -141,12 +141,11 @@ void Ratios::Generate()
 		
 		// Create node for child
 		Id(i->child);
-		bar.Increment();
 	}
 ***REMOVED***
 	// Create graph from query rows
 	ratios.resize(names.size());
-	for (auto i = rows.begin(); i != rows.end(); ++i) {
+	for (auto i = rows.begin(); i != rows.end(); i++, bar++) {
 		// Get table ids from row
 		size_t parent = ids[i->parent];
 		size_t child = ids[i->child];
@@ -159,8 +158,6 @@ void Ratios::Generate()
 ***REMOVED***
 		// Add parent ratio
 		ratios[parent][child] = i->parentratio;
-		
-		bar.Increment();
 	}
 	bar.Finish();
 }

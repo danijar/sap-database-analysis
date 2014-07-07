@@ -1,30 +1,56 @@
 #include "helper/queries.h"
-#define OTL_ODBC
-#define OTL_STL
-#include "otlv4.h"
 #include "helper/jsonize.h"
 using namespace std;
 ***REMOVED***
 ***REMOVED***
 namespace Queries {
-	// Connect to database and execute given query
-	bool Query(string Querystring)
+	// Ensure that a database connection is established
+	void Connection()
 	{
-		// Initialize database driver
-		otl_connect db;
-		otl_connect::otl_initialize();
-***REMOVED***
-		try {		
-			// Connect to database
+		// Return if already connected
+		if (connected)
+			return;
+		
+		// Connect to database
+		try {
+			otl_connect::otl_initialize();
 			string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
 			db.rlogon(connect.c_str());
+			db.auto_commit_on();
+			connected = true;
+		}
+		catch (...) {
+			connected = false;
+		}
+	}
 ***REMOVED***
+	// Create query from string
+	// If it has no unbound parameters, directly execute it catching errors
+	shared_ptr<otl_stream> Query(string Querystring, int Batchsize)
+	{
+		// Ensure connection
+		Connection();
+***REMOVED***
+		try {		
+			// Create query
+			otl_stream *query = new otl_stream(Batchsize, Querystring.c_str(), db);
+			return shared_ptr<otl_stream>(query);
+		}
+		catch (otl_exception& e) {
+			// Print database errors
+			cerr << e.msg << endl;
+			cerr << e.stm_text << endl;
+			cerr << e.sqlstate << endl;
+			cerr << e.var_info << endl;
+			return shared_ptr<otl_stream>();
+		}
+	}
+***REMOVED***
+	bool Flush(otl_stream Query)
+	{
+		try {
 			// Execute query
-			otl_stream query(50, Querystring.c_str(), db);
-			query.flush();
-***REMOVED***
-			// Cleanup
-			db.logoff();
+			Query.flush();
 			return true;
 		}
 		catch (otl_exception& e) {
@@ -33,9 +59,6 @@ namespace Queries {
 			cerr << e.stm_text << endl;
 			cerr << e.sqlstate << endl;
 			cerr << e.var_info << endl;
-***REMOVED***
-			// Cleanup
-			db.logoff();
 			return false;
 		}
 	}
@@ -45,50 +68,21 @@ namespace Queries {
 	{
 		vector<Ratio> rows;
 ***REMOVED***
-		// Initialize database driver
-		otl_connect db;
-		otl_connect::otl_initialize();
-***REMOVED***
-		try {
-			// Connect to database
-			string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
-			db.rlogon(connect.c_str());
-***REMOVED***
-			// Count number of rows in result
-			int count;
-			otl_stream countquery;
-			countquery.open(50, "SELECT COUNT(*) FROM ABAP.RESULT_V1", db);
-			countquery >> count;
-***REMOVED***
-			// Skip if empty
-			if (!count) {
-				cout << "No records found." << endl;
-				return rows;
-			}
-***REMOVED***
-			// Select whole results table
-			otl_stream query(50, "SELECT parent, child, parent_ratio, child_ratio FROM ABAP.RESULT_V1", db);
-***REMOVED***
-			// Read input data into array
-			Bar bar("Query ratios", count);
-			while (!query.eof()) {
-				Ratio ratio;
-				query >> ratio.parent >> ratio.child >> ratio.parentratio >> ratio.childratio;
-				rows.push_back(ratio);
-				bar.Increment();
-			}
-			bar.Finish();
-		}
-		catch (otl_exception& e) {
-			// Print database errors
-			cerr << e.msg << endl;
-			cerr << e.stm_text << endl;
-			cerr << e.sqlstate << endl;
-			cerr << e.var_info << endl;
+		// Count number of rows
+		int count = 0;
+		*Query("SELECT COUNT(*) FROM ABAP.RESULT_V1") >> count;
+		if (!count) {
+			cerr << "No ratios found in database." << endl;
+			return rows;
 		}
 ***REMOVED***
-		// Cleanup
-		db.logoff();
+		// Read results table into array
+		auto query = Query("SELECT parent, child, parent_ratio, child_ratio FROM ABAP.RESULT_V1");
+		for (Bar bar("Query ratios", count); !query->eof(); bar++) {
+			Ratio ratio;
+			*query >> ratio.parent >> ratio.child >> ratio.parentratio >> ratio.childratio;
+			rows.push_back(ratio);
+		}
 ***REMOVED***
 		return rows;
 	}
@@ -98,55 +92,24 @@ namespace Queries {
 	{
 		vector<Field> rows;
 ***REMOVED***
-		// Initialize database driver
-		otl_connect db;
-		otl_connect::otl_initialize();
-***REMOVED***
-		try {
-			// Connect to database
-			string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
-			db.rlogon(connect.c_str());
-***REMOVED***
-			// Count number of fields in result
-			int count;
-			otl_stream countquery;
-			string count_query = "SELECT COUNT(*) FROM ABAP.DD03L WHERE TABNAME = '" + Table + "'";
-			countquery.open(50, count_query.c_str(), db);
-			countquery >> count;
-***REMOVED***
-			// Skip if empty
-			if (!count) {
-				cout << "No records found." << endl;
-				return rows;
-			}
-***REMOVED***
-			// Select fields for the table
-			string select_query = "SELECT fieldname, rollname, domname, position FROM ABAP.DD03L WHERE TABNAME = '" + Table + "'";
-			otl_stream query(50, select_query.c_str(), db);
-***REMOVED***
-			// Read input data into array
-			Bar bar("Query fields", count);
-			while (!query.eof()) {
-				Field current;
-				string position;
-				query >> current.name >> current.roll >> current.domain >> position;
-				current.position = (size_t)stoi(position);
-				rows.push_back(current);
-				bar.Increment();
-			}
-			bar.Finish();
-		}
-		catch (otl_exception& e) {
-			// Print database errors
-			cerr << e.msg << endl;
-			cerr << e.stm_text << endl;
-			cerr << e.sqlstate << endl;
-			cerr << e.var_info << endl;
+		// Count number of fields in result
+		int count;
+		*Query("SELECT COUNT(*) FROM ABAP.DD03L WHERE TABNAME = '" + Table + "'") >> count;
+		if (!count) {
+			cerr << "No fields found in database." << endl;
+			return rows;
 		}
 ***REMOVED***
-		// Cleanup
-		db.logoff();
-***REMOVED***
+		// Read fields into array
+		auto query = Query("SELECT fieldname, rollname, domname, position FROM ABAP.DD03L WHERE TABNAME = '" + Table + "'");
+		for (Bar bar("Query fields", count); !query->eof(); bar++) {
+			Field current;
+			string position;
+			*query >> current.name >> current.roll >> current.domain >> position;
+			current.position = (size_t)stoi(position);
+			rows.push_back(current);
+		}
+		
 		return rows;
 	}
 ***REMOVED***
@@ -155,106 +118,40 @@ namespace Queries {
 	{
 		unordered_map<string, unordered_set<Field>> result;
 ***REMOVED***
-		// Building table list for query
-		string table_list;
-		bool first = true;
-		for (auto i = Names.begin(); i != Names.end(); ++i) {
-			if (first) {
-				table_list += "'" + *i + "'";
-				first = false;
-			} else {
-				table_list += ", '" + *i + "'";
-			}
-		}
+		// Build table list for query
+		string tables = "'" + *Names.begin() + "'";
+		for (auto i = ++Names.begin(); i != Names.end(); ++i)
+			tables += ", '" + *i + "'";
 		
-		// Initialize database driver
-		otl_connect db;
-		otl_connect::otl_initialize();
-***REMOVED***
-		try {
-			// Connect to database
-			string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
-			db.rlogon(connect.c_str());
-***REMOVED***
-			// Count number of fields in result
-			int count;
-			otl_stream countquery;
-			string count_query = "SELECT COUNT(*) FROM ABAP.DD03L WHERE TABNAME IN (" + table_list + ")";
-			countquery.open(50, count_query.c_str(), db);
-			countquery >> count;
-***REMOVED***
-			// Skip if empty
-			if (!count) {
-				cout << "No records found." << endl;
-				return result;
-			}
-***REMOVED***
-			// Select fields for the table
-			string select_query = "SELECT tabname, fieldname, rollname, domname, position FROM ABAP.DD03L WHERE TABNAME IN (" + table_list + ")";
-			otl_stream query(50, select_query.c_str(), db);
-***REMOVED***
-			// Read input data into array
-			Bar bar("Query structures", count);
-			result.reserve(count);
-			while (!query.eof()) {
-				Field current;
-				string table, position;
-				query >> table >> current.name >> current.roll >> current.domain >> position;
-				current.position = (size_t)stoi(position);
-				
-				// Find corresponding id and add to result
-				result[table].insert(current);
-***REMOVED***
-				bar.Increment();
-			}
-			bar.Finish();
-		}
-		catch (otl_exception& e) {
-			// Print database errors
-			cerr << e.msg << endl;
-			cerr << e.stm_text << endl;
-			cerr << e.sqlstate << endl;
-			cerr << e.var_info << endl;
+		// Count number of result fields
+		int count;
+		*Query("SELECT COUNT(*) FROM ABAP.DD03L WHERE TABNAME IN (" + tables + ")") >> count;
+		if (!count) {
+			cerr << "No structures found in database." << endl;
+			return result;
 		}
 ***REMOVED***
-		// Cleanup
-		db.logoff();
+		// Read structures into array
+		result.reserve(count);
+		auto query = Query("SELECT tabname, fieldname, rollname, domname, position FROM ABAP.DD03L WHERE TABNAME IN (" + tables + ")");
+		for (Bar bar("Query structures", count); !query->eof(); bar++) {
+			Field current;
+			string table, position;
+			*query >> table >> current.name >> current.roll >> current.domain >> position;
+			current.position = (size_t)stoi(position);
+			result[table].insert(current);
+		}
 		
 		return result;
 	}
 ***REMOVED***
 	void Table(string Name, string Columns)
 	{
-		// Initialize database driver
-		otl_connect db;
-		otl_connect::otl_initialize();
+		// Drop table if exists
+		try { Query("DROP TABLE " + Name); } catch (otl_exception&) {}
 ***REMOVED***
-		try {
-			// Connect to database
-			string connect = "UID=" + User + ";PWD=" + Password + ";DSN=" + Dsn;
-			db.rlogon(connect.c_str());
-***REMOVED***
-			// Drop table if exists
-			try {
-				otl_cursor::direct_exec(db, string("DROP TABLE " + Name).c_str());
-				db.commit();
-			}
-			catch (otl_exception&) {}
-***REMOVED***
-			// Create new table
-			otl_cursor::direct_exec(db, string("CREATE COLUMN TABLE " + Name + " (" + Columns + ")").c_str());
-			db.commit();
-		}
-		catch (otl_exception& e) {
-			// Print database errors
-			cerr << e.msg << endl;
-			cerr << e.stm_text << endl;
-			cerr << e.sqlstate << endl;
-			cerr << e.var_info << endl;
-		}
-***REMOVED***
-		// Cleanup
-		db.logoff();
+		// Create new table
+		Query("CREATE COLUMN TABLE " + Name + " (" + Columns + ")");
 	}
 	
 	void Create()

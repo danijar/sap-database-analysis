@@ -3,10 +3,13 @@
 #include <string>
 #include <unordered_set>
 #include <unordered_map>
+#include <memory>
+#define OTL_ODBC
+#define OTL_STL
+#include "otlv4.h"
 #include "type/field.h"
 #include "type/ratio.h"
 #include "helper/bar.h"
-***REMOVED***
 ***REMOVED***
 /*
  * This namespace holds all code that connects to the database.
@@ -14,13 +17,17 @@
 namespace Queries {
 	using namespace std;
 ***REMOVED***
-	// Global connection details
+	// Global connection information
 	static string Dsn = "HANA";
 	static string User = "***REMOVED***";
 	static string Password = "***REMOVED***";
+	static otl_connect db;
+	static bool connected = false;
 ***REMOVED***
 	// Helper functions
-	bool Query(string Querystring);
+	void Connection();
+	shared_ptr<otl_stream> Query(string Querystring, int Batchsize = 1);
+	bool Flush(otl_stream Query);
 ***REMOVED***
 	// Fetching functions
 	vector<Ratio> Ratios();

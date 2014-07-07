@@ -173,7 +173,7 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			unordered_set<size_t> subchildren = hierarchy.Subchildren(id);
 			subchildren.insert(id);
 			Bar bar("Store", subchildren.size());
-			for (auto i = subchildren.begin(); i != subchildren.end(); ++i) {
+			for (auto i = subchildren.begin(); i != subchildren.end(); i++, bar++) {
 				// Collect all information
 				auto ratios = hierarchy.ratios[*i];
 				unordered_set<string> names = hierarchy.names[*i];
@@ -184,7 +184,6 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 ***REMOVED***
 				// Insert into database
 				bool result = Queries::Store(*i, ratios, names, children, amount, added, removed);
-				bar.Increment();
 			}
 			bar.Finish();
 		}
@@ -200,7 +199,7 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			cout << "histo"  << "\t" << "Draw histogram of children and their number of occurrence." << endl;
 			cout << "json"   << "\t" << "Write JSON files of names, children and differences for current tree." << endl;
 			cout << "csv"    << "\t" << "Write CSV file of current children and their number of children." << endl;
-			cout << "store"  << "\t" << "Write all informations of current table to database." << endl;
+			cout << "store"  << "\t" << "Write all informations of current table to database. This will overwrite existing exports." << endl;
 			cout << "exit"   << "\t" << "Exit the navigator. Synonyms: quit." << endl;
 		}
 ***REMOVED***
