@@ -17,6 +17,16 @@ bool Serialize::Good()
 	return stream.is_open() && stream.good();
 }
 ***REMOVED***
+Serialize &Serialize::operator<<(const bool Value)
+{
+	// Convert and write
+	char data[1] = { Value ? 1 : 0 };
+	stream.write(data, 1);
+***REMOVED***
+	// Allow operator chaining
+	return *this;
+}
+***REMOVED***
 Serialize &Serialize::operator<<(const size_t Value)
 {
 	const size_t length = sizeof(size_t);
@@ -69,6 +79,18 @@ Deserialize::~Deserialize()
 bool Deserialize::Good()
 {
 	return stream.is_open() && stream.good();
+}
+***REMOVED***
+Deserialize &Deserialize::operator>>(bool &Value)
+{
+	// Read from stream
+	char data[1];
+	stream.read(data, 1);
+***REMOVED***
+	// Convert type
+	Value = (data[1] ? true : false);
+***REMOVED***
+	return *this;
 }
 ***REMOVED***
 Deserialize &Deserialize::operator>>(size_t &Value)

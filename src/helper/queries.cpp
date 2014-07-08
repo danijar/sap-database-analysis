@@ -27,34 +27,19 @@ namespace Queries {
 		// Ensure connection
 		Connection();
 ***REMOVED***
-		try {		
-			// Create query
+		// Create query
+		shared_ptr<otl_stream> result;
+		Catch([&] {
 			otl_stream *query = new otl_stream((int)BatchSize, QueryString.c_str(), db);
-			return shared_ptr<otl_stream>(query);
-		}
-		catch (otl_exception& e) {
-			// Print database errors
-			if (ErrorOutput) {
-				cerr << e.msg << endl;
-				cerr << e.stm_text << endl;
-				cerr << e.sqlstate << endl;
-				cerr << e.var_info << endl;
-			}
-			return shared_ptr<otl_stream>();
-		}
-	}
-***REMOVED***
-	bool Flush(otl_stream Query)
-	{
-		return Catch([&] {
-			Query.flush();
+			result = shared_ptr<otl_stream>(query);
 		});
+		return result;
 	}
 ***REMOVED***
 	bool Catch(function<void()> Callback)
 	{
 		try {
-			// Execute query
+			// Run code
 			Callback();
 			return true;
 		}
@@ -126,8 +111,8 @@ namespace Queries {
 		// Build table list for query
 		string tables = "";
 		for (auto i = Names.begin(); i != Names.end(); ++i)
-			tables += "'" + *i + "'" + (i != Names.end() ? ", " : "");
-		
+			tables += "'" + *i + "'" + (i != --Names.end() ? ", " : "");
+***REMOVED***
 		// Count number of result fields
 		int count;
 		*Query("SELECT COUNT(*) FROM ABAP.DD03L WHERE TABNAME IN (" + tables + ")") >> count;
@@ -170,7 +155,15 @@ namespace Queries {
 		Table(prefix + "_REMOVED",  "id INT, field VARCHAR(128)");
 	}
 ***REMOVED***
-	bool Store(size_t Id, unordered_map<size_t, float> &Ratios, unordered_set<string> &Names, unordered_set<size_t> &Children, size_t Amount, unordered_set<string> &Added, unordered_set<string> &Removed)
+	bool Store(size_t Id,
+		unordered_set<string> &Names,
+		unordered_set<size_t> &Children,
+		unordered_set<string> &Added,
+		unordered_set<string> &Removed,
+		size_t Amount,
+		float Ratio,
+		float Changes,
+		bool Removing)
 	{
 		int id = (int)Id;
 ***REMOVED***
@@ -179,8 +172,8 @@ namespace Queries {
 ***REMOVED***
 		bool result = Catch([&] {
 			static auto meta = Query("INSERT INTO " + prefix + "_META VALUES (:id<int>, :amount<int>, :ratio<float>, :changes<float>, :removing<int>)", 1);
-			*meta << id << (int)Amount << 0.0f << 0.0f << 0 << endr;
-***REMOVED***
+			*meta << id << (int)Amount << Ratio << Changes << (Removing ? 1 : 0) << endr;
+			
 			static auto names = Query("INSERT INTO " + prefix + "_NAMES VALUES (:id<int>, :name<char[128]>)", bulksize);
 			for (auto i = Names.begin(); i != Names.end(); ++i)
 				*names << id << *i << endr;

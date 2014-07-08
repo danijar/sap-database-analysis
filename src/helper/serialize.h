@@ -14,6 +14,7 @@ public:
 	Serialize(std::string Path);
 	~Serialize();
 	bool Good();
+	Serialize &operator<<(const bool Value);
 	Serialize &operator<<(const size_t Value);
 	Serialize &operator<<(const float Value);
 	Serialize &operator<<(const std::string Value);
@@ -34,6 +35,7 @@ public:
 	Deserialize(std::string Path);
 	~Deserialize();
 	bool Good();
+	Deserialize &operator>>(bool &Value);
 	Deserialize &operator>>(size_t &Value);
 	Deserialize &operator>>(float &Value);
 	Deserialize &operator>>(std::string &Value);
