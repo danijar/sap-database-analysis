@@ -26,8 +26,8 @@ public:
 	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> Difference(size_t Child);
 ***REMOVED***
 	std::vector<std::unordered_set<std::string>> added, removed;
-	std::vector<size_t> changes_percent;
-	std::vector<size_t> changes_type;
+	std::vector<float> changes;
+	std::vector<bool> removing;
 ***REMOVED***
 private:
 	std::vector<std::unordered_set<Field>> structures;

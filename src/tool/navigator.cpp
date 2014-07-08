@@ -174,16 +174,26 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			subchildren.insert(id);
 			Bar bar("Store", subchildren.size());
 			for (auto i = subchildren.begin(); i != subchildren.end(); i++, bar++) {
-				// Collect all information
-				auto ratios = hierarchy.ratios[*i];
-				unordered_set<string> names = hierarchy.names[*i];
-				auto children = hierarchy.children[*i];
-				size_t amount = hierarchy.amounts[*i];
-				auto added = structures.added[*i];
-				auto removed = structures.removed[*i];
+				// Compute ratio to parent
+				float ratio = 0.0f;
+				for (size_t j = 0; j < hierarchy.children.size(); ++j) {
+					if (hierarchy.children[j].find(*i) != hierarchy.children[j].end()) {
+						ratio = hierarchy.ratios[j][*i];
+						break;
+					}
+				}
 ***REMOVED***
 				// Insert into database
-				bool result = Queries::Store(*i, ratios, names, children, amount, added, removed);
+				bool result = Queries::Store(*i,
+					hierarchy.names[*i],
+					hierarchy.children[*i],
+					structures.added[*i],
+					structures.removed[*i],
+					hierarchy.amounts[*i],
+					ratio,
+					structures.changes[*i],
+					structures.removing[*i]
+				);
 			}
 			bar.Finish();
 		}
@@ -199,7 +209,7 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			cout << "histo"  << "\t" << "Draw histogram of children and their number of occurrence." << endl;
 			cout << "json"   << "\t" << "Write JSON files of names, children and differences for current tree." << endl;
 			cout << "csv"    << "\t" << "Write CSV file of current children and their number of children." << endl;
-			cout << "store"  << "\t" << "Write all informations of current table to database. This will overwrite existing exports." << endl;
+			cout << "store"  << "\t" << "Write all informations of current table to database." << endl;
 			cout << "exit"   << "\t" << "Exit the navigator. Synonyms: quit." << endl;
 		}
 ***REMOVED***
@@ -208,8 +218,7 @@ Navigator::Navigator(Hierarchy &Hierarchy, Structures &Structures) : hierarchy(H
 			if (Go(command)) {
 				Clear();
 				List();
-			}
-			else {
+			} else {
 				cout << "'" << command << "' is neither a table name nor a command. Enter 'help' to see a list of all available commands." << endl;
 			}
 		}
@@ -464,12 +473,12 @@ bool Navigator::Json(string Folder, size_t Root)
 ***REMOVED***
 	// Create json streams
 	Jsonize out_children(Folder + "/children.json");
-	Jsonize out_added(Folder + "/added.json");
-	Jsonize out_removed(Folder + "/removed.json");
-	Jsonize out_amounts(Folder + "/amounts.json");
-	Jsonize out_names(Folder + "/names.json");
-	Jsonize out_changes_percent(Folder + "/diff_percent.json");
-	Jsonize out_changes_type(Folder + "/diff_types.json");
+	Jsonize out_added   (Folder + "/added.json"   );
+	Jsonize out_removed (Folder + "/removed.json" );
+	Jsonize out_amounts (Folder + "/amounts.json" );
+	Jsonize out_names   (Folder + "/names.json"   );
+	Jsonize out_changes (Folder + "/changes.json" );
+	Jsonize out_removing(Folder + "/removing.json");
 ***REMOVED***
 	// Get recursive children
 	unordered_set<size_t> subchildren = hierarchy.Subchildren(Root);
@@ -483,8 +492,8 @@ bool Navigator::Json(string Folder, size_t Root)
 	unordered_map<size_t, size_t> amounts;
 	unordered_map<size_t, unordered_set<size_t>> children;
 	unordered_map<size_t, unordered_set<string>> added, removed;
-	unordered_map<size_t, size_t> changes_percent;
-	unordered_map<size_t, size_t> changes_type;
+	unordered_map<size_t, float> changes;
+	unordered_map<size_t, bool> removing;
 ***REMOVED***
 	// Set sizes
 	names.reserve(subchildren.size());
@@ -492,8 +501,8 @@ bool Navigator::Json(string Folder, size_t Root)
 	added.reserve(subchildren.size());
 	removed.reserve(subchildren.size());
 	amounts.reserve(subchildren.size());
-	changes_percent.reserve(subchildren.size());
-	changes_type.reserve(subchildren.size());
+	changes.reserve(subchildren.size());
+	removing.reserve(subchildren.size());
 ***REMOVED***
 	// Fill containers
 	for (auto i = subchildren.begin(); i != subchildren.end(); ++i) {
@@ -502,8 +511,8 @@ bool Navigator::Json(string Folder, size_t Root)
 		children[*i] = hierarchy.children[*i];
 		added[*i] = structures.added[*i];
 		removed[*i] = structures.removed[*i];
-		changes_percent[*i] = structures.changes_percent[*i];
-		changes_type[*i] = structures.changes_type[*i];
+		changes[*i] = structures.changes[*i];
+		removing[*i] = structures.removing[*i];
 	}
 ***REMOVED***
 	// Write to JSON streams
@@ -512,11 +521,11 @@ bool Navigator::Json(string Folder, size_t Root)
 	out_removed << removed;
 	out_amounts << amounts;
 	out_names << names;
-	out_changes_percent << changes_percent;
-	out_changes_type << changes_type;
+	out_changes << changes;
+	out_removing << removing;
 ***REMOVED***
 	// Flush files
-	bool result = out_children.Flush() && out_added.Flush() && out_removed.Flush() && out_amounts.Flush() && out_names.Flush() && out_changes_percent.Flush() && out_changes_type.Flush();
+	bool result = out_children.Flush() && out_added.Flush() && out_removed.Flush() && out_amounts.Flush() && out_names.Flush() && out_changes.Flush() && out_removing.Flush();
 	return result;
 }
 ***REMOVED***

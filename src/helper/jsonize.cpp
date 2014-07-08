@@ -16,6 +16,12 @@ Jsonize::~Jsonize()
 	}
 }
 ***REMOVED***
+Jsonize &Jsonize::operator << (const bool &Value)
+{
+	stream << (Value ? "true" : "false");
+	return *this;
+}
+***REMOVED***
 Jsonize &Jsonize::operator<<(const std::string &Value)
 {
 	stream << "\"" << Value << "\"";
