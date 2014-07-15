@@ -82,7 +82,7 @@ namespace Queries {
 		}
 ***REMOVED***
 		// Read results table into array
-		auto query = Query("SELECT parent, child, parent_ratio, child_ratio FROM ABAP.RESULT_V1");
+		auto query = Query("SELECT parent, child, parent_ratio, child_ratio FROM ABAP.RESULT_V1 ORDER BY parent, child");
 		for (Bar bar("Query ratios", count); !query->eof(); bar++) {
 			Ratio ratio;
 			*query >> ratio.parent >> ratio.child >> ratio.parentratio >> ratio.childratio;
