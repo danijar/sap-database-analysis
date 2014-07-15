@@ -138,7 +138,7 @@ public class fetcher extends HttpServlet {
 	 * @throws SQLException
 	 */
 	public static String getSummary(String id, java.sql.Connection connection) throws SQLException {
-		String allData = "{\"id\":" + id + ", ";
+		String allData = "{\"id\":" + id + ",";
 		allData += "\"names\":" + fetch_array(id, "NAMES", "name", connection) + ",";
 		allData += "\"amount\":" + fetch_single(id, "amount", connection) + ",";
 		allData += "\"ratio\":" + fetch_single(id, "ratio", connection) + ",";
@@ -194,7 +194,7 @@ public class fetcher extends HttpServlet {
 		System.out.println("Request was: " + tabID + "\"" + operation);
 		
 		PrintWriter output = response.getWriter();	
-				
+		response.setContentType("application/json");	
 		String result = "";
 		try {
 					
