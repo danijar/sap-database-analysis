@@ -80,6 +80,11 @@ public class fetcher extends HttpServlet {
 	}
 	
 	public static String fetch_single(String id, String field, java.sql.Connection connection) throws SQLException {
+		return fetch_single(id, field, connection, false);
+	}
+	
+	
+	public static String fetch_single(String id, String field, java.sql.Connection connection, boolean translate_boolean) throws SQLException {
 		Statement stmt = connection.createStatement();
 		
 		String query = "SELECT " + field + " FROM ABAP.ANALYSIS_META WHERE ID='" + id + "'"; 
@@ -96,7 +101,17 @@ public class fetcher extends HttpServlet {
 				res += "\"" + rs.getString(1) +"\"";
 			}
 			else
-				res += rs.getString(1);
+				if(translate_boolean)
+					switch(rs.getInt(1)) {
+						case 0: 
+							res += "false";
+							break;
+						case 1: 
+							res += "true";
+							break;
+					}
+				else
+					res += rs.getString(1);
 		}
 		
 		return res;
@@ -115,7 +130,6 @@ public class fetcher extends HttpServlet {
 		String delim = "";
 		while (rs.next()) {		
 			res += delim;
-			
 			if(rsmd.getColumnType(1) == Types.VARCHAR) {
 				res += "\"" + rs.getString(1) +"\"";
 			}
@@ -143,7 +157,7 @@ public class fetcher extends HttpServlet {
 		allData += "\"amount\":" + fetch_single(id, "amount", connection) + ",";
 		allData += "\"ratio\":" + fetch_single(id, "ratio", connection) + ",";
 		allData += "\"changes\":" + fetch_single(id, "changes", connection) + ",";
-		allData += "\"category\":" + fetch_single(id, "removing", connection) + ",";
+		allData += "\"removing\":" + fetch_single(id, "removing", connection, true) + ",";
 		allData += "\"children\":" + fetch_array(id, "CHILDREN", "child", connection) + ",";
 		allData += "\"added\":" + fetch_array(id, "ADDED", "field ", connection) + ",";
 		allData += "\"removed\":" + fetch_array(id, "REMOVED", "field ", connection) ;
