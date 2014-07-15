@@ -183,7 +183,6 @@ public class fetcher extends HttpServlet {
 		return childrenData;
 	}
 	
-	
 	public static void doProcess(HttpServletRequest request,
             HttpServletResponse response) throws IOException {
 		
@@ -209,6 +208,8 @@ public class fetcher extends HttpServlet {
 		
 		PrintWriter output = response.getWriter();	
 		response.setContentType("application/json");	
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		
 		String result = "";
 		try {
 					
