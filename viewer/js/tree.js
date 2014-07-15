@@ -1,4 +1,5 @@
-define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/children.json', 'text!../../data/root/differences.json', 'text!../../data/root/amounts.json'], function($, _, Connection, Popup, Children, Differences, Amounts) {
+define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connection, Popup) {
+	/*
 	// Members
 	var element;
 	var children, differences, amounts;
@@ -150,4 +151,5 @@ define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/chi
 	}
 ***REMOVED***
 	return main;
+	*/
 });
