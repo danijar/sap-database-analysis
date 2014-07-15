@@ -6,3 +6,5 @@
 ***REMOVED***
 # Binary files
 *.png binary
+*.jar binary
+*.war binary
