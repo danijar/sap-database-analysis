@@ -26,7 +26,6 @@ namespace Queries {
 	// Helper functions
 	void Connection();
 	shared_ptr<otl_stream> Query(string QueryString, size_t BatchSize = 1, bool ErrorOutput = true);
-	bool Flush(otl_stream Query);
 	bool Catch(function<void()> Callback);
 ***REMOVED***
 	// Fetching functions
@@ -37,5 +36,15 @@ namespace Queries {
 	// Inserting functions
 	void Table(string Name, string Columns);
 	void Create();
-	bool Store(size_t Id, unordered_map<size_t, float> &Ratios, unordered_set<string> &Names, unordered_set<size_t> &Children, size_t Amount, unordered_set<string> &Added, unordered_set<string> &Removed);
+	bool Store(
+		size_t Id,
+		unordered_set<string> &Names,
+		unordered_set<size_t> &Children,
+		unordered_set<string> &Added,
+		unordered_set<string> &Removed,
+		size_t Amount,
+		float Ratio,
+		float Changes,
+		bool Removing
+	);
 }

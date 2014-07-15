@@ -40,10 +40,12 @@ int main()
 	benchmark.Finish();
 	*/
 ***REMOVED***
+	/*
 	// Wait for user input
 	cout << "Press enter to start hierarchy navigator..." << endl;
 	cout.flush();
 	cin.get();
+	*/
 	
 	// Navigate through hierarchie
 	Navigator navigator(hierarchy, structures);
