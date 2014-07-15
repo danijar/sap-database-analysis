@@ -26,8 +26,8 @@ void Structures::Fetch(bool Output)
 	structures.clear();
 	added.clear();
 	removed.clear();
-	changes_type.clear();
-	changes_percent.clear();
+	changes.clear();
+	removing.clear();
 ***REMOVED***
 	structures.resize(ratios.ids.size());
 ***REMOVED***
@@ -67,8 +67,8 @@ bool Structures::Load(string Path)
 	structures.clear();
 	added.clear();
 	removed.clear();
-	changes_type.clear();
-	changes_percent.clear();
+	changes.clear();
+	removing.clear();
 ***REMOVED***
 	// Initialize stream
 	Deserialize in(Path);
@@ -79,8 +79,8 @@ bool Structures::Load(string Path)
 	in >> structures;
 	in >> added;
 	in >> removed;
-	in >> changes_type;
-	in >> changes_percent;
+	in >> changes;
+	in >> removing;
 ***REMOVED***
 	return true;
 }
@@ -97,8 +97,8 @@ bool Structures::Save(string Path)
 	out << structures;
 	out << added;
 	out << removed;
-	out << changes_type;
-	out << changes_percent;
+	out << changes;
+	out << removing;
 ***REMOVED***
 	return true;
 }
@@ -118,18 +118,19 @@ void Structures::Generate()
 	// Initialize container
 	added.resize(ratios.ids.size());
 	removed.resize(ratios.ids.size());
-	changes_percent.resize(ratios.ids.size());
-	changes_type.resize(ratios.names.size());
+	changes.resize(ratios.ids.size());
+	removing.resize(ratios.ids.size());
 ***REMOVED***
 	// Compute for each children of current table
-	for (size_t i = 0; i < hierarchy.names.size(); ++i)
+	for (size_t i = 0; i < hierarchy.names.size(); ++i) {
 		for (auto j = hierarchy.children[i].begin(); j != hierarchy.children[i].end(); ++j) {
 			pair<unordered_set<string>, unordered_set<string>> difference = Difference(i, *j);
-			added[*j] = difference.first;
-			removed[*j] = difference.second;
-			changes_percent[*j] = (size_t)(100 * ((float)structures.at(*j).size()) / (difference.first.size() + difference.second.size()));
-			changes_type[*j] = (difference.second.size() == 0) ? 1 : 2;
+			added[*j]    = difference.first;
+			removed[*j]  = difference.second;
+			changes[*j]  = (float)(added[*j].size() + removed[*j].size()) / structures[*j].size();
+			removing[*j] = (removed[*j].size() > 0);
 		}
+	}
 }
 ***REMOVED***
 // Compute added and removed fields between any two tables
@@ -140,16 +141,14 @@ pair<unordered_set<string>, unordered_set<string>> Structures::Difference(size_t
 	// Find added fields
 	for (auto i = structures[Child].begin(); i != structures[Child].end(); ++i) {
 		// Using the own find operator because find doesent use def. comperator
-		if (std::find_if(structures[Parent].begin(), structures[Parent].end(),
-				Field::find(*i)) == structures[Parent].end())
+		if (std::find(structures[Parent].begin(), structures[Parent].end(), *i) == structures[Parent].end())
 			result.first.insert(i->name);
 	}
 ***REMOVED***
 	// Find removed streams
 	for (auto i = structures[Parent].begin(); i != structures[Parent].end(); ++i) {
 		// Using the own find operator because find doesent use def. comperator
-		if (std::find_if(structures[Child].begin(), structures[Child].end(),
-			Field::find(*i)) == structures[Child].end())
+		if (std::find(structures[Child].begin(), structures[Child].end(), *i) == structures[Child].end())
 			result.second.insert(i->name);
 	}
 ***REMOVED***

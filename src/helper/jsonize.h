@@ -15,6 +15,7 @@ class Jsonize {
 public:
 	Jsonize(std::string Path = "");
 	~Jsonize();
+	Jsonize &operator<<(const bool &Value);
 	Jsonize &operator<<(const std::string &Value);
 	template <typename T> Jsonize &operator<<(const T &Value);
 	template <typename TLeft, typename TRight> Jsonize &operator<<(const std::pair<TLeft, TRight> Value);
