@@ -130,7 +130,7 @@ void Ratios::Generate()
 	for (auto i = rows.begin(); i != rows.end(); i++, bar++) {
 		// Get or generate parent id		
 		size_t parent_id = Id(i->parent);
-***REMOVED***
+		
 		// Don't add if child and parent are the same
 		if (i->parentratio >= 1.0f && i->childratio >= 1.0f) {
 			// Add to the mapping of names and id
@@ -140,14 +140,12 @@ void Ratios::Generate()
 		else
 			// Create node for child
 			Id(i->child);
+		
 	}
 ***REMOVED***
 	// Create graph from query rows
 	ratios.resize(names.size());
-	cout << "Created " << names.size() << " ids for names" << endl;
-	char buf[100];
-	cin >> buf;
-***REMOVED***
+	
 	for (auto i = rows.begin(); i != rows.end(); i++, bar++) {
 		// Get table ids from row
 		size_t parent = ids[i->parent];
@@ -155,7 +153,6 @@ void Ratios::Generate()
 		
 		// Do not add ratio for copies
 		if (parent == child) continue;
-	
 		if (parent > ratios.size() - 1)
 			cout << endl << parent << endl << ratios.size();
 ***REMOVED***
@@ -172,9 +169,9 @@ size_t Ratios::Id(string name)
 	auto i = ids.find(name);
 	if (i == ids.end()) {
 		size_t id = names.size();
-		cout << "Created id " << id << endl;
 		names.push_back({ name });
 		ids[name] = id;
+		
 		return id;
 	}
 ***REMOVED***
