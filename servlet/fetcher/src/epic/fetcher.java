@@ -175,8 +175,8 @@ public class fetcher extends HttpServlet {
 		prepareSummaryStatements(connection);
 		
 		fetch_children_stmt = connection.prepareStatement("SELECT child FROM ABAP.ANALYSIS_CHILDREN WHERE ID=?");
-		fetch_removed_stmt = connection.prepareStatement("SELECT field FROM ABAP.ANALYSIS_REMOVED WHERE ID=?");
 		fetch_added_stmt = connection.prepareStatement("SELECT field FROM ABAP.ANALYSIS_ADDED WHERE ID=?");
+		fetch_removed_stmt = connection.prepareStatement("SELECT field FROM ABAP.ANALYSIS_REMOVED WHERE ID=?");
 		
 		fetch_ratio_stmt = connection.prepareStatement("SELECT ratio FROM ABAP.ANALYSIS_META WHERE ID=?");
 		fetch_changes_stmt = connection.prepareStatement("SELECT changes FROM ABAP.ANALYSIS_META WHERE ID=?");
@@ -201,13 +201,14 @@ public class fetcher extends HttpServlet {
 		 + "\"changes\":" + fetch_single(id, connection, fetch_changes_stmt) + ","
 		 + "\"removing\":" + fetch_single(id, connection, fetch_removing_stmt, true) + ","
 		 + "\"children\":" + fetch_array(id, connection, fetch_children_stmt) + ","
-		 + "\"added\":" + fetch_array(id, connection, fetch_removed_stmt) + ","
-		 + "\"removed\":" + fetch_array(id, connection, fetch_added_stmt) + "}";
+		 + "\"added\":" + fetch_array(id, connection, fetch_added_stmt) + ","
+		 + "\"removed\":" + fetch_array(id, connection, fetch_removed_stmt) + "}";
 		return allData;
 	}
 	
 	public static String getSummary(String id, java.sql.Connection connection) throws SQLException {
 		prepareSummaryStatements(connection);
+		
 		String allData = "{\"id\":" + id + ","
 		 + "\"names\":" + fetch_array(id, connection, fetch_names_stmt) + ","
 		 + "\"amount\":" + fetch_single(id, connection, fetch_amount_stmt) + "}";
