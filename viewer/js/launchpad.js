@@ -1,57 +1,59 @@
-define(['jquery', 'underscore', 'text!../../data/root/children.json', 'text!../../data/root/differences.json', 'text!../../data/root/amounts.json'], function($, _, Children, Differences, Amounts) {
-	var element, children, differences, amounts;
+define(['jquery', 'underscore'], function($, _) {
+	var element, amounts;
 ***REMOVED***
-	function initialize(container) {
+	function initialize(container, root) {
 		// Change window title
 		document.title = 'SAP Database Analysis';
+		
+		// Fetch and render input data
+		container.html('<div class="loading">Loading...</div>');
+		var url = 'http://localhost:8080/fetcher/' + root + '/children';
+		$.getJSON(url).done(function(json) {
+			// Sort head tables by cluster size
+			data = _.sortBy(json, 'amount');
+			data.reverse();
 ***REMOVED***
-		// Create and attach container
-		element = $('<div class="launchpad">');
-		container.append(element);
+			// Create and attach container
+			element = $('<div class="launchpad">');
+			container.html(element);
 ***REMOVED***
-		// Parse input data
-		children 	= JSON.parse(Children);
-		differences = JSON.parse(Differences);
-		amounts 	= JSON.parse(Amounts);
+			// Add head tables as tiles
+			_.each(data, tile);
+		}).error(function(error) {
+			$('.loading').text('An error occured.');
+			console.error(error);
+		});
 	}
 ***REMOVED***
 	// Render a tile
 	function tile(current) {
-		// Create node
+		// Structure changes
 		var difference = $('<div class="difference">');
 		var added = $('<ul class="added">');
-		if (differences[current]) {
-			if (differences[current][0].length) {
-				_.each(differences[current][0], function(field) {
-					added.append('<li>' + field + '</li>');
-				});
-			}
+		if (current.added) {
+			_.each(current.added, function(field) {
+				added.append('<li>' + field + '</li>');
+			});
 		}
 		difference.append(added);
 ***REMOVED***
-		var tile = $('<a class="tile" href="#/table/' + current + '">');
-		tile.append('<h2>' + current + '</h2>');
+		// Copies
+		var more = $('<span class="more">');
+		if (current.names.length > 1)
+			more.append('Represents ' + current.names.length + ' tables');
+***REMOVED***
+		// Tile
+		var tile = $('<a class="tile" href="#/table/' + current.id + '">');
+		tile.append('<h2>' + current.names[0] + '</h2>');
+		tile.append(more);
 		tile.append(difference);
-		tile.append('<p>' + (amounts[current] + 1) + ' tables</p>');
+		tile.append('<p>' + (current.amount + 1) + ' tables</p>');
 ***REMOVED***
 		element.append(tile);
 	}
 ***REMOVED***
-***REMOVED***
-	function main(container) {
-		initialize(container);
-***REMOVED***
-		// Sort head tables by cluster size
-		var heads = children['<root>'];
-		heads = _.sortBy(heads, function(head) {
-			return amounts[head];
-		});
-		heads.reverse();
-***REMOVED***
-		// Add head tables as tiles
-		_.each(heads, function(head) {
-			tile(head);
-		});
+	function main(container, root) {
+		initialize(container, root);
 	}
 ***REMOVED***
 	return main;
