@@ -72,10 +72,14 @@ public class fetcher extends HttpServlet {
 				res += ",\"" + rsmd.getColumnLabel(2).toLowerCase() + "\":false";
 			else
 				res += ",\"" + rsmd.getColumnLabel(2).toLowerCase() + "\":true";
-			
+					
 			for (int i = 3; i < fetch_len+1; i++) {
-				res += ",\"" + rsmd.getColumnLabel(i).toLowerCase() + "\":\"" + rs.getString(i) + "\"";
-				
+				if(rsmd.getColumnLabel(i).equals("LENGTH"))
+					res += ",\"" + rsmd.getColumnLabel(i).toLowerCase() + "\":" + rs.getInt(i) + "";
+				else
+					res += ",\"" + rsmd.getColumnLabel(i).toLowerCase() + "\":\"" + rs.getString(i) + "\"";
+			
+				System.out.println("Test "+ rsmd.getColumnLabel(i));
 			}
 			delim = ",";
 			res += "}";
