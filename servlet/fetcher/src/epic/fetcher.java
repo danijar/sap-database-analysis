@@ -160,18 +160,24 @@ public class fetcher extends HttpServlet {
 	private static PreparedStatement fetch_removed_stmt = null;
 	private static PreparedStatement fetch_added_stmt = null;
 	
-	
-	private static void prepareStatements(java.sql.Connection connection) throws SQLException {
+	private static void prepareSummaryStatements(java.sql.Connection connection) throws SQLException {
 		if(fetch_names_stmt != null)
 			return;
 		
 		// Prepare all the statements for the queries on the db
 		fetch_names_stmt = connection.prepareStatement("SELECT name FROM ABAP.ANALYSIS_NAMES WHERE ID=?");
+		fetch_amount_stmt = connection.prepareStatement("SELECT amount FROM ABAP.ANALYSIS_META WHERE ID=?");
+	}
+	
+	private static void prepareDetailStatements(java.sql.Connection connection) throws SQLException {
+		if(fetch_children_stmt != null)
+			return;
+		prepareSummaryStatements(connection);
+		
 		fetch_children_stmt = connection.prepareStatement("SELECT child FROM ABAP.ANALYSIS_CHILDREN WHERE ID=?");
 		fetch_removed_stmt = connection.prepareStatement("SELECT field FROM ABAP.ANALYSIS_REMOVED WHERE ID=?");
 		fetch_added_stmt = connection.prepareStatement("SELECT field FROM ABAP.ANALYSIS_ADDED WHERE ID=?");
 		
-		fetch_amount_stmt = connection.prepareStatement("SELECT amount FROM ABAP.ANALYSIS_META WHERE ID=?");
 		fetch_ratio_stmt = connection.prepareStatement("SELECT ratio FROM ABAP.ANALYSIS_META WHERE ID=?");
 		fetch_changes_stmt = connection.prepareStatement("SELECT changes FROM ABAP.ANALYSIS_META WHERE ID=?");
 		fetch_removing_stmt = connection.prepareStatement("SELECT removing FROM ABAP.ANALYSIS_META WHERE ID=?");
@@ -185,28 +191,62 @@ public class fetcher extends HttpServlet {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static String getSummary(String id, java.sql.Connection connection) throws SQLException {
-		prepareStatements(connection);
+	public static String getDetail(String id, java.sql.Connection connection) throws SQLException {
+		prepareDetailStatements(connection);
 		
-		String allData = "{\"id\":" + id + ",";
-		allData += "\"names\":" + fetch_array(id, connection, fetch_names_stmt) + ",";
-		allData += "\"amount\":" + fetch_single(id, connection, fetch_amount_stmt) + ",";
-		allData += "\"ratio\":" + fetch_single(id, connection, fetch_ratio_stmt) + ",";
-		allData += "\"changes\":" + fetch_single(id, connection, fetch_changes_stmt) + ",";
-		allData += "\"removing\":" + fetch_single(id, connection, fetch_removing_stmt, true) + ",";
-		allData += "\"children\":" + fetch_array(id, connection, fetch_children_stmt) + ",";
-		allData += "\"added\":" + fetch_array(id, connection, fetch_removed_stmt) + ",";
-		allData += "\"removed\":" + fetch_array(id, connection, fetch_added_stmt) ;
-		allData += "}";
+		String allData = "{\"id\":" + id + ","
+		 + "\"names\":" + fetch_array(id, connection, fetch_names_stmt) + ","
+		 + "\"amount\":" + fetch_single(id, connection, fetch_amount_stmt) + ","
+		 + "\"ratio\":" + fetch_single(id, connection, fetch_ratio_stmt) + ","
+		 + "\"changes\":" + fetch_single(id, connection, fetch_changes_stmt) + ","
+		 + "\"removing\":" + fetch_single(id, connection, fetch_removing_stmt, true) + ","
+		 + "\"children\":" + fetch_array(id, connection, fetch_children_stmt) + ","
+		 + "\"added\":" + fetch_array(id, connection, fetch_removed_stmt) + ","
+		 + "\"removed\":" + fetch_array(id, connection, fetch_added_stmt) + "}";
 		return allData;
 	}
 	
-	public static String getAllChildrenData(String id, java.sql.Connection connection) throws SQLException {
+	public static String getSummary(String id, java.sql.Connection connection) throws SQLException {
+		prepareSummaryStatements(connection);
+		String allData = "{\"id\":" + id + ","
+		 + "\"names\":" + fetch_array(id, connection, fetch_names_stmt) + ","
+		 + "\"amount\":" + fetch_single(id, connection, fetch_amount_stmt) + "}";
+		return allData;
+	}
+	
+	
+	private static PreparedStatement children_stmt = null;
+	
+	public static String getAllChildrenDetail(String id, java.sql.Connection connection) throws SQLException {
+		if(children_stmt == null) {
+			children_stmt = connection.prepareStatement("SELECT CHILD FROM ABAP.ANALYSIS_CHILDREN WHERE ID= ?");
+		}
+		
 		String childrenData = "{";
 		// Get all children from DB
-		Statement stmt = connection.createStatement();
-		String childrenQuery = "SELECT CHILD FROM ABAP.ANALYSIS_CHILDREN WHERE ID='" + id + "'";
-		ResultSet rs = stmt.executeQuery(childrenQuery);
+		children_stmt.setString(1, id);
+		ResultSet rs = children_stmt.executeQuery();
+		
+		String delim = "";
+		while (rs.next()) {
+			childrenData += delim;
+			childrenData += "\"" + rs.getString("CHILD") + "\":" + getDetail(rs.getString("CHILD"), connection);
+			delim = ",";
+		}
+		
+		childrenData += "}";		
+		return childrenData;
+	}
+	
+	public static String getAllChildrenSummary(String id, java.sql.Connection connection) throws SQLException {
+		if(children_stmt == null) {
+			children_stmt = connection.prepareStatement("SELECT CHILD FROM ABAP.ANALYSIS_CHILDREN WHERE ID= ?");
+		}
+		
+		String childrenData = "{";
+		// Get all children from DB
+		children_stmt.setString(1, id);
+		ResultSet rs = children_stmt.executeQuery();
 		
 		String delim = "";
 		while (rs.next()) {
@@ -223,25 +263,33 @@ public class fetcher extends HttpServlet {
             HttpServletResponse response) throws IOException {
 		
 		String pathInfo = request.getPathInfo();
-	
+		//System.out.println("Path info was " + request.getPathInfo());
 		// We could parse the table id, but we need string anyway
-		Pattern pattern = Pattern.compile("^/([0-9]+)/([a-z]+)");
+		Pattern pattern = Pattern.compile("^/([0-9]+)(/[a-z]+)?(/[a-z]+)?");
 		Matcher m = pattern.matcher(pathInfo);
+		
 		if(!m.find()) {
 			System.out.println("Wrong request! Path failed");
 			return;
 		}
 		
-		String tabID 	= m.group(1);
-		String operation= m.group(2);
-				
-		if(tabID == "" || operation == "") {
+		String tabID 		= m.group(1);
+		String operation 	= "";
+		if(m.group(2) != null)
+			operation += m.group(2).substring(1);
+		String sub_operation= "";
+		if(m.group(3) != null)
+			sub_operation += m.group(3).substring(1);
+		
+		if(tabID == "") {
 			System.out.println("Got wrong query tabID was " + (tabID != "") + " and operation was " + (operation != ""));
 			response.setStatus(400);
 			return;
 		}
-		
-		System.out.println("Request was: " + tabID + "\"" + operation);
+		if(operation == "")
+			operation = "detail";
+			
+		//System.out.println("Request was: " + tabID + "\t" + operation + "|" + sub_operation);
 		
 		PrintWriter output = null;
 		
@@ -268,13 +316,26 @@ public class fetcher extends HttpServlet {
 				result = fetch_from_DB(tabID, conn);
 				break;
 			case "children":
-				System.out.println("Printing chilren ....");
-				result = getAllChildrenData(tabID, conn);
+				switch (sub_operation) {
+					case "":
+					case "detail":
+						System.out.println("Printing children details ....");
+						result = getAllChildrenDetail(tabID, conn);
+						break;
+					case "summary":
+						System.out.println("Printing children summary ....");
+						result = getAllChildrenSummary(tabID, conn);
+						break;
+				}
 				break;	
+			case "detail":
+				System.out.println("Printing details ....");
+				result = getDetail(tabID, conn);
+				break;
 			case "summary":
 				System.out.println("Printing summary ....");
 				result = getSummary(tabID, conn);
-				break;
+				break;	
 			default:
 				break;
 			}
