@@ -7,7 +7,7 @@ define(['jquery', 'underscore'], function($, _) {
 		
 		// Fetch and render input data
 		container.html('<div class="loading">Loading...</div>');
-		var url = 'http://localhost:8080/fetcher/' + root + '/children';
+		var url = 'http://localhost:8080/fetcher/' + root + '/children/detail/';
 		$.getJSON(url).done(function(json) {
 			// Sort head tables by cluster size
 			data = _.sortBy(json, 'amount');

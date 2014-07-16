@@ -45,7 +45,10 @@ svg { position: absolute; pointer-events: none; z-index: 0; }
 .popup h1 { margin: 0 0 .5em; color: #333; }
 .popup hr { display: block; margin: 1em 0; padding: 0; height: 1px; border: 0; border-top: 1px solid #ccc; }
 .popup p { margin-top: 0; }
-table { text-align: left; }
-table tr:first-child { padding-bottom: 1em; }
-table tr > * { padding: .1em 1em .1em 0; }
-table th { font-weight: normal; text-decoration: underline; }
+table { min-width: 50%; border-collapse: collapse; text-align: left; }
+thead { border-bottom: 2px solid #ccc; }
+tr { border-bottom: 1px solid #ccc; }
+tbody tr:nth-child(odd) { background-color: #fafafa; }
+th, td { color: #444; padding: .5em 1em .5em 0; }
+tr > *:nth-child(2) { text-align: center; }
+.key { display: inline-block; height: 1em; width: 1em; background: url(../img/key.png) no-repeat center; background-size: contain; }
