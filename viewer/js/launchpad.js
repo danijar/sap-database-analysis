@@ -7,7 +7,7 @@ define(['jquery', 'underscore'], function($, _) {
 		
 		// Fetch and render input data
 		container.html('<div class="loading">Loading...</div>');
-		var url = 'http://localhost:8080/fetcher/' + root + '/children';
+		var url = 'http://localhost:8080/fetcher/' + root + '/children/summary';
 		$.getJSON(url).done(function(json) {
 			// Sort head tables by cluster size
 			data = _.sortBy(json, 'amount');
@@ -27,26 +27,9 @@ define(['jquery', 'underscore'], function($, _) {
 ***REMOVED***
 	// Render a tile
 	function tile(current) {
-		// Structure changes
-		var difference = $('<div class="difference">');
-		var added = $('<ul class="added">');
-		if (current.added) {
-			_.each(current.added, function(field) {
-				added.append('<li>' + field + '</li>');
-			});
-		}
-		difference.append(added);
-***REMOVED***
-		// Copies
-		var more = $('<span class="more">');
-		if (current.names.length > 1)
-			more.append('Represents ' + current.names.length + ' tables');
-***REMOVED***
 		// Tile
 		var tile = $('<a class="tile" href="#/table/' + current.id + '">');
 		tile.append('<h2>' + current.names[0] + '</h2>');
-		tile.append(more);
-		tile.append(difference);
 		tile.append('<p>' + (current.amount + 1) + ' tables</p>');
 ***REMOVED***
 		element.append(tile);
