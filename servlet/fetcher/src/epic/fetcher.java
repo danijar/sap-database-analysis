@@ -201,14 +201,24 @@ public class fetcher extends HttpServlet {
 				
 		if(tabID == "" || operation == "") {
 			System.out.println("Got wrong query tabID was " + (tabID != "") + " and operation was " + (operation != ""));
+			response.setStatus(400);
 			return;
 		}
 		
 		System.out.println("Request was: " + tabID + "\"" + operation);
 		
-		PrintWriter output = response.getWriter();	
+		PrintWriter output = null;
+		
 		response.setContentType("application/json");	
 		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setStatus(200);
+		
+		try {
+			output = response.getWriter();
+		} catch (IOException e1) {
+			response.setStatus(500);
+			e1.printStackTrace();
+		}	
 		
 		String result = "";
 		try {
@@ -236,11 +246,15 @@ public class fetcher extends HttpServlet {
 		} catch (SQLException e) {
 		//	System.out.println("Sql excepiton" + e.getMessage());
 			output.write("{ \"TABNAME\": \"SQL error in Databaseconnection "+ e.getMessage() + "\" }");
+			response.sendError(response.SC_EXPECTATION_FAILED);
+			response.setStatus(404);
 			return;
 		
 		} catch (ClassNotFoundException e) {
 			System.out.println("Class was not found!");
 			e.printStackTrace();
+			response.sendError(response.SC_EXPECTATION_FAILED);
+			response.setStatus(500);
 		}
 		
 		//System.out.println("Response was : " + result);
