@@ -66,7 +66,14 @@ public class fetcher extends HttpServlet {
 		while (rs.next()) {		
 			res += delim;
 			res += "{\"" + rsmd.getColumnLabel(1).toLowerCase() + "\":\"" + rs.getString(1) + "\"";
-			for (int i = 2; i < fetch_len+1; i++) {
+			
+			// Output of keyflags shall be true / false
+			if(rs.getString(2).isEmpty())
+				res += ",\"" + rsmd.getColumnLabel(2).toLowerCase() + "\":false";
+			else
+				res += ",\"" + rsmd.getColumnLabel(2).toLowerCase() + "\":true";
+			
+			for (int i = 3; i < fetch_len+1; i++) {
 				res += ",\"" + rsmd.getColumnLabel(i).toLowerCase() + "\":\"" + rs.getString(i) + "\"";
 				
 			}
