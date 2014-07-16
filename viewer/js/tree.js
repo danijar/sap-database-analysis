@@ -1,6 +1,7 @@
 define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connection, Popup) {
 	// Members
 	var element;
+	var datas = {};
 	var connections = {};
 ***REMOVED***
 	function initialize(container, root) {
@@ -12,6 +13,8 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 		var url = 'http://localhost:8080/fetcher/' + root + '/summary';
 		$.getJSON(url).done(function(data) {
 			node(data);
+			// Expand first level of children
+			$('#' + escape(root) + ' > .inner').click();
 		}).error(console.error);
 ***REMOVED***
 		// Events
@@ -23,8 +26,7 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 		element.on('click', 'h2', function() {
 			// Open structure popup when clicking table name
 			var table = $(this).parent().parent().attr('id');
-			var popup = Popup();
-			popup.append('<h1>' + table + '</h1>');
+			popup(table);
 			
 			// Prevent expanding children
 			return false;
@@ -44,6 +46,9 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 ***REMOVED***
 	// Render a table
 	function node(data, parent) {
+		// Cache data
+		datas[data.id] = data;
+***REMOVED***
 		// Structure changes
 		var difference = $('<div class="difference">');
 		if (data.added.length) {
@@ -152,11 +157,34 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 		});
 	}
 ***REMOVED***
+	function popup(table) {
+		var url = 'http://localhost:8080/fetcher/' + table + '/fields';
+		$.getJSON(url).done(function(fields) {
+			var popup = Popup();
+***REMOVED***
+			popup.append('<h1>' + datas[table].names[0] + '</h1>');
+***REMOVED***
+			if (datas[table].names.length > 1) {
+				names = datas[table].names[1];
+				for (var i = 2; i < datas[table].names.length; i++)
+					names += ', ' + datas[table].names[i];
+				popup.append('<p class="more">Other names are ' + names + '.</p>');
+			}
+***REMOVED***
+			popup.append('<h2>Fields</h2>');
+			
+			var list = $('<table>');
+			list.append('<tr><th>Name</th><th>Key</th><th>Type</th><th>Role</th></tr>');
+			_.each(fields, function(field) {
+				var row = '<tr><td>' + field.name + '</td><td>' + field.key + '</td><td>' + field.type + '</td><td>' + field.role + '</tr>';
+				list.append(row);
+			});
+			popup.append(list);
+		}).error(console.error);
+	}
+***REMOVED***
 	function main(container, root) {
 		initialize(container, root);
-		
-		// Expand first level of children
-		$('#' + escape(root) + ' > .inner').click();
 	}
 ***REMOVED***
 	return main;

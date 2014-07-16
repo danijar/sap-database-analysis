@@ -25,7 +25,7 @@ ul { box-sizing: border-box; display: inline-block; height: 10em; width: 7em; ma
 .added { background: rgba(92, 184, 92, .2); border-color: rgb(92, 184, 92); }
 .removed { background: rgba(255, 0, 0, .2); border-color: rgb(255, 0, 0); }
 .added + .removed {  margin-left: 1em !important;  }
-p { margin: 0; color: #666; clear: both; }
+.inner p { margin: 0; color: #666; clear: both; }
 ***REMOVED***
 /* box for holding hideable children */
 .children { display: none; position: relative; padding: .5em 1em 0; white-space: nowrap; overflow-y: hidden; overflow-x: hidden; }
@@ -37,10 +37,15 @@ p { margin: 0; color: #666; clear: both; }
 .tile .added { height: 10em; width: 13em; }
 ***REMOVED***
 /* line connections */
-svg{ position: absolute; pointer-events: none; z-index: 0; }
+svg { position: absolute; pointer-events: none; z-index: 0; }
 ***REMOVED***
 /* popup */
-.popup { position: fixed; font-size: 1.5em; left: 1em; top: 1em; right: 1em; bottom: 1em; padding: 1em; background: #fff; border-radius: .3em; box-shadow: 0 0 .5em rgba(0, 0, 0, .5), 0 0 0 2em rgba(0, 0, 0, .1); z-index: 4; }
-.popup .close { position: absolute; right: 1em; top: .95em; width: 3em; height: 3em; background: url(../img/close.png) no-repeat center; background-size: 50% auto; border-radius: .1em; cursor: pointer; opacity: .5; }
-.popup h1 { margin: .5em; color: #333; }
+.popup { position: fixed; font-size: 1.5em; left: 1em; top: 1em; right: 1em; bottom: 1em; padding: 2em; background: #fff; border-radius: .3em; box-shadow: 0 0 .5em rgba(0, 0, 0, .5), 0 0 0 2em rgba(0, 0, 0, .1); z-index: 4; overflow: auto; }
+.popup .close { position: absolute; right: 1.2em; top: 1.2em; width: 3em; height: 3em; background: url(../img/close.png) no-repeat center; background-size: 50% auto; border-radius: .1em; cursor: pointer; opacity: .5; }
+.popup h1 { margin: 0 0 .5em; color: #333; }
 .popup hr { display: block; margin: 1em 0; padding: 0; height: 1px; border: 0; border-top: 1px solid #ccc; }
+.popup p { margin-top: 0; }
+table { text-align: left; }
+table tr:first-child { padding-bottom: 1em; }
+table tr > * { padding: .1em 1em .1em 0; }
+table th { font-weight: normal; text-decoration: underline; }
