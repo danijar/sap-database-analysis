@@ -4,7 +4,6 @@ define(['jquery', 'underscore'], function($, _) {
 	function initialize(container, root) {
 		// Change window title
 		document.title = 'SAP Database Analysis';
-***REMOVED***
 		
 		// Fetch and render input data
 		container.html('<div class="loading">Loading...</div>');
@@ -28,7 +27,7 @@ define(['jquery', 'underscore'], function($, _) {
 ***REMOVED***
 	// Render a tile
 	function tile(current) {
-		// Create node
+		// Structure changes
 		var difference = $('<div class="difference">');
 		var added = $('<ul class="added">');
 		if (current.added) {
@@ -38,10 +37,12 @@ define(['jquery', 'underscore'], function($, _) {
 		}
 		difference.append(added);
 ***REMOVED***
+		// Copies
 		var more = $('<span class="more">');
 		if (current.names.length > 1)
 			more.append('Represents ' + current.names.length + ' tables');
 ***REMOVED***
+		// Tile
 		var tile = $('<a class="tile" href="#/table/' + current.id + '">');
 		tile.append('<h2>' + current.names[0] + '</h2>');
 		tile.append(more);
