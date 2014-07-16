@@ -3,6 +3,7 @@ package epic;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -15,7 +16,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-***REMOVED***
 ***REMOVED***
 /**
  * Servlet implementation class fetcher
@@ -79,17 +79,18 @@ public class fetcher extends HttpServlet {
 		return res;
 	}
 	
-	public static String fetch_single(String id, String field, java.sql.Connection connection) throws SQLException {
-		return fetch_single(id, field, connection, false);
+	public static String fetch_single(String id, java.sql.Connection connection, PreparedStatement prepStatement) throws SQLException {
+		return fetch_single(id, connection, prepStatement, false);
 	}
 	
 	
-	public static String fetch_single(String id, String field, java.sql.Connection connection, boolean translate_boolean) throws SQLException {
-		Statement stmt = connection.createStatement();
+	public static String fetch_single(String id, java.sql.Connection connection, PreparedStatement prepStatement, boolean translate_boolean) throws SQLException {
+		//Statement stmt = connection.createStatement();
 		
-		String query = "SELECT " + field + " FROM ABAP.ANALYSIS_META WHERE ID='" + id + "'"; 
+		//String query = "SELECT " + field + " FROM ABAP.ANALYSIS_META WHERE ID='" + id + "'"; 
 		//System.out.println("Tabname is " + tabname);
-		ResultSet rs = stmt.executeQuery(query);
+		prepStatement.setString(1, id);
+		ResultSet rs = prepStatement.executeQuery();
 		ResultSetMetaData rsmd = rs.getMetaData();
 		int fetch_len = rsmd.getColumnCount();
 		if(fetch_len > 1)
@@ -117,16 +118,14 @@ public class fetcher extends HttpServlet {
 		return res;
 	}
 	
-	public static String fetch_array(String id, String tableName, String fieldName, java.sql.Connection connection) throws SQLException {
-		Statement stmt = connection.createStatement();
-		String query;
-		query = "SELECT " + fieldName + " FROM ABAP.ANALYSIS_" + tableName + " WHERE ID ='" + id + "'"; 
-		//System.out.println("Tabname is " + tabname);
-		ResultSet rs = stmt.executeQuery(query);
+	public static String fetch_array(String id, java.sql.Connection connection, PreparedStatement prepStatement) throws SQLException {	
+		prepStatement.setString(1, id);
+		
+		ResultSet rs = prepStatement.executeQuery();
 		ResultSetMetaData rsmd = rs.getMetaData();
 		
 		String res = "[";
-		boolean first = true;
+		//boolean first = true;
 		String delim = "";
 		while (rs.next()) {		
 			res += delim;
@@ -144,6 +143,34 @@ public class fetcher extends HttpServlet {
 		return res;
 	}
 	
+	private static PreparedStatement fetch_names_stmt = null;
+	private static PreparedStatement fetch_amount_stmt = null;
+	private static PreparedStatement fetch_ratio_stmt = null;
+	private static PreparedStatement fetch_changes_stmt = null;
+	private static PreparedStatement fetch_removing_stmt = null;
+	
+	private static PreparedStatement fetch_children_stmt = null;
+	private static PreparedStatement fetch_removed_stmt = null;
+	private static PreparedStatement fetch_added_stmt = null;
+	
+	
+	private static void prepareStatements(java.sql.Connection connection) throws SQLException {
+		if(fetch_names_stmt != null)
+			return;
+		
+		// Prepare all the statements for the queries on the db
+		fetch_names_stmt = connection.prepareStatement("SELECT name FROM ABAP.ANALYSIS_NAMES WHERE ID=?");
+		fetch_children_stmt = connection.prepareStatement("SELECT child FROM ABAP.ANALYSIS_CHILDREN WHERE ID=?");
+		fetch_removed_stmt = connection.prepareStatement("SELECT field FROM ABAP.ANALYSIS_REMOVED WHERE ID=?");
+		fetch_added_stmt = connection.prepareStatement("SELECT field FROM ABAP.ANALYSIS_ADDED WHERE ID=?");
+		
+		fetch_amount_stmt = connection.prepareStatement("SELECT amount FROM ABAP.ANALYSIS_META WHERE ID=?");
+		fetch_ratio_stmt = connection.prepareStatement("SELECT ratio FROM ABAP.ANALYSIS_META WHERE ID=?");
+		fetch_changes_stmt = connection.prepareStatement("SELECT changes FROM ABAP.ANALYSIS_META WHERE ID=?");
+		fetch_removing_stmt = connection.prepareStatement("SELECT removing FROM ABAP.ANALYSIS_META WHERE ID=?");
+	}
+	
+	
 	/**
 	 * Fetches a summary of all the data stored in the different tables
 	 * @param id 			= The distinct id of the node
@@ -152,15 +179,17 @@ public class fetcher extends HttpServlet {
 	 * @throws SQLException
 	 */
 	public static String getSummary(String id, java.sql.Connection connection) throws SQLException {
+		prepareStatements(connection);
+		
 		String allData = "{\"id\":" + id + ",";
-		allData += "\"names\":" + fetch_array(id, "NAMES", "name", connection) + ",";
-		allData += "\"amount\":" + fetch_single(id, "amount", connection) + ",";
-		allData += "\"ratio\":" + fetch_single(id, "ratio", connection) + ",";
-		allData += "\"changes\":" + fetch_single(id, "changes", connection) + ",";
-		allData += "\"removing\":" + fetch_single(id, "removing", connection, true) + ",";
-		allData += "\"children\":" + fetch_array(id, "CHILDREN", "child", connection) + ",";
-		allData += "\"added\":" + fetch_array(id, "ADDED", "field ", connection) + ",";
-		allData += "\"removed\":" + fetch_array(id, "REMOVED", "field ", connection) ;
+		allData += "\"names\":" + fetch_array(id, connection, fetch_names_stmt) + ",";
+		allData += "\"amount\":" + fetch_single(id, connection, fetch_amount_stmt) + ",";
+		allData += "\"ratio\":" + fetch_single(id, connection, fetch_ratio_stmt) + ",";
+		allData += "\"changes\":" + fetch_single(id, connection, fetch_changes_stmt) + ",";
+		allData += "\"removing\":" + fetch_single(id, connection, fetch_removing_stmt, true) + ",";
+		allData += "\"children\":" + fetch_array(id, connection, fetch_children_stmt) + ",";
+		allData += "\"added\":" + fetch_array(id, connection, fetch_removed_stmt) + ",";
+		allData += "\"removed\":" + fetch_array(id, connection, fetch_added_stmt) ;
 		allData += "}";
 		return allData;
 	}
@@ -187,7 +216,7 @@ public class fetcher extends HttpServlet {
             HttpServletResponse response) throws IOException {
 		
 		String pathInfo = request.getPathInfo();
-	//	System.out.println("Pathinfo was: " + pathInfo);
+	
 		// We could parse the table id, but we need string anyway
 		Pattern pattern = Pattern.compile("^/([0-9]+)/([a-z]+)");
 		Matcher m = pattern.matcher(pathInfo);
@@ -244,16 +273,14 @@ public class fetcher extends HttpServlet {
 			}
 						
 		} catch (SQLException e) {
-		//	System.out.println("Sql excepiton" + e.getMessage());
+			System.out.println("Sql excepiton\t" + e.getMessage());
 			output.write("{ \"TABNAME\": \"SQL error in Databaseconnection "+ e.getMessage() + "\" }");
-			response.sendError(response.SC_EXPECTATION_FAILED);
 			response.setStatus(404);
 			return;
 		
 		} catch (ClassNotFoundException e) {
 			System.out.println("Class was not found!");
 			e.printStackTrace();
-			response.sendError(response.SC_EXPECTATION_FAILED);
 			response.setStatus(500);
 		}
 		
