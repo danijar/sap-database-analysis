@@ -10,7 +10,7 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 		container.html(element);
 ***REMOVED***
 		// Fetch and add root node
-		var url = 'http://localhost:8080/fetcher/' + root + '/summary';
+		var url = 'http://localhost:8080/fetcher/' + root;
 		$.getJSON(url).done(function(data) {
 			node(data);
 			// Expand first level of children
@@ -171,15 +171,16 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 				popup.append('<p class="more">Other names are ' + names + '.</p>');
 			}
 ***REMOVED***
-			popup.append('<h2>Fields</h2>');
-			
-			var list = $('<table>');
-			list.append('<tr><th>Name</th><th>Key</th><th>Type</th><th>Role</th></tr>');
+			var rows = '<table><thead><tr><th>Name</th><th>Key</th><th>Type</th><th>Role</th></tr></thead>';
+			rows += '<tbody>';
 			_.each(fields, function(field) {
-				var row = '<tr><td>' + field.name + '</td><td>' + field.key + '</td><td>' + field.type + '</td><td>' + field.role + '</tr>';
-				list.append(row);
+				var key = '';
+				if (field.key)
+					key = '<span class="key"></span>';
+				rows += '<tr><td>' + field.name + '</td><td>' + key + '</td><td>' + field.type + '</td><td>' + field.role + '</tr>';
 			});
-			popup.append(list);
+			rows += '</tbody></table>'
+			popup.append(rows);
 		}).error(console.error);
 	}
 ***REMOVED***
