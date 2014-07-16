@@ -4,6 +4,7 @@ div { position: relative; box-sizing: border-box; }
 nav { position: fixed; width: 100%; background: #fff; box-shadow: 0 0 1em rgba(0, 0, 0, .5); z-index: 3; }
 nav a { display: inline-block; font-size: 2em; padding: .8em 1em .7em; color: #999; font-weight: bold; text-decoration: none; }
 .container { position: relative; padding: 7em; }
+.loading { font-size: 1.5em; width: 100%; height: 100%; padding-top: 10em; color: #555; text-align: center; }
 ***REMOVED***
 /* hierarchy tree view */
 .tree { text-align: center; }
@@ -12,13 +13,15 @@ nav a { display: inline-block; font-size: 2em; padding: .8em 1em .7em; color: #9
 .table { display: inline-block; position: relative; padding: .5em; vertical-align: top; }
 ***REMOVED***
 /* box for a single table */
-.inner, .tile { display: inline-block; font-size: 1.5em; padding: 1em; height: 16em; text-align: center; background: #fff; border: 1px solid #aaa; border-radius: .5em; cursor: pointer; transition: all .2s; z-index: 2; }
+.inner, .tile { display: inline-block; font-size: 1.5em; padding: 1em; min-height: 17.5em; text-align: center; background: #fff; border: 1px solid #aaa; border-radius: .5em; cursor: pointer; transition: all .2s; z-index: 2; }
+.inner:after, .tile:after { content:' '; display:block; height:0; clear:both; overflow:hidden; visibility:hidden; }
 .inner:hover, .tile:hover { background: #fafafa; box-shadow: 0 0 .5em rgba(0, 0, 0, .2); }
 ***REMOVED***
 /* elements of inner */
 h2 { font-size: 1.2em; margin: 0; padding: .2em 0; color: #333; }
+.more { display: inline-block; font-size: 1em; height: 1em; color: #777; cursor: pointer; }
 .difference { margin: .5em 0; }
-ul { box-sizing: border-box; display: inline-block; height: 10em; margin: 0; padding: .5em 1.5em .5em .5em; list-style-type: none; text-align: left; border-style: solid; border-width: .2em; overflow-x: hidden; overflow-y: auto; vertical-align: top; }
+ul { box-sizing: border-box; display: inline-block; height: 10em; width: 7em; margin: 0; padding: .5em 1.5em .5em .5em; list-style-type: none; text-align: left; border-style: solid; border-width: .2em; overflow-x: hidden; overflow: auto; vertical-align: top; }
 .added { background: rgba(92, 184, 92, .2); border-color: rgb(92, 184, 92); }
 .removed { background: rgba(255, 0, 0, .2); border-color: rgb(255, 0, 0); }
 .added + .removed {  margin-left: 1em !important;  }
@@ -30,7 +33,7 @@ p { margin: 0; color: #666; clear: both; }
 ***REMOVED***
 /* launchpad tiles */
 .launchpad { text-align: center; }
-.tile { box-sizing: border-box; width: 15em; height: 16em; margin: .5em; color: inherit; text-decoration: none; overflow: hidden; box-shadow: 0 .25em .5em rgba(0, 0, 0, .1); }
+.tile { box-sizing: border-box; width: 15em; margin: .5em; color: inherit; text-decoration: none; overflow: hidden; box-shadow: 0 .25em .5em rgba(0, 0, 0, .1); }
 .tile .added { height: 10em; width: 13em; }
 ***REMOVED***
 /* line connections */

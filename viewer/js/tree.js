@@ -1,21 +1,18 @@
-define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/children.json', 'text!../../data/root/differences.json', 'text!../../data/root/amounts.json'], function($, _, Connection, Popup, Children, Differences, Amounts) {
+define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connection, Popup) {
 	// Members
 	var element;
-	var children, differences, amounts;
 	var connections = {};
 ***REMOVED***
 	function initialize(container, root) {
-		// Change window title
-		document.title = root;
-***REMOVED***
 		// Create and attach container
 		element = $('<div class="tree">');
-		container.append(element);
+		container.html(element);
 ***REMOVED***
-		// Parse input data
-		children    = JSON.parse(Children);
-		differences = JSON.parse(Differences);
-		amounts 	= JSON.parse(Amounts);
+		// Fetch and add root node
+		var url = 'http://localhost:8080/fetcher/' + root + '/summary';
+		$.getJSON(url).done(function(data) {
+			node(data);
+		}).error(console.error);
 ***REMOVED***
 		// Events
 		element.on('click', '.inner', function() {
@@ -28,8 +25,7 @@ define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/chi
 			var table = $(this).parent().parent().attr('id');
 			var popup = Popup();
 			popup.append('<h1>' + table + '</h1>');
-			//popup.append('<hr>');
-***REMOVED***
+			
 			// Prevent expanding children
 			return false;
 		});
@@ -47,105 +43,119 @@ define(['jquery', 'underscore', 'connection', 'popup', 'text!../../data/root/chi
 	}
 ***REMOVED***
 	// Render a table
-	function node(current, parent) {
+	function node(data, parent) {
 		// Structure changes
 		var difference = $('<div class="difference">');
-		if (differences[current]) {
-			if (differences[current][0].length) {
-				var added = $('<ul class="added">');
-				_.each(differences[current][0].sort(), function(field) {
-					added.append('<li>' + field + '</li>');
-				});
-				difference.append(added);
-			}
-***REMOVED***
-			if (differences[current][1].length) {
-				var removed = $('<ul class="removed">');
-				_.each(differences[current][1].sort(), function(field) {
-					removed.append('<li>' + field + '</li>');
-				});
-				difference.append(removed);
-			}
+		if (data.added.length) {
+			var added = $('<ul class="added">');
+			_.each(data.added.sort(), function(field) {
+				added.append('<li>' + field + '</li>');
+			});
+			difference.append(added);
 		}
+		if (data.added.length) {
+			var removed = $('<ul class="removed">');
+			_.each(data.added.sort(), function(field) {
+				removed.append('<li>' + field + '</li>');
+			});
+			difference.append(removed);
+		}
+***REMOVED***
+		// Copies
+		var more = $('<span class="more">');
+		if (data.names.length > 1)
+			more.append('Represents ' + data.names.length + ' tables');
 ***REMOVED***
 		// Table
 		var inner = $('<div class="inner">');
-		inner.append('<h2>' + current + '</h2>');
+		inner.append('<h2>' + data.names[0] + '</h2>');
+		inner.append(more);
 		inner.append(difference);
 ***REMOVED***
 		// Information about descendants
 		var paragraph = '<p>';
-		var number = children[current] ? children[current].length : 0;
-		if (amounts[current] > number)
-			paragraph += amounts[current] + ' tables ';
+		var number = data.children ? data.children.length : 0;
+		if (data.amount > number)
+			paragraph += data.amount + ' tables ';
 		if (number)
 			paragraph += number + (number > 1 ? ' children' : ' child');
 		paragraph += '</p>';
 		inner.append(paragraph);
 ***REMOVED***
 		// Wrapper containing table and children
-		var table = $('<div class="table" id="' + current + '">');
+		var table = $('<div class="table" id="' + data.id + '">');
 		table.append(inner);
 		table.append('<br>');
 		table.append('<div class="children">');
 ***REMOVED***
 		// Append to parent
-		var container = parent ? $('#' + escape(parent) + ' > .children') : element;
-		container.append(table);
+		if (parent) {
+			$('#' + escape(parent) + ' > .children').append(table);
+		} else {
+			element.append(table);
+			document.title = data.names[0];
+		}
 	}
 ***REMOVED***
 	function toggle(table) {
-		var tablebox = $('#' + escape(table));
-		var childrenbox = tablebox.children('.children');
-		var innerbox = tablebox.children('.inner');
+		var url = 'http://localhost:8080/fetcher/' + table + '/children';
+		$.getJSON(url).done(function(children) {
+			// Containers
+			var tablebox = $('#' + escape(table));
+			var childrenbox = tablebox.children('.children');
+			var innerbox = tablebox.children('.inner');
 ***REMOVED***
-		// Keep view
-		var oldoffset = innerbox.offset();
+			// Keep view
+			var oldoffset = innerbox.offset();
 ***REMOVED***
-		// Load children
-		var empty = childrenbox.children().length < 1;
-		if (empty)
-			for (var i = 0; i < children[table].length; ++i)
-				node(children[table][i], table);
+			// Load children
+			if (!childrenbox.children().length) {
+				_.each(children, function(child) {
+					node(child, table);
+				});
+			}
 ***REMOVED***
-		// Expand or collapse
-		if (childrenbox.hasClass('visible')) {
-			// Remove line connections
-			childrenbox.children().each(function() {
-				var key = $(this).attr('id');
-				connections[key].remove();
-				delete connections[key];
+			// Expand or collapse
+			if (childrenbox.hasClass('visible')) {
+				// Remove line connections
+				childrenbox.children().each(function() {
+					var key = $(this).attr('id');
+					connections[key].remove();
+					delete connections[key];
+				});
+***REMOVED***
+				// Hide
+				childrenbox.removeClass('visible');
+			} else {
+				// Show
+				childrenbox.addClass('visible');
+***REMOVED***
+				// Add line connections
+				childrenbox.children().each(function() {
+					var key = $(this).attr('id');
+					connections[key] = Connection(tablebox, $(this), innerbox);
+				});
+			}
+***REMOVED***
+			// Restore view
+			var newoffset = innerbox.offset();
+			$('body').scrollTop($('body').scrollTop() - (oldoffset.top - newoffset.top));
+			$('body').scrollLeft($('body').scrollLeft() - (oldoffset.left - newoffset.left));
+***REMOVED***
+			// Update all connections
+			_.each(connections, function(connection) {
+				connection.update();
 			});
-***REMOVED***
-			// Hide
-			childrenbox.removeClass('visible');
-		} else {
-			// Show
-			childrenbox.addClass('visible');
-***REMOVED***
-			// Add line connections
-			childrenbox.children().each(function() {
-				var key = $(this).attr('id');
-				connections[key] = Connection(tablebox, $(this), innerbox);
-			});
-		}
-***REMOVED***
-		// Restore view
-		var newoffset = innerbox.offset();
-		$('body').scrollTop($('body').scrollTop() - (oldoffset.top - newoffset.top));
-		$('body').scrollLeft($('body').scrollLeft() - (oldoffset.left - newoffset.left));
-***REMOVED***
-		// Update all connections
-		_.each(connections, function(connection) {
-			connection.update();
+		}).error(function(error) {
+			$('.loading').text('An error occured.');
+			console.error(error);
 		});
 	}
 ***REMOVED***
 	function main(container, root) {
 		initialize(container, root);
-		node(root);
-***REMOVED***
-		// Open first level of children
+		
+		// Expand first level of children
 		$('#' + escape(root) + ' > .inner').click();
 	}
 ***REMOVED***
