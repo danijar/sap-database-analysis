@@ -171,13 +171,13 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 				popup.append('<p class="more">Other names are ' + names + '.</p>');
 			}
 ***REMOVED***
-			var rows = '<table><thead><tr><th>Name</th><th>Key</th><th>Type</th><th>Length</th><th>Role</th></tr></thead>';
+			var rows = '<table><thead><tr><th>Name</th><th>Key</th><th>Type</th><th>Length</th><th>Domain</th><th>Role</th></tr></thead>';
 			rows += '<tbody>';
 			_.each(fields, function(field) {
 				var key = '';
 				if (field.key)
 					key = '<span class="key"></span>';
-				rows += '<tr><td>' + field.name + '</td><td>' + key + '</td><td>' + field.type + '</td><td>' + field.length + '</td><td>' + field.role + '</tr>';
+				rows += '<tr><td>' + field.name + '</td><td>' + key + '</td><td>' + field.type + '</td><td>' + field.length + '</td><td>' + field.domain + '</td><td>' + field.role + '</tr>';
 			});
 			rows += '</tbody></table>'
 			popup.append(rows);
