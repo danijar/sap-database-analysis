@@ -166,7 +166,7 @@ public class fetcher extends HttpServlet {
 	}
 	
 	public static String getAllChildrenData(String id, java.sql.Connection connection) throws SQLException {
-		String childrenData = "[";
+		String childrenData = "{";
 		// Get all children from DB
 		Statement stmt = connection.createStatement();
 		String childrenQuery = "SELECT CHILD FROM ABAP.ANALYSIS_CHILDREN WHERE ID='" + id + "'";
@@ -175,11 +175,11 @@ public class fetcher extends HttpServlet {
 		String delim = "";
 		while (rs.next()) {
 			childrenData += delim;
-			childrenData += getSummary(rs.getString("CHILD"), connection);
+			childrenData += "\"" + rs.getString("CHILD") + "\":" + getSummary(rs.getString("CHILD"), connection);
 			delim = ",";
 		}
 		
-		childrenData += "]";		
+		childrenData += "}";		
 		return childrenData;
 	}
 	
