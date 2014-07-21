@@ -72,10 +72,12 @@ public class fetcher extends HttpServlet {
 				res += ",\"" + rsmd.getColumnLabel(2).toLowerCase() + "\":false";
 			else
 				res += ",\"" + rsmd.getColumnLabel(2).toLowerCase() + "\":true";
-			
+					
 			for (int i = 3; i < fetch_len+1; i++) {
-				res += ",\"" + rsmd.getColumnLabel(i).toLowerCase() + "\":\"" + rs.getString(i) + "\"";
-				
+				if(rsmd.getColumnLabel(i).equals("LENGTH"))
+					res += ",\"" + rsmd.getColumnLabel(i).toLowerCase() + "\":" + rs.getInt(i) + "";
+				else
+					res += ",\"" + rsmd.getColumnLabel(i).toLowerCase() + "\":\"" + rs.getString(i) + "\"";
 			}
 			delim = ",";
 			res += "}";
@@ -239,10 +241,20 @@ public class fetcher extends HttpServlet {
 		return childrenData;
 	}
 	
+//	private static Stat fetch_children_names = null;
+//	private static PreparedStatement fetch_children_amounts = null;
+	
 	public static String getAllChildrenSummary(String id, java.sql.Connection connection) throws SQLException {
 		if(children_stmt == null) {
-			children_stmt = connection.prepareStatement("SELECT CHILD FROM ABAP.ANALYSIS_CHILDREN WHERE ID= ?");
+			children_stmt = connection.prepareStatement("SELECT CHILD FROM ABAP.ANALYSIS_CHILDREN WHERE ID=?");
 		}
+		//if(fetch_children_names == null) {
+		Statement fetch_children_names = connection.createStatement();
+		Statement fetch_children_amounts = connection.createStatement();
+	
+		//	fetch_children_names = connection.prepareStatement("SELECT name, id FROM ABAP.ANALYSIS_NAMES WHERE id IN (?)");
+		//	fetch_children_amounts = connection.prepareStatement("SELECT amount FROM ABAP.ANALYSIS_META WHERE id IN (?)");
+		//}
 		
 		String childrenData = "{";
 		// Get all children from DB
@@ -250,11 +262,51 @@ public class fetcher extends HttpServlet {
 		ResultSet rs = children_stmt.executeQuery();
 		
 		String delim = "";
+	
+		String fetch_children_n_query = "SELECT name, id FROM ABAP.ANALYSIS_NAMES WHERE id IN ("; //= "(";
+		String fetch_children_a_query = "SELECT amount FROM ABAP.ANALYSIS_META WHERE id IN ("; //= "(";
 		while (rs.next()) {
-			childrenData += delim;
-			childrenData += "\"" + rs.getString("CHILD") + "\":" + getSummary(rs.getString("CHILD"), connection);
+			// Generate all ids
+			fetch_children_n_query += delim + rs.getString("CHILD");
+			fetch_children_a_query += delim + rs.getString("CHILD");
 			delim = ",";
 		}
+		fetch_children_n_query += ")";
+		fetch_children_a_query += ")";
+//		System.out.println("Ids: " + fetch_children_n_query);
+//		
+//		fetch_children_names.setString(1, fetch_children_n_query);
+//		fetch_children_amounts.setString(1, fetch_children_n_query);
+//		
+		
+		String lastID = "";
+		String mapEnd = "";
+		String names  = "";
+	//	System.out.println(fetch_children_names.toString());
+		ResultSet namesSet	= fetch_children_names.executeQuery(fetch_children_n_query);
+		ResultSet amountSet = fetch_children_amounts.executeQuery(fetch_children_a_query);
+	//	System.out.println("test");
+		delim = "";
+		while(namesSet.next()) {
+			if(!lastID.equals(namesSet.getString("id"))) {
+				if(!lastID.isEmpty()) {
+					delim = "";
+					amountSet.next();
+					childrenData += mapEnd + "\"" + lastID + "\":{\"id\":" + lastID + ","
+							 + "\"names\":[" + names + "],"
+							 + "\"amount\":" + amountSet.getString("amount") + "}";
+					mapEnd = ",";
+					names = "";
+				}
+				
+				lastID = namesSet.getString("id");
+			}
+			
+			//ystem.out.println("1");
+			names += delim;
+			names += "\"" + namesSet.getString(1) +"\"";
+			delim = ",";
+		} 
 		
 		childrenData += "}";		
 		return childrenData;
