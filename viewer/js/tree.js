@@ -58,16 +58,16 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			});
 			difference.append(added);
 		}
-		if (data.added.length) {
+		if (data.removed.length) {
 			var removed = $('<ul class="removed">');
-			_.each(data.added.sort(), function(field) {
+			_.each(data.removed.sort(), function(field) {
 				removed.append('<li>' + field + '</li>');
 			});
 			difference.append(removed);
 		}
 ***REMOVED***
 		// Copies
-		var more = $('<span class="more">');
+		var more = $('<p class="more">');
 		if (data.names.length > 1)
 			more.append('Represents ' + data.names.length + ' tables');
 ***REMOVED***
@@ -164,12 +164,15 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 ***REMOVED***
 			popup.append('<h1>' + datas[table].names[0] + '</h1>');
 ***REMOVED***
+			var header = $('<p>');
 			if (datas[table].names.length > 1) {
 				names = datas[table].names[1];
 				for (var i = 2; i < datas[table].names.length; i++)
 					names += ', ' + datas[table].names[i];
-				popup.append('<p class="more">Other names are ' + names + '.</p>');
+				header.append('Other names are ' + names + '. ');
 			}
+			header.append('You can open <a href="/viewer/#/table/' + table + '" target="_blank" class="gray">this table</a> in a new tab.');
+			popup.append(header);
 ***REMOVED***
 			var rows = '<table><thead><tr><th>Name</th><th>Key</th><th>Type</th><th>Length</th><th>Domain</th><th>Role</th></tr></thead>';
 			rows += '<tbody>';
@@ -181,6 +184,14 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			});
 			rows += '</tbody></table>'
 			popup.append(rows);
+***REMOVED***
+			var keys = _.where(fields, { key: true }).length;
+			if (keys)
+				keys = keys.toString();
+			else
+				keys = 'none';
+			var footer = '<p>The table consists of ' + fields.length + ' columns, with ' + keys + ' of them being keys.</p>';
+			popup.append(footer);
 		}).error(console.error);
 	}
 ***REMOVED***
