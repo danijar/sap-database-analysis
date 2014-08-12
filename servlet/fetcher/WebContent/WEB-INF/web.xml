@@ -12,6 +12,10 @@
   <servlet>	
    <servlet-name>Fetcher</servlet-name>
    <servlet-class>epic.fetcher</servlet-class>
+   <init-param>
+        <param-name>DBPrefix</param-name>
+        <param-value>SSUITE</param-value>
+   </init-param>
 </servlet>
 <servlet-mapping>
     <servlet-name>Fetcher</servlet-name>
