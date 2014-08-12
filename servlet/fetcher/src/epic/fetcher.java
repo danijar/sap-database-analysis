@@ -12,6 +12,8 @@ import java.sql.Types;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 ***REMOVED***
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,11 +25,18 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/fetcher")
 public class fetcher extends HttpServlet {
 	/**
-	 * 
+	 * Implements an excess to the result tables for the web viewer
 	 */
 	private static final long serialVersionUID = 1L;
 ***REMOVED***
-***REMOVED***
+	// Save the prefix of the DB here
+	// This is set via init and parameters from the config file
+	private static String db_prefix = "ABAP";
+	
+	public void init(ServletConfig servletConfig) throws ServletException{
+	    this.db_prefix = servletConfig.getInitParameter("DBPrefix");
+	    System.out.println("This was the paramter " + this.db_prefix);
+	}
 ***REMOVED***
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws MalformedURLException, IOException {
@@ -39,8 +48,9 @@ public class fetcher extends HttpServlet {
         doProcess(request, response);
     }
     
+    
+    // Fetch raw DD03L values from db
 	public static String fetch_from_DB(String tabID, java.sql.Connection connection) throws SQLException {
-		
 		Statement stmt = connection.createStatement();
 		ResultSet tabNameSet = stmt.executeQuery("SELECT NAME FROM ABAP.ANALYSIS_NAMES WHERE ID='" + tabID + "'");
 		String tabname = "";
@@ -52,9 +62,8 @@ public class fetcher extends HttpServlet {
 			return "";
 		}
 		
-		
-		String query = "SELECT FIELDNAME AS name, KEYFLAG AS key, ROLLNAME AS role, DOMNAME as domain, DATATYPE as type, LENG as length FROM ABAP.DD03L WHERE TABNAME='" + tabname + "' ORDER BY POSITION ASC"; 
-		//System.out.println("Tabname is " + tabname);
+		String query = "SELECT FIELDNAME AS name, KEYFLAG AS key, ROLLNAME AS role, DOMNAME as domain, DATATYPE as type, LENG as length FROM " + db_prefix + ".DD03L WHERE TABNAME='" + tabname + "' ORDER BY POSITION ASC"; 
+***REMOVED***
 		ResultSet rs = stmt.executeQuery(query);
 		ResultSetMetaData rsmd = rs.getMetaData();
 		
@@ -81,23 +90,19 @@ public class fetcher extends HttpServlet {
 			}
 			delim = ",";
 			res += "}";
-		//	System.out.print("\n");
 		}
-		//System.out.println("balldalkf" + rs.toString());
 		res += "]";
 		return res;
 	}
 	
+	// 	Fetch single data fileds from DB and do net translate boolean to true, false
 	public static String fetch_single(String id, java.sql.Connection connection, PreparedStatement prepStatement) throws SQLException {
 		return fetch_single(id, connection, prepStatement, false);
 	}
 	
 	
+	// 	Fetch single data fileds from DB
 	public static String fetch_single(String id, java.sql.Connection connection, PreparedStatement prepStatement, boolean translate_boolean) throws SQLException {
-		//Statement stmt = connection.createStatement();
-		
-		//String query = "SELECT " + field + " FROM ABAP.ANALYSIS_META WHERE ID='" + id + "'"; 
-		//System.out.println("Tabname is " + tabname);
 		prepStatement.setString(1, id);
 		ResultSet rs = prepStatement.executeQuery();
 		ResultSetMetaData rsmd = rs.getMetaData();
@@ -127,6 +132,7 @@ public class fetcher extends HttpServlet {
 		return res;
 	}
 	
+	// Fetch fields from the result table and return JSON arrays
 	public static String fetch_array(String id, java.sql.Connection connection, PreparedStatement prepStatement) throws SQLException {	
 		prepStatement.setString(1, id);
 		
@@ -134,7 +140,6 @@ public class fetcher extends HttpServlet {
 		ResultSetMetaData rsmd = rs.getMetaData();
 		
 		String res = "[";
-		//boolean first = true;
 		String delim = "";
 		while (rs.next()) {		
 			res += delim;
@@ -146,12 +151,13 @@ public class fetcher extends HttpServlet {
 			
 			delim = ",";
 		}
-		//System.out.println("balldalkf" + rs.toString());
 		res += "]";
 		
 		return res;
 	}
 	
+	
+	// Use static prepared statements for faster execution and less memory use
 	private static PreparedStatement fetch_names_stmt = null;
 	private static PreparedStatement fetch_amount_stmt = null;
 	private static PreparedStatement fetch_ratio_stmt = null;
@@ -220,6 +226,7 @@ public class fetcher extends HttpServlet {
 	
 	private static PreparedStatement children_stmt = null;
 	
+	// Get the details of all children of a certain talbe
 	public static String getAllChildrenDetail(String id, java.sql.Connection connection) throws SQLException {
 		if(children_stmt == null) {
 			children_stmt = connection.prepareStatement("SELECT CHILD FROM ABAP.ANALYSIS_CHILDREN WHERE ID= ?");
@@ -241,20 +248,13 @@ public class fetcher extends HttpServlet {
 		return childrenData;
 	}
 	
-//	private static Stat fetch_children_names = null;
-//	private static PreparedStatement fetch_children_amounts = null;
-	
+	// Get a summary of all children of a certain table
 	public static String getAllChildrenSummary(String id, java.sql.Connection connection) throws SQLException {
 		if(children_stmt == null) {
 			children_stmt = connection.prepareStatement("SELECT CHILD FROM ABAP.ANALYSIS_CHILDREN WHERE ID=?");
 		}
-		//if(fetch_children_names == null) {
 		Statement fetch_children_names = connection.createStatement();
 		Statement fetch_children_amounts = connection.createStatement();
-	
-		//	fetch_children_names = connection.prepareStatement("SELECT name, id FROM ABAP.ANALYSIS_NAMES WHERE id IN (?)");
-		//	fetch_children_amounts = connection.prepareStatement("SELECT amount FROM ABAP.ANALYSIS_META WHERE id IN (?)");
-		//}
 		
 		String childrenData = "{";
 		// Get all children from DB
@@ -273,19 +273,14 @@ public class fetcher extends HttpServlet {
 		}
 		fetch_children_n_query += ")";
 		fetch_children_a_query += ")";
-//		System.out.println("Ids: " + fetch_children_n_query);
-//		
-//		fetch_children_names.setString(1, fetch_children_n_query);
-//		fetch_children_amounts.setString(1, fetch_children_n_query);
-//		
-		
+***REMOVED***
 		String lastID = "";
 		String mapEnd = "";
 		String names  = "";
-	//	System.out.println(fetch_children_names.toString());
+***REMOVED***
 		ResultSet namesSet	= fetch_children_names.executeQuery(fetch_children_n_query);
 		ResultSet amountSet = fetch_children_amounts.executeQuery(fetch_children_a_query);
-	//	System.out.println("test");
+***REMOVED***
 		delim = "";
 		while(namesSet.next()) {
 			if(!lastID.equals(namesSet.getString("id"))) {
@@ -301,8 +296,6 @@ public class fetcher extends HttpServlet {
 				
 				lastID = namesSet.getString("id");
 			}
-			
-			//ystem.out.println("1");
 			names += delim;
 			names += "\"" + namesSet.getString(1) +"\"";
 			delim = ",";
@@ -312,6 +305,7 @@ public class fetcher extends HttpServlet {
 		return childrenData;
 	}
 	
+	// Handle HTTP request and return JSON values depending on the query
 	public static void doProcess(HttpServletRequest request,
             HttpServletResponse response) throws IOException {
 		
@@ -326,6 +320,7 @@ public class fetcher extends HttpServlet {
 			return;
 		}
 		
+		// Get operation and (if any) suboperation out of the query to implement REST-like API
 		String tabID 		= m.group(1);
 		String operation 	= "";
 		if(m.group(2) != null)
@@ -335,17 +330,16 @@ public class fetcher extends HttpServlet {
 			sub_operation += m.group(3).substring(1);
 		
 		if(tabID == "") {
-			System.out.println("Got wrong query tabID was " + (tabID != "") + " and operation was " + (operation != ""));
+		//	System.out.println("Got wrong query tabID was " + (tabID != "") + " and operation was " + (operation != ""));
+			// Return error code
 			response.setStatus(400);
 			return;
 		}
 		if(operation == "")
 			operation = "detail";
 			
-		//System.out.println("Request was: " + tabID + "\t" + operation + "|" + sub_operation);
-		
+		// Init printer and set response header for cross origin use
 		PrintWriter output = null;
-		
 		response.setContentType("application/json");	
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		response.setStatus(200);
@@ -359,7 +353,7 @@ public class fetcher extends HttpServlet {
 		
 		String result = "";
 		try {
-					
+			// Open DB connection and execute fetch	depending on requested operation
 			Class.forName("com.sap.db.jdbc.Driver");     	
 			java.sql.Connection conn = java.sql.DriverManager.getConnection("jdbc:sap://***REMOVED***","***REMOVED***","***REMOVED***");    	
 			
@@ -404,7 +398,6 @@ public class fetcher extends HttpServlet {
 			e.printStackTrace();
 			response.setStatus(500);
 		}
-		
 		//System.out.println("Response was : " + result);
 		output.println(result);
 	}
