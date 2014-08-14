@@ -16,7 +16,7 @@
 class Structures
 {
 public:
-	Structures(Ratios &Ratios, Hierarchy &Hierarchy, std::string Path = "data/structures.dump");
+	Structures(Ratios &Ratios, Hierarchy &Hierarchy, std::string Path = "data/structures.dump", bool ForceFetch = false);
 	void Fetch(bool Output = false);
 	bool Load(std::string Path = "data/structures.dump");
 	bool Save(std::string Path = "data/structures.dump");

@@ -60,14 +60,14 @@ namespace Queries {
 ***REMOVED***
 		// Count number of rows
 		int count = 0;
-		*Query("SELECT COUNT(*) FROM ABAP.RESULT_V1") >> count;
+		*Query("SELECT COUNT(*) FROM " + DBSchema + "." + InputTable) >> count;
 		if (!count) {
 			cerr << "No ratios found in database." << endl;
 			return rows;
 		}
 ***REMOVED***
 		// Read results table into array
-		auto query = Query("SELECT parent, child, parent_ratio, child_ratio FROM ABAP.RESULT_V1 ORDER BY (parent_ratio + child_ratio) DESC, parent, child");
+		auto query = Query("SELECT parent, child, parent_ratio, child_ratio FROM " + DBSchema + "." + InputTable + " ORDER BY (parent_ratio + child_ratio) DESC, parent, child");
 		for (Bar bar("Query ratios", count); !query->eof(); bar++) {
 			Ratio ratio;
 			*query >> ratio.parent >> ratio.child >> ratio.parentratio >> ratio.childratio;
@@ -84,14 +84,14 @@ namespace Queries {
 ***REMOVED***
 		// Count number of fields in result
 		int count;
-		*Query("SELECT COUNT(*) FROM ABAP.DD03L WHERE TABNAME = '" + Table + "'") >> count;
+		*Query("SELECT COUNT(*) FROM " + DBSchema + "." + FieldsTable + " WHERE TABNAME = '" + Table + "'") >> count;
 		if (!count) {
 			cerr << "No fields found in database." << endl;
 			return rows;
 		}
 ***REMOVED***
 		// Read fields into array
-		auto query = Query("SELECT fieldname, rollname, domname, position FROM ABAP.DD03L WHERE TABNAME = '" + Table + "'");
+		auto query = Query("SELECT fieldname, rollname, domname, position FROM " + DBSchema + "." + FieldsTable + " WHERE TABNAME = '" + Table + "'");
 		for (Bar bar("Query fields", count); !query->eof(); bar++) {
 			Field current;
 			string position;
@@ -115,7 +115,7 @@ namespace Queries {
 ***REMOVED***
 		// Count number of result fields
 		int count;
-		*Query("SELECT COUNT(*) FROM ABAP.DD03L WHERE TABNAME IN (" + tables + ")") >> count;
+		*Query("SELECT COUNT(*) FROM " + DBSchema + "." + FieldsTable + " WHERE TABNAME IN (" + tables + ")") >> count;
 		if (!count) {
 			cerr << "No structures found in database." << endl;
 			return result;
@@ -123,7 +123,7 @@ namespace Queries {
 ***REMOVED***
 		// Read structures into array
 		result.reserve(count);
-		auto query = Query("SELECT tabname, fieldname, rollname, domname, position FROM ABAP.DD03L WHERE TABNAME IN (" + tables + ")");
+		auto query = Query("SELECT tabname, fieldname, rollname, domname, position FROM " + DBSchema + "." + FieldsTable + " WHERE TABNAME IN (" + tables + ")");
 		for (Bar bar("Query structures", count); !query->eof(); bar++) {
 			Field current;
 			string table, position;
@@ -147,7 +147,7 @@ namespace Queries {
 	void Create()
 	{
 		// Create table schema for storing results
-		const string prefix = "ABAP.ANALYSIS";
+		const string prefix = DBSchema + "." + OutputPrefix;
 		Table(prefix + "_META",     "id INT, amount INT, ratio FLOAT, changes FLOAT, removing TINYINT, PRIMARY KEY(id)");
 		Table(prefix + "_NAMES",    "id INT, name VARCHAR(128)");
 		Table(prefix + "_CHILDREN", "id INT, child INT");
@@ -167,7 +167,7 @@ namespace Queries {
 	{
 		int id = (int)Id;
 ***REMOVED***
-		const string prefix = "ABAP.ANALYSIS";
+		const string prefix = DBSchema + "." + OutputPrefix;
 		const size_t bulksize = 500;
 ***REMOVED***
 		bool result = Catch([&] {
