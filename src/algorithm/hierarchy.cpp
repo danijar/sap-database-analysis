@@ -5,10 +5,10 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor
-Hierarchy::Hierarchy(Ratios &Ratios, string Path) : ids(Ratios.ids), names(Ratios.names), ratios(Ratios.ratios)
+Hierarchy::Hierarchy(Ratios &Ratios, string Path, bool ForceFetch) : ids(Ratios.ids), names(Ratios.names), ratios(Ratios.ratios)
 {
 	// Try to load dump
-	if (Load(Path)) {
+	if (Load(Path) && !ForceFetch) {
 		cout << "Loaded cached hierarchy." << endl;
 		return;
 	}
