@@ -5,10 +5,10 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor checks dump and fetch data
-Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path) : ratios(Ratios), hierarchy(Hierarchy)
+Structures::Structures(Ratios &Ratios, Hierarchy &Hierarchy, string Path, bool ForceFetch) : ratios(Ratios), hierarchy(Hierarchy)
 {
 	// Try to load dump
-	if (Load(Path)) {
+	if (Load(Path) && !ForceFetch) {
 		cout << "Loaded cached schemata." << endl;
 		return;
 	}
