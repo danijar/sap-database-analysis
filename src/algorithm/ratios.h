@@ -10,7 +10,7 @@
  */
 class Ratios {
 public:
-	Ratios(std::string Path = "data/ratios.dump");
+	Ratios(std::string Path = "data/ratios.dump", bool ForceFetch = false);
 	void Fetch(bool Output = false);
 	bool Load(std::string Path = "data/ratios.dump");
 	bool Save(std::string Path = "data/ratios.dump");
