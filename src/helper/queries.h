@@ -18,9 +18,15 @@ namespace Queries {
 	using namespace std;
 ***REMOVED***
 	// Global connection information
-	static string Dsn = "***REMOVED***";
-	static string User = "***REMOVED***";
-	static string Password = "***REMOVED***";
+	static string Dsn		= "***REMOVED***";
+	static string User		= "***REMOVED***";
+	static string Password	= "***REMOVED***";
+***REMOVED***
+	static string DBSchema		= "ABAP";
+	static string InputTable	= "RESULT_V1";
+	static string FieldsTable	= "DD03L";
+	static string OutputPrefix	= "ANALYSIS";
+***REMOVED***
 	static otl_connect db;
 ***REMOVED***
 	// Helper functions

@@ -10,10 +10,10 @@ using namespace std;
 ***REMOVED***
 ***REMOVED***
 // Constructor checks for dump or queries
-Ratios::Ratios(string Path)
+Ratios::Ratios(string Path, bool ForceFetch)
 {
 	// Try to load dump
-	if (Load(Path)) {
+	if (Load(Path) && !ForceFetch) {
 		cout << "Loaded cached ratios." << endl;
 		return;
 	}

@@ -12,7 +12,7 @@
  */
 class Hierarchy {
 public:
-	Hierarchy(Ratios &Ratios, std::string Path = "data/hierarchy.dump");
+	Hierarchy(Ratios &Ratios, std::string Path = "data/hierarchy.dump", bool ForceFetch = false);
 	bool Load(std::string Path = "data/hierarchy.dump");
 	bool Save(std::string Path = "data/hierarchy.dump");
 	bool Saved(std::string Path = "data/hierarchy.dump");

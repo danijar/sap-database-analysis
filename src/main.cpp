@@ -13,18 +13,99 @@
 #include "helper/bar.h"
 using namespace std;
 ***REMOVED***
+void storeInDB(size_t tabID, Hierarchy hierarchy, Structures structures) {
+	// Reset tables
+	Queries::Create();
 ***REMOVED***
-int main()
+	// Fill with all tables in cluster
+	unordered_set<size_t> subchildren = hierarchy.Subchildren(tabID);
+	subchildren.insert(tabID);
+	Bar bar("Store", subchildren.size());
+	for (auto i = subchildren.begin(); i != subchildren.end(); i++, bar++) {
+		// Compute ratio to parent
+		float ratio = 0.0f;
+		for (size_t j = 0; j < hierarchy.children.size(); ++j) {
+			if (hierarchy.children[j].find(*i) != hierarchy.children[j].end()) {
+				ratio = hierarchy.ratios[j][*i];
+				break;
+			}
+		}
+***REMOVED***
+		// Insert into database
+		bool result = Queries::Store(*i,
+			hierarchy.names[*i],
+			hierarchy.children[*i],
+			structures.added[*i],
+			structures.removed[*i],
+			hierarchy.amounts[*i],
+			ratio,
+			structures.changes[*i],
+			structures.removing[*i]
+			);
+	}
+	bar.Finish();
+}
+***REMOVED***
+***REMOVED***
+void loadConfig() {
+	ifstream dbConnectionFile("Settings.cfg");
+	if (!dbConnectionFile.good() || dbConnectionFile.eof())
+		return;
+	
+	char keyBuffer[200];
+	char valueBuffer[200];
+	while (!dbConnectionFile.eof()) {
+		// Read identifier
+		dbConnectionFile.getline(keyBuffer, 200);
+		if (!dbConnectionFile.good() || dbConnectionFile.eof())
+			return;
+		// Now the next value and assing
+		dbConnectionFile.getline(valueBuffer, 200);
+***REMOVED***
+		if (strcmp(keyBuffer, "Dsn:") == 0) {
+			Queries::Dsn = string(valueBuffer);
+		}
+		if (strcmp(keyBuffer, "User:") == 0) {
+			Queries::User = string(valueBuffer);
+		}
+		if (strcmp(keyBuffer, "Password:") == 0) {
+			Queries::Password = string(valueBuffer);
+		}
+		if (strcmp(keyBuffer, "DBSchema:") == 0) {
+			Queries::DBSchema = string(valueBuffer);
+		}
+		if (strcmp(keyBuffer, "InputTable:") == 0) {
+			Queries::InputTable = string(valueBuffer);
+		}
+		if (strcmp(keyBuffer, "FieldsTable:") == 0) {
+			Queries::FieldsTable = string(valueBuffer);
+		}
+		if (strcmp(keyBuffer, "OutputPrefix:") == 0) {
+			Queries::OutputPrefix = string(valueBuffer);
+		}
+	}
+***REMOVED***
+}
+***REMOVED***
+int main(int argc, char *argv[])
 {
 	// Database credentials
 	Queries::Dsn = "***REMOVED***";
 	Queries::User = "***REMOVED***";
 	Queries::Password = "***REMOVED***";
 ***REMOVED***
+	// Load from files if possible
+	loadConfig();
 	// Compute ratio graph, hierarchy and differences
-	Ratios ratios;
-	Hierarchy hierarchy(ratios);
-	Structures structures(ratios, hierarchy);
+	bool	force_fetch = false;
+***REMOVED***
+	if (argc > 1 && strcmp(argv[1], "clean") == 0) {
+		force_fetch = true;
+	}
+***REMOVED***
+	Ratios ratios("data/ratios.dump", force_fetch);
+	Hierarchy hierarchy(ratios, "data/hierarchy.dump", force_fetch);
+	Structures structures(ratios, hierarchy, "data/structures.dump", force_fetch);
 ***REMOVED***
 	/*
 	// Benchmark structure generation
@@ -47,6 +128,12 @@ int main()
 	cin.get();
 	*/
 	
+	// Check if only need to export
+	if (argc > 1 && strcmp(argv[argc-1], "export") == 0) {
+		storeInDB(0, hierarchy, structures);
+		return 1;
+	}
+***REMOVED***
 	// Navigate through hierarchie
 	Navigator navigator(hierarchy, structures);
 }
