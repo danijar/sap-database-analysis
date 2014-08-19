@@ -396,6 +396,10 @@
 % Big 0 Notation
 \newcommand{\BigO}[1]{\ensuremath{\operatorname{O}\bigl(#1\bigr)}}
 ***REMOVED***
+\usepackage{float}
+%\floatstyle{boxed} % Box...
+%\restylefloat{figure}% ...figure environment contents.
+***REMOVED***
 \begin{document}
 %
 % paper title
@@ -598,7 +602,6 @@ Subsubsection text here.
 ***REMOVED***
 ***REMOVED***
 \section{The input data}
-***REMOVED***
 \IEEEPARstart{T}{he} algorithm works on a set of peer-to-peer compares of tables in a database scheme. The input data need the following characteristics to work with the algorithm: Be $S$ the database scheme and $T_a$, $T_b$ tables from this scheme, so has the input data the following character 
 $$\{T_a, T_b \in S | (T_a, T_b, \delta_{parent\_ratio}(T_a, T_b),\delta_{child\_ratio}(T_a, T_b))\}$$\hspace{-300cm} 
 .\footnote{Überprüfen ob das nur ein beispiel für parent child ratio ist. eventuell mit tobi + alex absprechen, vielleicht sonst einfach als naives beispiel angeben} Whereby the $\delta_{parent\_ratio}(T_a, T_b)$ and $\delta_{child\_ratio}(T_a, T_b))$ are calculated by the following formula: $$\delta_{parent\_ratio}(T_a, T_b) = \frac{ | T_a \cap T_b |}{ | T_a |} $$ and  $$\delta_{child\_ratio}(T_a, T_b) = \frac{ | T_a \cap T_b |}{ | T_b |} $$\\
@@ -653,7 +656,13 @@ After the structure of the cluster was build up as described above, some importa
 \\\subsubsection{Calculation of the amounts}
 To get the size of a cluster and the amount of tables, which direct and indirect inherited from a certain parent table, at first a mapping from table to the amount of its children has build. This can easily be done by using $f\_children$: $$ f\_childrenamount: S \rightarrow \mathbb{N} $$ $$T \in domain(f\_children): f\_childrenamount(T) = | f\_children(T) | $$\\
 Now the size of each inheritance tree, where a certain table $T_root$ is the root node, can be calculated with a recursive, dynamic function:
-$$ f\_amount: S \rightarrow \mathbb{N} $$ $$T \in domain(f\_children): f\_amount(T) = $$ $$| f\_childrenamount(T) | + \sum_{child \in f\_chilren(T)}{f\_amount(child)} $$ For the size of a whole cluster just $f\_amount$ of the root node has to be calculated.
+***REMOVED***
+\begin{figure*}[h]
+\centering
+$$ f\_amount: S \rightarrow \mathbb{N} $$ $$T \in domain(f\_children): f\_amount(T) = | f\_childrenamount(T) | + \sum_{child \in f\_chilren(T)}{f\_amount(child)} $$ 
+\end{figure*}
+***REMOVED***
+For the size of a whole cluster just $f\_amount$ of the root node has to be calculated.
 \\\subsubsection{Calculation of the differences}
 To enable an in-deep analysis of the single relations between two tables, for each relation a compare of the fields is computed. Therefore for every of the both tables in the relation the table structure is retrieved from the database system and compared. Now the added and removed fields from parent to child are saved in new mappings:
 \begin{itemize}
@@ -706,6 +715,7 @@ For the example analysis the following deployment environment was used:\footnote
 \item A Java Servlet running on an Apache Tomcat server was used a data distributor, which delivered for a table the joined results as JSON data via a REST-full interface.
 \item The visualization was done by a single-page application implemented in Javascript, which lazy-loaded the data from the Java Servlet and made it possible to discover the hierarchy of the data interactive.
 \end{itemize}
+\footnote{Hier noch das Deploymentdiagram }
 \section{Summary}
 Gerade kein bock mehr :O
 ***REMOVED***
