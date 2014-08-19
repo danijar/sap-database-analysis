@@ -19,3 +19,8 @@
 *.dump
 *.json
 ***REMOVED***
+# Latex
+*.pdf
+*.aux
+*.log
+*.synctex.gz

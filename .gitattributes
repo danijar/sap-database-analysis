@@ -8,3 +8,4 @@
 *.png binary
 *.jar binary
 *.war binary
+*.pdf binary
