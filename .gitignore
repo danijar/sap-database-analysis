@@ -24,3 +24,7 @@
 *.aux
 *.log
 *.synctex.gz
+***REMOVED***
+# Visual Paradigm
+*.vpp.working
+*.vpp~1
