@@ -131,7 +131,7 @@
   % \graphicspath{{../pdf/}{../jpeg/}}
   % and their extensions so you won't have to specify these with
   % every instance of \includegraphics
-  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+  \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 \else
   % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
   % will default to the driver specified in the system graphics.cfg if no
@@ -396,7 +396,8 @@
 % Big 0 Notation
 \newcommand{\BigO}[1]{\ensuremath{\operatorname{O}\bigl(#1\bigr)}}
 ***REMOVED***
-\usepackage{float}
+%\usepackage{float}
+%\usepackage{multicol-floats}
 %\floatstyle{boxed} % Box...
 %\restylefloat{figure}% ...figure environment contents.
 ***REMOVED***
@@ -657,9 +658,12 @@ After the structure of the cluster was build up as described above, some importa
 To get the size of a cluster and the amount of tables, which direct and indirect inherited from a certain parent table, at first a mapping from table to the amount of its children has build. This can easily be done by using $f\_children$: $$ f\_childrenamount: S \rightarrow \mathbb{N} $$ $$T \in domain(f\_children): f\_childrenamount(T) = | f\_children(T) | $$\\
 Now the size of each inheritance tree, where a certain table $T_root$ is the root node, can be calculated with a recursive, dynamic function:
 ***REMOVED***
-\begin{figure*}[h]
+\begin{figure*}
 \centering
-$$ f\_amount: S \rightarrow \mathbb{N} $$ $$T \in domain(f\_children): f\_amount(T) = | f\_childrenamount(T) | + \sum_{child \in f\_chilren(T)}{f\_amount(child)} $$ 
+\begin{equation}
+\resizebox{.9\linewidth}{!}{$ f\_amount: S \rightarrow \mathbb{N} T \in domain(f\_children): f\_amount(T) = | f\_childrenamount(T) | + \sum_{child \in f\_chilren(T)}{f\_amount(child)} $ }
+\resizebox{.9\linewidth}{!}{$ f\_amount: S \rightarrow \mathbb{N} T \in domain(f\_children): f\_amount(T) = | f\_childrenamount(T) | + \sum_{child \in f\_chilren(T)}{f\_amount(child)} $ }
+\end{equation}
 \end{figure*}
 ***REMOVED***
 For the size of a whole cluster just $f\_amount$ of the root node has to be calculated.
@@ -683,7 +687,7 @@ As a result overall algorithm builds up and returns the following structures:
 Also a runtime analysis of the algorithm can be easily done, by analyzing the different steps of the algorithm:\\($n$ be the amount of relations in the input data, $p$ be the amount of parent nodes found in the cluster and $r$ be the amount of relations in the graph)
 \begin{enumerate}
 \item Summarizing copies and creating id mapping: \BigO{n}
-\item Identifying parents: \BigO{n*}
+\item Identifying parents: \BigO{n*1/log(n)} \footnote{zu ueberpruefen}
 \item Calculation the amount children: \BigO{p}
 \item Calculation the amount of nodes in the clusters (with caching): \BigO{p}
 \item Calculation of added and removed: \BigO{2r}
@@ -694,16 +698,36 @@ Because of $p \le r < n$ applies the overall runtime is about $ t \in $ \BigO{n*
 \subsection{Advantages}
 \IEEEPARstart{T}{he} algorithm has some advantages, when it comes to analyze and characterize huge amount of tables and relations among them. The runtime complexity is low compared to some more common clustering algorithms like k-means. Furthermore the output can be used to easily analyze the database scheme for a widespread set of task and request. Copies of tables are detected early in the process and handled as one table and in the end the assignment of different tables to the cluster is very clear. But the key advantage of this algorithm is that it runs on any kind of comparison between database tables if an input data can be generated, which fulfills the described format.
 \subsection{Shortcomings}
-One of the biggest shortcomings of the algorithm is that it mostly depends on the quality of the input data. Because the algorithm has to build up on already made compares of the tables there is no way of ensure a correct clustering, if it has not been ensured for the input data. Therefore it should not be used for raw, unchecked input data. but the input should have been sanity-checked before applying the algorithm. Another problem is that in its current state the algorithm identifies only one parent of a certain table. It might be needed and reasonable to check, if a table has more than one parent eventhough this would add much more complexity to the algorithm, because it has to be ensured, that a another child from the same parent is not identified as other parent, just because of its similarity. Here again the algorithm relies on the input data. And in some scenarios the fact that the algorithm creates disjoint clusters could become a disadvantage because sometimes you might have tables, which originated from more than one \textit{cluster parent}.
+One of the biggest shortcomings of the algorithm is that it mostly depends on the quality of the input data. Because the algorithm has to build up on already made compares of the tables there is no way of ensure a correct clustering, if it has not been ensured for the input data. Therefore it should not be used for raw, unchecked input data. but the input should have been sanity-checked before applying the algorithm. Another problem is that in its current state the algorithm identifies only one parent of a certain table. It might be needed and reasonable to check, if a table has more than one parent even though this would add much more complexity to the algorithm, because it has to be ensured, that a another child from the same parent is not identified as other parent, just because of its similarity. Here again the algorithm relies on the input data. And in some scenarios the fact that the algorithm creates disjoint clusters could become a disadvantage because sometimes you might have tables, which originated from more than one \textit{cluster parent}.
 \section{Patterns and statistics of example data}
 \IEEEPARstart{T}{ested} on input set from an example database scheme off an ERP system, some characteristic patterns and relations between the tables were found several times. Also some interesting insights about the structure was gained.
 \subsection{Characteristics of the sample data}
  anzahl der tabellen anzahl der vergleiche threshold bla bla bla blab
 \subsection{Patterns}
-***REMOVED***
-	hier nochmal unsere 6 patterns aus der vorlesung samt erkläreung am besten in subsubsections
-***REMOVED***
-\subsection{Statistics}
+\IEEEPARstart{T}here is a wide set of patterns in the relationships between the tables, which can be found several times throughout different clusters. The following patterns can be seen as an example of different steps a evolution of a database table. These steps are often modifications or changes that are not possible\footnote{hoert sich seltsam an} to the object-oriented model. The patterns where only analyzed between a parent table and it's respective children.
+\subsubsection{Inheritance:}
+\begin{figure}[h]
+\centering
+\includegraphics[width=1.5in]{SingleInheritance}
+\caption{Schema of single inheritance}
+\footnote{Hier die das UML Model}
+\end{figure}
+The most basic change between two tables is inheritance. This means that the child table consists out of the parent table but has additional table fields. It fits the inheritance relation known from the object-oriented model.
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{SingleInheritance_ex}
+\caption{Example of a single inheritance}
+\footnote{Hier die Beispiel, bei allen anderen gleiches schema}
+\end{figure}
+\subsubsection{Multiple inheritance:}
+Inheritance often occurs multiple times in one level of the cluster hierarchy. The parent table is used as a template for all its children and all these children share all the tables of the parent table. This is one of the clearest relations about how tables in one level of a cluster are connected. Especially small clusters with often are purely made of multiple or single inheritance.
+\subsubsection{Modification:}
+Modification is a pattern that is not possible in the common object-oriented model. A modification occurs in the relation between a parent and a child table, when the child not only has additional table fields but also misses some fields of the parent.
+\subsubsection{Renaming:}
+A renaming occurs when in the child table a certain table field was removed and is replaced by another, which has a different name but has an identical or similar domain name and data type. This often occurs multiple times in one level or step of a cluster and is an indicator that a table was used in a different context and therefore the field names had to been altered.
+\subsubsection{Implicit base table:}
+It occurs in the clusters that in one level it seems like a step or an base table is missing. This assumption can be drawn from the fact that all children tables in one level share a certain modification (addition and removing of table fields) compared to their respective base table, but a table with this certain modification is not in the input set. Therefore it can be concluded that in the modification of the children table from the base table, they all shared a certain prepossessing for which the result was not saved in the database.
+\section{Statistic:}
 For an example input set this characteristic was found:
 \footnote{Hier noch mal alle statistik die wir haben, charts, charts, charts :D }
 ***REMOVED***
@@ -717,8 +741,7 @@ For the example analysis the following deployment environment was used:\footnote
 \end{itemize}
 \footnote{Hier noch das Deploymentdiagram }
 \section{Summary}
-Gerade kein bock mehr :O
-***REMOVED***
+This paper describes an algorithm to analyze and categorize relations between tables in a database. The algorithm builds up on single relationships between the tables and builds up a set of distinct clusters. Each of the clusters has a tree hierarchy between the tables which is generated according to the input relations. The cluster are distinct and each has root table from which a chain of modification can be build up to any other table in the cluster. The clusters and the modifications between any root table and it's leafs are the output of this algorithm. They can be the foundation for further and more specific analysis of the table relations. Because the input data is only a set of relations between certain entities the algorithm can be used in a wide range of settings and applications.
 \section{Further use and development}
 Further development of the algorithm could include steps to detect inheritance from several parents and connections between the cluster as discussed above. Also a detection and inclusion of \textit{abstract parents}, as seen in \textit{Patterns} could be implemented. \\ In further projects the algorithm could be used together with statistics about the use of certain tables in a database scheme to rethink and restructure of certain aspects of the database scheme, to make it more efficient and reduce copies. Furthermore several patterns in a cluster or in the database system could be analyzed with an expert of this system, to make statements about the historic development of the system and to gain knowledge about how a further development can be shaped to improve the overall system.
 % if have a single appendix:
