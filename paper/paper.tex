@@ -651,21 +651,14 @@ This structure is achieved by the following algorithm, which is done for all dis
 \end{enumerate}
 With this processing every node has either a distinct parent node or is a cluster root node. Because the identification of the parent node is based only on $\delta_{parent\_ratio}$ its quality depends very much on the quality of $\delta_{parent\_ratio}$. 
 \\\subsection{Building a hierarchy}
-In the preprocessing a mapping was created, which gives for every distinct table a set of its children ($f\_children$), and the root nodes for the clusters identified. This itself represents already the complete internal structure of the database scheme. To obtain an overall structure of a clusters, it must only be traversed recursively with $f\_children$ starting at the respective root node. In addition the structure has also to be saved in a suited format, for example XML. Cluster, which consists out of only one table, can often be filtered out because there are irrelevant for a analysis of clusters and their inner structure. 
+In the preprocessing a mapping was created, which gives for every distinct table a set of its children ($f\_ch$), and the root nodes for the clusters identified. This itself represents already the complete internal structure of the database scheme. To obtain an overall structure of a clusters, it must only be traversed recursively with $f\_ch$ starting at the respective root node. In addition the structure has also to be saved in a suited format, for example XML. Cluster, which consists out of only one table, can often be filtered out because there are irrelevant for a analysis of clusters and their inner structure. 
 \\\subsection{Postprocessing}
 After the structure of the cluster was build up as described above, some important figures can be calculated for the clusters, which than can be used to analyze the data afterwords:
 \\\subsubsection{Calculation of the amounts}
-To get the size of a cluster and the amount of tables, which direct and indirect inherited from a certain parent table, at first a mapping from table to the amount of its children has build. This can easily be done by using $f\_children$: $$ f\_childrenamount: S \rightarrow \mathbb{N} $$ $$T \in domain(f\_children): f\_childrenamount(T) = | f\_children(T) | $$\\
-Now the size of each inheritance tree, where a certain table $T_root$ is the root node, can be calculated with a recursive, dynamic function:
-***REMOVED***
-\begin{figure*}
-\centering
-\begin{equation}
-\resizebox{.9\linewidth}{!}{$ f\_amount: S \rightarrow \mathbb{N} T \in domain(f\_children): f\_amount(T) = | f\_childrenamount(T) | + \sum_{child \in f\_chilren(T)}{f\_amount(child)} $ }
-\resizebox{.9\linewidth}{!}{$ f\_amount: S \rightarrow \mathbb{N} T \in domain(f\_children): f\_amount(T) = | f\_childrenamount(T) | + \sum_{child \in f\_chilren(T)}{f\_amount(child)} $ }
-\end{equation}
-\end{figure*}
-***REMOVED***
+To get the size of a cluster and the amount of tables, which direct and indirect inherited from a certain parent table, at first a mapping from table to the amount of its children has build. This can easily be done by using $f\_ch$: $$ f\_cham: S \rightarrow \mathbb{N} $$ $$T \in domain(f\_children): f\_cham(T) = | f\_ch(T) | $$\\
+Now the size of each inheritance tree, where a certain table $T_{root}$ is the root node, can be calculated with a recursive, dynamic function:
+$$ f\_am: S \rightarrow \mathbb{N} $$
+$$ T \in domain(f\_children): $$ $$f\_am(T) = | f\_cham(T) | + \sum_{child \in f\_ch(T)}{f\_am(child)} $$
 For the size of a whole cluster just $f\_amount$ of the root node has to be calculated.
 \\\subsubsection{Calculation of the differences}
 To enable an in-deep analysis of the single relations between two tables, for each relation a compare of the fields is computed. Therefore for every of the both tables in the relation the table structure is retrieved from the database system and compared. Now the added and removed fields from parent to child are saved in new mappings:
