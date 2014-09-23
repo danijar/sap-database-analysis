@@ -7,8 +7,8 @@
 #include "type/field.h"
 #include "algorithm/ratios.h"
 #include "algorithm/hierarchy.h"
-***REMOVED***
-***REMOVED***
+
+
 /*
 * Responsible for querying field data from database and
 * building a map of the tables and their fields and saving them
@@ -24,11 +24,11 @@ public:
 	void Generate();
 	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> Difference(size_t Parent, size_t Child);
 	std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> Difference(size_t Child);
-***REMOVED***
+
 	std::vector<std::unordered_set<std::string>> added, removed;
 	std::vector<float> changes;
 	std::vector<bool> removing;
-***REMOVED***
+
 private:
 	std::vector<std::unordered_set<Field>> structures;
 	Ratios &ratios;

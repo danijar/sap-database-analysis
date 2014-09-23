@@ -1,5 +1,5 @@
 package epic;
-***REMOVED***
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
@@ -11,14 +11,14 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-***REMOVED***
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-***REMOVED***
+
 /**
  * Servlet implementation class fetcher
  */
@@ -28,7 +28,7 @@ public class fetcher extends HttpServlet {
 	 * Implements an excess to the result tables for the web viewer
 	 */
 	private static final long serialVersionUID = 1L;
-***REMOVED***
+
 	// Save the prefix of the DB here
 	// This is set via init and parameters from the config file
 	private static String db_prefix = "ABAP";
@@ -37,12 +37,12 @@ public class fetcher extends HttpServlet {
 	    this.db_prefix = servletConfig.getInitParameter("DBPrefix");
 	    System.out.println("This was the paramter " + this.db_prefix);
 	}
-***REMOVED***
+
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws MalformedURLException, IOException {
         doProcess(request, response);
     }
-***REMOVED***
+
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws MalformedURLException, IOException {
         doProcess(request, response);
@@ -63,7 +63,7 @@ public class fetcher extends HttpServlet {
 		}
 		
 		String query = "SELECT FIELDNAME AS name, KEYFLAG AS key, ROLLNAME AS role, DOMNAME as domain, DATATYPE as type, LENG as length FROM " + db_prefix + ".DD03L WHERE TABNAME='" + tabname + "' ORDER BY POSITION ASC"; 
-***REMOVED***
+
 		ResultSet rs = stmt.executeQuery(query);
 		ResultSetMetaData rsmd = rs.getMetaData();
 		
@@ -273,14 +273,14 @@ public class fetcher extends HttpServlet {
 		}
 		fetch_children_n_query += ")";
 		fetch_children_a_query += ")";
-***REMOVED***
+
 		String lastID = "";
 		String mapEnd = "";
 		String names  = "";
-***REMOVED***
+
 		ResultSet namesSet	= fetch_children_names.executeQuery(fetch_children_n_query);
 		ResultSet amountSet = fetch_children_amounts.executeQuery(fetch_children_a_query);
-***REMOVED***
+
 		delim = "";
 		while(namesSet.next()) {
 			if(!lastID.equals(namesSet.getString("id"))) {
@@ -355,7 +355,7 @@ public class fetcher extends HttpServlet {
 		try {
 			// Open DB connection and execute fetch	depending on requested operation
 			Class.forName("com.sap.db.jdbc.Driver");     	
-			java.sql.Connection conn = java.sql.DriverManager.getConnection("jdbc:sap://***REMOVED***","***REMOVED***","***REMOVED***");    	
+			java.sql.Connection conn = java.sql.DriverManager.getConnection("jdbc:sap://192.168.30.43:30015","SYSTEM","manager");    	
 			
 			switch (operation) {
 			case "fields":

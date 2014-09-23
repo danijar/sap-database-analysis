@@ -4,8 +4,8 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <fstream>
-***REMOVED***
-***REMOVED***
+
+
 /*
  * Stream to serialize values to disk.
  */
@@ -25,8 +25,8 @@ public:
 private:
 	std::ofstream stream;
 };
-***REMOVED***
-***REMOVED***
+
+
 /*
  * Stream to deserialize values from disk.
  */
@@ -46,6 +46,6 @@ public:
 private:
 	std::ifstream stream;
 };
-***REMOVED***
+
 // Templates
 #include "serialize.tpl"

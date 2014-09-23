@@ -10,35 +10,35 @@
 #include "type/field.h"
 #include "type/ratio.h"
 #include "helper/bar.h"
-***REMOVED***
+
 /*
  * This namespace holds all code that connects to the database.
  */
 namespace Queries {
 	using namespace std;
-***REMOVED***
+
 	// Global connection information
-	static string Dsn		= "***REMOVED***";
-	static string User		= "***REMOVED***";
-	static string Password	= "***REMOVED***";
-***REMOVED***
-	static string DBSchema		= "ABAP";
-	static string InputTable	= "RESULT_V1";
-	static string FieldsTable	= "DD03L";
-	static string OutputPrefix	= "ANALYSIS";
-***REMOVED***
+	static string Dsn		= "";
+	static string User		= "";
+	static string Password	= "";
+
+	static string DBSchema		= "";
+	static string InputTable	= "";
+	static string FieldsTable	= "";
+	static string OutputPrefix	= "";
+
 	static otl_connect db;
-***REMOVED***
+
 	// Helper functions
 	void Connection();
 	shared_ptr<otl_stream> Query(string QueryString, size_t BatchSize = 1, bool ErrorOutput = true);
 	bool Catch(function<void()> Callback);
-***REMOVED***
+
 	// Fetching functions
 	vector<Ratio> Ratios();
 	vector<Field> Fields(string Table);
 	unordered_map<string, unordered_set<Field>> Structures(vector<string> &Names);
-***REMOVED***
+
 	// Inserting functions
 	void Table(string Name, string Columns);
 	void Create();

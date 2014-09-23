@@ -1,9 +1,9 @@
 # Unix line endings
 * text eol=lf
-***REMOVED***
+
 # Source files
 *.cpp text
-***REMOVED***
+
 # Binary files
 *.png binary
 *.jar binary

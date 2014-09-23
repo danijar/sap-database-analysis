@@ -15,17 +15,17 @@ requirejs.config({
         },
     }
 });
-***REMOVED***
+
 require(['tree', 'launchpad'], function(View, Launchpad) {
     var container = $('.container');
-***REMOVED***
+
     // Initialize routes
     var routes = {
         '/?':                function() { Launchpad(container, 0); },
         '/([0-9]+)/?':       function(table) { Launchpad(container, table); },
         '/table/([0-9]+)/?': function(table) { View(container, table); },
     };
-***REMOVED***
+
     // Listen to route changes
     $(window).on('hashchange', function() {
         // Find matching route
@@ -37,7 +37,7 @@ require(['tree', 'launchpad'], function(View, Launchpad) {
             if (matches) {
                 // Cleanup old view
                 container.children().remove();
-***REMOVED***
+
                 // Create view with captured groups
                 var args = matches.slice(1, matches.length);
                 routes[i].apply(undefined, args);
@@ -48,7 +48,7 @@ require(['tree', 'launchpad'], function(View, Launchpad) {
         // No route found
         console.error("No route matches the hash '" + hash + "'.");
     });
-***REMOVED***
+
     // Load initial view
     $(window).trigger('hashchange');
 });

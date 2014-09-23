@@ -1,12 +1,12 @@
 #include "helper/jsonize.h"
 using namespace std;
-***REMOVED***
-***REMOVED***
+
+
 Jsonize::Jsonize(std::string Path) : path(Path)
 {
-***REMOVED***
+
 }
-***REMOVED***
+
 Jsonize::~Jsonize()
 {
 	// Write to file
@@ -15,19 +15,19 @@ Jsonize::~Jsonize()
 		stream.flush();
 	}
 }
-***REMOVED***
+
 Jsonize &Jsonize::operator << (const bool &Value)
 {
 	stream << (Value ? "true" : "false");
 	return *this;
 }
-***REMOVED***
+
 Jsonize &Jsonize::operator<<(const std::string &Value)
 {
 	stream << "\"" << Value << "\"";
 	return *this;
 }
-***REMOVED***
+
 bool Jsonize::Flush()
 {
 	// Write to file
@@ -41,21 +41,21 @@ bool Jsonize::Flush()
 	
 	// Prevent destructor from saving as file
 	flushed = true;
-***REMOVED***
+
 	return true;
 }
-***REMOVED***
+
 string Jsonize::Dissolve()
 {
 	// Prevent destructor from saving as file
 	flushed = true;
-***REMOVED***
+
 	// Get string and empty stream
 	string content = stream.str();
 	stream.clear();
 	
 	// Return placeholder since this is currently not working
 	return "{}";
-***REMOVED***
+
 	return content;
 }

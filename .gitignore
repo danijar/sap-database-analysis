@@ -2,7 +2,7 @@
 /Debug
 /Release
 /x64
-***REMOVED***
+
 # Project files
 *.sdf
 *.opensdf
@@ -11,20 +11,20 @@
 *.vcxproj.user
 *.vcxproj.filters
 *.v12.suo
-***REMOVED***
+
 # Binaries
 *.exe
-***REMOVED***
+
 # Dumps
 *.dump
 *.json
-***REMOVED***
+
 # Latex
 *.pdf
 *.aux
 *.log
 *.synctex.gz
-***REMOVED***
+
 # Visual Paradigm
 *.vpp.working
 *.vpp~*

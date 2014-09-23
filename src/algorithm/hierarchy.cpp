@@ -2,8 +2,8 @@
 #include <iostream>
 #include "helper/serialize.h"
 using namespace std;
-***REMOVED***
-***REMOVED***
+
+
 // Constructor
 Hierarchy::Hierarchy(Ratios &Ratios, string Path, bool ForceFetch) : ids(Ratios.ids), names(Ratios.names), ratios(Ratios.ratios)
 {
@@ -12,33 +12,33 @@ Hierarchy::Hierarchy(Ratios &Ratios, string Path, bool ForceFetch) : ids(Ratios.
 		cout << "Loaded cached hierarchy." << endl;
 		return;
 	}
-***REMOVED***
+
 	Generate();
 	if (ids.size())
 		Save(Path);
 }
-***REMOVED***
+
 // Reset and load data from disk
 bool Hierarchy::Load(string Path)
 {
 	if (!Saved())
 		return false;
-***REMOVED***
+
 	// Reset data
 	children.clear();
-***REMOVED***
+
 	// Initialize stream
 	Deserialize in(Path);
 	if (!in.Good())
 		return false;
-***REMOVED***
+
 	// Read data
 	in >> children;
 	in >> amounts;
-***REMOVED***
+
 	return true;
 }
-***REMOVED***
+
 // Save current data to disk
 bool Hierarchy::Save(string Path)
 {
@@ -46,14 +46,14 @@ bool Hierarchy::Save(string Path)
 	Serialize out(Path);
 	if (!out.Good())
 		return false;
-***REMOVED***
+
 	// Write data
 	out << children;
 	out << amounts;
-***REMOVED***
+
 	return true;
 }
-***REMOVED***
+
 // Check whether there is a dump file at this location
 bool Hierarchy::Saved(string Path)
 {
@@ -62,7 +62,7 @@ bool Hierarchy::Saved(string Path)
 	stream.close();
 	return result;
 }
-***REMOVED***
+
 // Find head tables
 unordered_set<size_t> Hierarchy::Heads()
 {
@@ -71,14 +71,14 @@ unordered_set<size_t> Hierarchy::Heads()
 	heads.reserve(ratios.size() - 1);
 	for (size_t i = 1; i < ratios.size(); ++i)
 		heads.insert(heads.end(), i);
-***REMOVED***
+
 	// Remove tables that have parents
 	Bar bar("Find head tables", ratios.size());
 	for (auto i = ratios.begin(); i != ratios.end(); i++, bar++)
 		for (auto j = i->begin(); j != i->end(); ++j)
 			heads.erase(j->first);
 	bar.Finish();
-***REMOVED***
+
 	// Remove tables that have no children
 	auto iterator = heads.begin();
 	while (iterator != heads.end()) {
@@ -86,10 +86,10 @@ unordered_set<size_t> Hierarchy::Heads()
 		if (*i > children.size() - 1 || !children[*i].size())
 			heads.erase(i);
 	}
-***REMOVED***
+
 	return heads;
 }
-***REMOVED***
+
 void Hierarchy::Generate()
 {
 	// Add children of all nodes to hierarchy
@@ -100,12 +100,12 @@ void Hierarchy::Generate()
 	for (size_t i = 1; i < names.size(); i++, bar++)
 		Children(i);
 	bar.Finish();
-***REMOVED***
+
 	// Attach head tables to root node
 	auto heads = Heads();
 	for (auto i = heads.begin(); i != heads.end(); ++i)
 		children[0].insert(*i);
-***REMOVED***
+
 	// Calculate recursive amount of children starting at root
 	amounts.clear();
 	amounts.resize(names.size());
@@ -113,17 +113,17 @@ void Hierarchy::Generate()
 	Amount(0, &amount_bar);
 	amount_bar.Finish();
 }
-***REMOVED***
+
 // Return list of all tables under the specified one
 unordered_set<size_t> Hierarchy::Subchildren(size_t Root)
 {
 	unordered_set<size_t> result;
-***REMOVED***
+
 	// Iterate over direct children
 	for (auto i = children[Root].begin(); i != children[Root].end(); ++i) {
 		// Add direct children itself
 		result.insert(*i);
-***REMOVED***
+
 		// Recusrively add next levels
 		auto current = Subchildren(*i);
 		result.insert(current.begin(), current.end());
@@ -131,14 +131,14 @@ unordered_set<size_t> Hierarchy::Subchildren(size_t Root)
 	
 	return result;
 }
-***REMOVED***
+
 // Add children of given table to hierarchy
 void Hierarchy::Children(size_t Id)
 {
 	// Skip if there are no children
 	if (Id > ratios.size() - 1)
 		return;
-***REMOVED***
+
 	// Process children
 	for (auto i = ratios[Id].begin(); i != ratios[Id].end(); ++i) {
 		size_t child = i->first;
@@ -147,15 +147,15 @@ void Hierarchy::Children(size_t Id)
 		if (processed.find(child) != processed.end())
 			continue;
 		processed.insert(child);
-***REMOVED***
+
 		// Start with actual parent based on input data
 		size_t parent = Id;
 		float ratio = i->second;
-***REMOVED***
+
 		// Try to find stronger match among siblings
 		for (auto j = ratios[Id].begin(); j != ratios[Id].end(); ++j) {
 			size_t current = j->first;
-***REMOVED***
+
 			// Check for connection to current table
 			if (ratios[current].find(child) == ratios[current].end())
 				continue;
@@ -166,12 +166,12 @@ void Hierarchy::Children(size_t Id)
 				ratio = ratios[current][child];
 			}
 		}
-***REMOVED***
+
 		// Add to tree
 		children[parent].insert(child);
 	}
 }
-***REMOVED***
+
 // Calculate recursive amount of children
 size_t Hierarchy::Amount(size_t Id, Bar *Bar)
 {
