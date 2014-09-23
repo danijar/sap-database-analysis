@@ -3,12 +3,12 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 	var element;
 	var datas = {};
 	var connections = {};
-***REMOVED***
+
 	function initialize(container, root) {
 		// Create and attach container
 		element = $('<div class="tree">');
 		container.html(element);
-***REMOVED***
+
 		// Fetch and add root node
 		var url = 'http://localhost:8080/fetcher/' + root;
 		$.getJSON(url).done(function(data) {
@@ -16,7 +16,7 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			// Expand first level of children
 			$('#' + escape(root) + ' > .inner').click();
 		}).error(console.error);
-***REMOVED***
+
 		// Events
 		element.on('click', '.inner', function() {
 			// Lazy load children when clicking a table
@@ -32,7 +32,7 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			return false;
 		});
 	}
-***REMOVED***
+
 	// Escape special chars for proper id selectors
 	function escape(name) {
 		var result = "";
@@ -43,12 +43,12 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 		}
 		return result;
 	}
-***REMOVED***
+
 	// Render a table
 	function node(data, parent) {
 		// Cache data
 		datas[data.id] = data;
-***REMOVED***
+
 		// Structure changes
 		var difference = $('<div class="difference">');
 		if (data.added.length) {
@@ -65,18 +65,18 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			});
 			difference.append(removed);
 		}
-***REMOVED***
+
 		// Copies
 		var more = $('<p class="more">');
 		if (data.names.length > 1)
 			more.append('Represents ' + data.names.length + ' tables');
-***REMOVED***
+
 		// Table
 		var inner = $('<div class="inner">');
 		inner.append('<h2>' + data.names[0] + '</h2>');
 		inner.append(more);
 		inner.append(difference);
-***REMOVED***
+
 		// Information about descendants
 		var paragraph = '<p>';
 		var number = data.children ? data.children.length : 0;
@@ -86,13 +86,13 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			paragraph += number + (number > 1 ? ' children' : ' child');
 		paragraph += '</p>';
 		inner.append(paragraph);
-***REMOVED***
+
 		// Wrapper containing table and children
 		var table = $('<div class="table" id="' + data.id + '">');
 		table.append(inner);
 		table.append('<br>');
 		table.append('<div class="children">');
-***REMOVED***
+
 		// Append to parent
 		if (parent) {
 			$('#' + escape(parent) + ' > .children').append(table);
@@ -101,7 +101,7 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			document.title = data.names[0];
 		}
 	}
-***REMOVED***
+
 	function toggle(table) {
 		var url = 'http://localhost:8080/fetcher/' + table + '/children';
 		$.getJSON(url).done(function(children) {
@@ -109,17 +109,17 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			var tablebox = $('#' + escape(table));
 			var childrenbox = tablebox.children('.children');
 			var innerbox = tablebox.children('.inner');
-***REMOVED***
+
 			// Keep view
 			var oldoffset = innerbox.offset();
-***REMOVED***
+
 			// Load children
 			if (!childrenbox.children().length) {
 				_.each(children, function(child) {
 					node(child, table);
 				});
 			}
-***REMOVED***
+
 			// Expand or collapse
 			if (childrenbox.hasClass('visible')) {
 				// Remove line connections
@@ -128,25 +128,25 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 					connections[key].remove();
 					delete connections[key];
 				});
-***REMOVED***
+
 				// Hide
 				childrenbox.removeClass('visible');
 			} else {
 				// Show
 				childrenbox.addClass('visible');
-***REMOVED***
+
 				// Add line connections
 				childrenbox.children().each(function() {
 					var key = $(this).attr('id');
 					connections[key] = Connection(tablebox, $(this), innerbox);
 				});
 			}
-***REMOVED***
+
 			// Restore view
 			var newoffset = innerbox.offset();
 			$('body').scrollTop($('body').scrollTop() - (oldoffset.top - newoffset.top));
 			$('body').scrollLeft($('body').scrollLeft() - (oldoffset.left - newoffset.left));
-***REMOVED***
+
 			// Update all connections
 			_.each(connections, function(connection) {
 				connection.update();
@@ -156,14 +156,14 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			console.error(error);
 		});
 	}
-***REMOVED***
+
 	function popup(table) {
 		var url = 'http://localhost:8080/fetcher/' + table + '/fields';
 		$.getJSON(url).done(function(fields) {
 			var popup = Popup();
-***REMOVED***
+
 			popup.append('<h1>' + datas[table].names[0] + '</h1>');
-***REMOVED***
+
 			var header = $('<p>');
 			if (datas[table].names.length > 1) {
 				names = datas[table].names[1];
@@ -173,7 +173,7 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			}
 			header.append('You can open <a href="/viewer/#/table/' + table + '" target="_blank" class="gray">this table</a> in a new tab.');
 			popup.append(header);
-***REMOVED***
+
 			var rows = '<table><thead><tr><th>Name</th><th>Key</th><th>Type</th><th>Length</th><th>Domain</th><th>Role</th></tr></thead>';
 			rows += '<tbody>';
 			_.each(fields, function(field) {
@@ -184,7 +184,7 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			});
 			rows += '</tbody></table>'
 			popup.append(rows);
-***REMOVED***
+
 			var keys = _.where(fields, { key: true }).length;
 			if (keys)
 				keys = keys.toString();
@@ -194,10 +194,10 @@ define(['jquery', 'underscore', 'connection', 'popup'], function($, _, Connectio
 			popup.append(footer);
 		}).error(console.error);
 	}
-***REMOVED***
+
 	function main(container, root) {
 		initialize(container, root);
 	}
-***REMOVED***
+
 	return main;
 });

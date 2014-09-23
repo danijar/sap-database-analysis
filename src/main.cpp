@@ -12,11 +12,11 @@
 #include "helper/benchmark.h"
 #include "helper/bar.h"
 using namespace std;
-***REMOVED***
+
 void storeInDB(size_t tabID, Hierarchy hierarchy, Structures structures) {
 	// Reset tables
 	Queries::Create();
-***REMOVED***
+
 	// Fill with all tables in cluster
 	unordered_set<size_t> subchildren = hierarchy.Subchildren(tabID);
 	subchildren.insert(tabID);
@@ -30,7 +30,7 @@ void storeInDB(size_t tabID, Hierarchy hierarchy, Structures structures) {
 				break;
 			}
 		}
-***REMOVED***
+
 		// Insert into database
 		bool result = Queries::Store(*i,
 			hierarchy.names[*i],
@@ -45,8 +45,8 @@ void storeInDB(size_t tabID, Hierarchy hierarchy, Structures structures) {
 	}
 	bar.Finish();
 }
-***REMOVED***
-***REMOVED***
+
+
 void loadConfig() {
 	ifstream dbConnectionFile("Settings.cfg");
 	if (!dbConnectionFile.good() || dbConnectionFile.eof())
@@ -61,52 +61,40 @@ void loadConfig() {
 			return;
 		// Now the next value and assing
 		dbConnectionFile.getline(valueBuffer, 200);
-***REMOVED***
-		if (strcmp(keyBuffer, "Dsn:") == 0) {
+
+		if (strcmp(keyBuffer, "Dsn:") == 0)
 			Queries::Dsn = string(valueBuffer);
-		}
-		if (strcmp(keyBuffer, "User:") == 0) {
+		if (strcmp(keyBuffer, "User:") == 0)
 			Queries::User = string(valueBuffer);
-		}
-		if (strcmp(keyBuffer, "Password:") == 0) {
+		if (strcmp(keyBuffer, "Password:") == 0)
 			Queries::Password = string(valueBuffer);
-		}
-		if (strcmp(keyBuffer, "DBSchema:") == 0) {
+		if (strcmp(keyBuffer, "DBSchema:") == 0)
 			Queries::DBSchema = string(valueBuffer);
-		}
-		if (strcmp(keyBuffer, "InputTable:") == 0) {
+		if (strcmp(keyBuffer, "InputTable:") == 0)
 			Queries::InputTable = string(valueBuffer);
-		}
-		if (strcmp(keyBuffer, "FieldsTable:") == 0) {
+		if (strcmp(keyBuffer, "FieldsTable:") == 0)
 			Queries::FieldsTable = string(valueBuffer);
-		}
-		if (strcmp(keyBuffer, "OutputPrefix:") == 0) {
+		if (strcmp(keyBuffer, "OutputPrefix:") == 0)
 			Queries::OutputPrefix = string(valueBuffer);
-		}
 	}
-***REMOVED***
+
 }
-***REMOVED***
+
 int main(int argc, char *argv[])
 {
-	// Database credentials
-	Queries::Dsn = "***REMOVED***";
-	Queries::User = "***REMOVED***";
-	Queries::Password = "***REMOVED***";
-***REMOVED***
 	// Load from files if possible
 	loadConfig();
+
 	// Compute ratio graph, hierarchy and differences
-	bool	force_fetch = false;
-***REMOVED***
-	if (argc > 1 && strcmp(argv[1], "clean") == 0) {
+	bool force_fetch = false;
+
+	if (argc > 1 && strcmp(argv[1], "clean") == 0)
 		force_fetch = true;
-	}
-***REMOVED***
+
 	Ratios ratios("data/ratios.dump", force_fetch);
 	Hierarchy hierarchy(ratios, "data/hierarchy.dump", force_fetch);
 	Structures structures(ratios, hierarchy, "data/structures.dump", force_fetch);
-***REMOVED***
+
 	/*
 	// Benchmark structure generation
 	Benchmark::Output = true;
@@ -120,7 +108,7 @@ int main(int argc, char *argv[])
 	}
 	benchmark.Finish();
 	*/
-***REMOVED***
+
 	/*
 	// Wait for user input
 	cout << "Press enter to start hierarchy navigator..." << endl;
@@ -131,9 +119,9 @@ int main(int argc, char *argv[])
 	// Check if only need to export
 	if (argc > 1 && strcmp(argv[argc-1], "export") == 0) {
 		storeInDB(0, hierarchy, structures);
-		return 1;
+		return 0;
 	}
-***REMOVED***
+
 	// Navigate through hierarchie
 	Navigator navigator(hierarchy, structures);
 }

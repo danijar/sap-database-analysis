@@ -7,8 +7,8 @@
 #include "helper/bar.h"
 #include "helper/serialize.h"
 using namespace std;
-***REMOVED***
-***REMOVED***
+
+
 // Constructor checks for dump or queries
 Ratios::Ratios(string Path, bool ForceFetch)
 {
@@ -17,12 +17,12 @@ Ratios::Ratios(string Path, bool ForceFetch)
 		cout << "Loaded cached ratios." << endl;
 		return;
 	}
-***REMOVED***
+
 	Fetch();
 	if (ids.size())
 		Save(Path);
 }
-***REMOVED***
+
 // Fetch input from database and generate graph from it
 void Ratios::Fetch(bool Output)
 {
@@ -30,18 +30,18 @@ void Ratios::Fetch(bool Output)
 	ids.clear();
 	names.clear();
 	ratios.clear();
-***REMOVED***
+
 	// Query rows from database
 	rows = Queries::Ratios();
 	Generate();
-***REMOVED***
+
 	// Output
 	if (Output) {
 		// Count connections
 		size_t connections = 0;
 		for (auto i = ratios.begin(); i != ratios.end(); ++i)
 			connections += i->size();
-***REMOVED***
+
 		// Print message
 		cout << fixed;
 		cout << "Loaded "
@@ -52,13 +52,13 @@ void Ratios::Fetch(bool Output)
 		cout << scientific;
 	}
 }
-***REMOVED***
+
 // Reset and load data from disk
 bool Ratios::Load(string Path)
 {
 	if (!Saved())
 		return false;
-***REMOVED***
+
 	// Reset data
 	rows.clear();
 	ids.clear();
@@ -69,16 +69,16 @@ bool Ratios::Load(string Path)
 	Deserialize in(Path);
 	if (!in.Good())
 		return false;
-***REMOVED***
+
 	// Read data
 	in >> rows;
 	in >> ids;
 	in >> names;
 	in >> ratios;
-***REMOVED***
+
 	return true;
 }
-***REMOVED***
+
 // Save current data to disk
 bool Ratios::Save(string Path)
 {
@@ -86,16 +86,16 @@ bool Ratios::Save(string Path)
 	Serialize out(Path);
 	if (!out.Good())
 		return false;
-***REMOVED***
+
 	// Write data
 	out << rows;
 	out << ids;
 	out << names;
 	out << ratios;
-***REMOVED***
+
 	return true;
 }
-***REMOVED***
+
 // Check whether there is a dump file at this location
 bool Ratios::Saved(string Path)
 {
@@ -104,7 +104,7 @@ bool Ratios::Saved(string Path)
 	stream.close();
 	return result;
 }
-***REMOVED***
+
 // Build ratio graph
 void Ratios::Generate()
 {
@@ -113,20 +113,20 @@ void Ratios::Generate()
 		cout << "No rows to process." << endl;
 		return;
 	}
-***REMOVED***
+
 	// Clear data
 	names.clear();
 	ids.clear();
 	ratios.clear();
-***REMOVED***
+
 	// Push root node at index zero
 	names.push_back({"<root>"});
 	ids.insert(make_pair("<root>", 0));
 	ratios.emplace_back();
-***REMOVED***
+
 	// Fetch distinct table names
 	Bar bar("Unpack data", rows.size() * 2);
-***REMOVED***
+
 	for (auto i = rows.begin(); i != rows.end(); i++, bar++) {
 		// Get or generate parent id		
 		size_t parent_id = Id(i->parent);
@@ -142,7 +142,7 @@ void Ratios::Generate()
 			Id(i->child);
 		
 	}
-***REMOVED***
+
 	// Create graph from query rows
 	ratios.resize(names.size());
 	
@@ -155,13 +155,13 @@ void Ratios::Generate()
 		if (parent == child) continue;
 		if (parent > ratios.size() - 1)
 			cout << endl << parent << endl << ratios.size();
-***REMOVED***
+
 		// Add parent ratio
 		ratios[parent][child] = i->parentratio;
 	}
 	bar.Finish();
 }
-***REMOVED***
+
 // Get or create id of a table name
 size_t Ratios::Id(string name)
 {
@@ -174,25 +174,25 @@ size_t Ratios::Id(string name)
 		
 		return id;
 	}
-***REMOVED***
+
 	// Otherwise return existing
 	else
 		return i->second;
 }
-***REMOVED***
+
 // Calculate memory size in bytes
 size_t Ratios::Size()
 {
 	size_t size = 0;
-***REMOVED***
+
 	// Dictionary encoded names
 	for (auto i = ids.begin(); i != ids.end(); ++i)
 		size += i->first.length() + sizeof(size_t);
-***REMOVED***
+
 	// Ratios
 	size += ratios.size() * sizeof(size_t);
 	for (auto i = ratios.begin(); i != ratios.end(); ++i)
 		size += i->size() * (sizeof(size_t) + sizeof(float));
-***REMOVED***
+
 	return size;
 }

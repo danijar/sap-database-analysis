@@ -6,8 +6,8 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
-***REMOVED***
-***REMOVED***
+
+
 /*
  * Stream to serialize values to disk.
  */
@@ -27,11 +27,11 @@ public:
 private:
 	template <typename T> std::string tolerant_to_string(T Value);
 	template <> std::string tolerant_to_string(std::string Value);
-***REMOVED***
+
 	std::stringstream stream;
 	std::string path;
 	bool flushed = false;
 };
-***REMOVED***
+
 // Templates
 #include "jsonize.tpl"

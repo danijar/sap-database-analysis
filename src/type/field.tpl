@@ -1,8 +1,8 @@
 #pragma once
 #include <functional>
 #include "field.h"
-***REMOVED***
-***REMOVED***
+
+
 // Type traits
 namespace std {
 	template <>

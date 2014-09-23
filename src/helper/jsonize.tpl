@@ -1,12 +1,12 @@
 #pragma once
 #include "jsonize.h"
-***REMOVED***
+
 template <typename T> Jsonize &Jsonize::operator<<(const T &Value)
 {
 	this->stream << Value;
 	return *this;
 }
-***REMOVED***
+
 template <typename TLeft, typename TRight> Jsonize &Jsonize::operator<<(const std::pair<TLeft, TRight> Value)
 {
 	stream << "[";
@@ -14,7 +14,7 @@ template <typename TLeft, typename TRight> Jsonize &Jsonize::operator<<(const st
 	stream << "]";
 	return *this;
 }
-***REMOVED***
+
 template <typename T> Jsonize &Jsonize::operator<<(const std::vector<T> &Value)
 {
 	stream << "[";
@@ -26,7 +26,7 @@ template <typename T> Jsonize &Jsonize::operator<<(const std::vector<T> &Value)
 	stream << "]";
 	return *this;
 }
-***REMOVED***
+
 template <typename T> Jsonize &Jsonize::operator<<(const std::unordered_set<T> &Value)
 {
 	stream << "[";
@@ -38,7 +38,7 @@ template <typename T> Jsonize &Jsonize::operator<<(const std::unordered_set<T> &
 	stream << "]";
 	return *this;
 }
-***REMOVED***
+
 template <typename TKey, typename TVal> Jsonize &Jsonize::operator<<(const std::unordered_map<TKey, TVal> &Value)
 {
 	stream << "{";
@@ -50,12 +50,12 @@ template <typename TKey, typename TVal> Jsonize &Jsonize::operator<<(const std::
 	stream << "}";
 	return *this;
 }
-***REMOVED***
+
 template <typename T> std::string Jsonize::tolerant_to_string(T Value)
 {
 	return std::to_string(Value);
 }
-***REMOVED***
+
 template <> std::string Jsonize::tolerant_to_string(std::string Value)
 {
 	return Value;

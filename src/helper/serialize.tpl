@@ -1,7 +1,7 @@
 #pragma once
 #include "serialize.h"
-***REMOVED***
-***REMOVED***
+
+
 template <typename T> Serialize &Serialize::operator<<(const std::vector<T> Value)
 {
 	*this << Value.size();
@@ -9,13 +9,13 @@ template <typename T> Serialize &Serialize::operator<<(const std::vector<T> Valu
 		*this << *i;
 	return *this;
 }
-***REMOVED***
+
 template <typename TLeft, typename TRight> Serialize &Serialize::operator<<(const std::pair<TLeft, TRight> Value)
 {
 	*this << Value.first << Value.second;
 	return *this;
 }
-***REMOVED***
+
 template <typename T> Serialize &Serialize::operator<<(const std::unordered_set<T> Value)
 {
 	*this << Value.size();
@@ -23,7 +23,7 @@ template <typename T> Serialize &Serialize::operator<<(const std::unordered_set<
 		*this << *i;
 	return *this;
 }
-***REMOVED***
+
 template <typename TKey, typename TVal> Serialize &Serialize::operator<<(const std::unordered_map<TKey, TVal> Value)
 {
 	*this << Value.size();
@@ -31,13 +31,13 @@ template <typename TKey, typename TVal> Serialize &Serialize::operator<<(const s
 		*this << i->first << i->second;
 	return *this;
 }
-***REMOVED***
+
 template <typename TLeft, typename TRight> Deserialize &Deserialize::operator>>(std::pair<TLeft, TRight> &Value)
 {
 	*this >> Value.first >> Value.second;
 	return *this;
 }
-***REMOVED***
+
 template <typename T> Deserialize &Deserialize::operator>>(std::vector<T> &Value)
 {
 	size_t size;
@@ -49,7 +49,7 @@ template <typename T> Deserialize &Deserialize::operator>>(std::vector<T> &Value
 	}
 	return *this;
 }
-***REMOVED***
+
 template <typename T> Deserialize &Deserialize::operator>>(std::unordered_set<T> &Value)
 {
 	size_t size;
@@ -61,7 +61,7 @@ template <typename T> Deserialize &Deserialize::operator>>(std::unordered_set<T>
 	}
 	return *this;
 }
-***REMOVED***
+
 template <typename TKey, typename TVal> Deserialize &Deserialize::operator>>(std::unordered_map<TKey, TVal> &Value)
 {
 	size_t size;
